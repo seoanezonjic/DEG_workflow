@@ -5,6 +5,9 @@ INPUT_FOLDER=$1
 RESULTS_FOLDER=$2
 TARGET_FILE=$3
 
+cat $INPUT_FOLDER/*/metrics > $RESULTS_FOLDER'/all_metrics'
+create_metric_table.rb $RESULTS_FOLDER'/all_metrics' sample $RESULTS_FOLDER'/metric_table'
+
 mkdir $RESULTS_FOLDER
 controls=`grep 'Ctrl' $TARGET_FILE | cut -f 1 | tr "\n" ","`
 controls=${controls%?}
