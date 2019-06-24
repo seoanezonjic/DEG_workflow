@@ -17,7 +17,7 @@ clean_samples){
 	get_fastqc_data.rb -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
 }
 
-align_rna_seq){
+%align_rna_seq){
 	resources: -m '30gb' -c 2 -t '10:00:00'
 	module load star/2.5.3a
 	module load qualimap/2.2.1

@@ -3,7 +3,6 @@
 framework_dir=`dirname $0`
 CODE_PATH=$(readlink -f $framework_dir )
 export PATH=$CODE_PATH'/aux_sh:'$PATH
-
 ## DAEMON VARS
 ###################################
 project_folder=`pwd`'/project_execution'
@@ -15,6 +14,7 @@ MAPPING_RESULTS_FOLDER=$project_folder'/clean_and_map/'
 HUNTER_RESULTS_FOLDER=$project_folder'/DEGenesHunter_results'
 TARGET_FILE="target.txt"
 
+REPORT_TEMPLATES_FOLDER=$CODE_PATH"/templates/reports"
 
 ## WORKFLOW VARS
 ##################################
@@ -48,7 +48,7 @@ elif [ "$1" == "2" ] ; then
 elif [ "$1" == "3" ] ; then
 #STAGE 2 (Sample comparison)
 	echo "Launching stage 3"
-	compare_all_samples.sh $MAPPING_RESULTS_FOLDER $HUNTER_RESULTS_FOLDER $TARGET_FILE
+	compare_all_samples.sh $MAPPING_RESULTS_FOLDER $HUNTER_RESULTS_FOLDER $TARGET_FILE $REPORT_TEMPLATES_FOLDER
 
 elif [ "$1" == "4" ] ; then
 	check_wf.sh $MAPPING_RESULTS_FOLDER $SAMPLES_FILE

@@ -1,0 +1,19 @@
+# Report showing alignment details and stats
+
+```{r  echo=FALSE, warning=FALSE, message=FALSE}
+	library(reshape2)
+	library(ggplot2)
+
+	metric_table <- data[['metric_table']]
+	make_stacked_barchart_from_df <- function(df, id, other_vars) {
+		reduced_df <- df[,c(id, other_vars)]
+		melt_df <- melt(reduced_df, id.vars = id )
+		g <- ggplot(melt_df, aes_string(x=id, y="value", fill="variable"))
+		g + geom_bar(stat='identity', position=position_dodge())
+	}
+	make_stacked_barchart_from_df(
+		df = metric_table, 
+        id = "sample", 
+        other_vars = c("initial_total_sequences", "final_total_sequences")
+    )
+```

@@ -4,11 +4,14 @@ source ~soft_bio_267/initializes/init_degenes_hunter
 INPUT_FOLDER=$1
 RESULTS_FOLDER=$2
 TARGET_FILE=$3
-
-cat $INPUT_FOLDER/*/metrics > $RESULTS_FOLDER'/all_metrics'
-create_metric_table.rb $RESULTS_FOLDER'/all_metrics' sample $RESULTS_FOLDER'/metric_table'
+REPORT_TEMPLATES_FOLDER=$4
 
 mkdir $RESULTS_FOLDER
+cat $INPUT_FOLDER/*/metrics > $RESULTS_FOLDER'/all_metrics'
+create_metric_table.rb $RESULTS_FOLDER'/all_metrics' sample $RESULTS_FOLDER'/metric_table'
+create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $RESULTS_FOLDER/alignments_report.html -d $RESULTS_FOLDER/metric_table -H t
+# Exit so as to not keep going unnecessarily to folder generation... for now
+exit
 controls=`grep 'Ctrl' $TARGET_FILE | cut -f 1 | tr "\n" ","`
 controls=${controls%?}
 treatments=`grep 'Treat' $TARGET_FILE | cut -f 1 | tr "\n" ","`
