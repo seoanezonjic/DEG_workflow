@@ -13,12 +13,13 @@ clean_samples){
 		seqtrimbb -t transcriptomics.txt -Q $read_folder'/'$sample'.fastq.gz' -w [cpu] -O output_files
 
 	fi
+	# . ~soft_bio_267/initializes/init_ruby 
 	get_fastqc_data.rb -i 'output_files/initial_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tinitial_" $0 }' >> ../metrics
 	get_fastqc_data.rb -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
 }
 
-%align_rna_seq){
-	resources: -m '30gb' -c 2 -t '10:00:00'
+align_rna_seq){
+	resources: -m '4gb' -c 2 -t '10:00:00'
 	module load star/2.5.3a
 	module load qualimap/2.2.1
 	module load samtools
@@ -27,9 +28,12 @@ clean_samples){
 		STAR --runThreadN [cpu] --genomeDir $ref/index --readFilesIn clean_samples)/output_files/paired_1.fastq.gz clean_samples)/output_files/paired_2.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate
 	elif [ "$read_layout" == "single" ] ; then
 		STAR --runThreadN [cpu] --genomeDir $ref/index --readFilesIn clean_samples)/output_files/sequences_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate
-
 	fi
 	qualimap bamqc -bam Aligned.sortedByCoord.out.bam -outdir results
 	sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
 	cut -f 1,$star_count_column ReadsPerGene.out.tab > selected_counts
+
+	parse_STAR_log.R -d Log.final.out | awk '{print "$sample" "\t" $0}' >> ../metrics
+
+	awk 'NR>4 {sum+=$2} END {print sum}' selected_counts |  awk '{print "$sample" "\t" "aligned_to_feature" "\t" $0 }' >> ../metrics
 }

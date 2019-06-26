@@ -3,6 +3,7 @@
 framework_dir=`dirname $0`
 CODE_PATH=$(readlink -f $framework_dir )
 export PATH=$CODE_PATH'/aux_sh:'$PATH
+export PATH=$CODE_PATH'/aux_parsers:'$PATH
 ## DAEMON VARS
 ###################################
 project_folder=`pwd`'/project_execution'

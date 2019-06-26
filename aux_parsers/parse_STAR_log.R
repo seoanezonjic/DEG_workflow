@@ -28,5 +28,5 @@ clean_split_lines <- lapply(split_lines, function(x) {
     }
 )
 invisible(
-	lapply(clean_split_lines, function(x) cat(x[1], "\t", x[2], "\n"))
+	lapply(clean_split_lines, function(x) cat(x[1], "\t", x[2], "\n", sep=""))
 )
