@@ -1,4 +1,4 @@
-. ~soft_cvi_114/initializes/init_autoflow
+. ~soft_bio_267/initializes/init_autoflow
 
 TEMPLATE=$1
 OUTPUT_FOLDER=$2
