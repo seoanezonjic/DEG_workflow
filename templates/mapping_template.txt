@@ -19,7 +19,7 @@ clean_samples){
 }
 
 align_rna_seq){
-	resources: -m '4gb' -c 2 -t '10:00:00'
+	resources: -m '30gb' -c 2 -t '10:00:00'
 	module load star/2.5.3a
 	module load qualimap/2.2.1
 	module load samtools
