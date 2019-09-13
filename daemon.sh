@@ -6,10 +6,12 @@ export PATH=$CODE_PATH'/aux_sh:'$PATH
 export PATH=$CODE_PATH'/aux_parsers:'$PATH
 ## DAEMON VARS
 ###################################
-project_folder=`pwd`'/project_execution'
+#project_folder=`pwd`'/project_execution'
+project_folder=$SCRATCH'/NGS_projects/aurora_omicas/executions/mRNAseq'
 TEMPLATE=$CODE_PATH"/templates/mapping_template.txt"
-SAMPLES_FILE=$project_folder"/samples_to_process.lst"
-read_layout='single' # paired
+#SAMPLES_FILE=$project_folder"/samples_to_process.lst"
+SAMPLES_FILE=./samples_to_process.lst
+read_layout='paired' #'single' # paired
 
 MAPPING_RESULTS_FOLDER=$project_folder'/clean_and_map/'
 HUNTER_RESULTS_FOLDER=$project_folder'/DEGenesHunter_results'
@@ -23,9 +25,11 @@ REPORT_TEMPLATES_FOLDER=$CODE_PATH"/templates/reports"
 # General
 #-----------------
 RESOURCES="-c 2 -t 10:00:00 -n cal"
-read_path=$project_folder'/raw_data'
-mapping_ref=$project_folder'/references'
-
+#read_path=$project_folder'/raw_data'
+read_path=/mnt/home/users/pab_001_uma/pedro/proyectos/aurora_omicas/data/reestructured/RNA_seq/data
+#mapping_ref=$project_folder'/references'
+mapping_ref=~/proyectos/ramon_areces19/pmm2_belen/project_execution/references/
+stranded='yes' #no
 
 ## STAGE EXECUTION
 #######################################################################
@@ -43,7 +47,7 @@ elif [ "$1" == "1b" ] ; then
 elif [ "$1" == "2" ] ; then
 #STAGE 2 
 	echo "Launching stage 2"
-	GENERAL_VARS="\$read_folder=$read_path,\$star_count_column=2" 
+	GENERAL_VARS="\$read_folder=$read_path,\$stranded=$stranded" 
 	trim_and_map.sh $TEMPLATE $MAPPING_RESULTS_FOLDER $SAMPLES_FILE "$RESOURCES" "$GENERAL_VARS" $mapping_ref $read_layout $2
 
 elif [ "$1" == "3" ] ; then
