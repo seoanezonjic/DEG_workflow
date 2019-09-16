@@ -14,7 +14,7 @@ def load_file(path)
 			# https://groups.google.com/d/msg/rna-star/gZRJx3ElRNo/cDInEONVCAAJ #STAR author comment
 			noFcounts = fields[2..3].map{|i| i.to_i }
 			min_count = noFcounts.min
-			select_col = noFcounts.index(min_count) - 1
+			select_col = noFcounts.index(min_count) + 2
 		end
 		counts << fields
 	end
@@ -33,7 +33,7 @@ optparse = OptionParser.new do |opts|
         end
 
         options[:stranded] = 'no'
-        opts.on( '-s', '--stranded STRING', 'Strand attribute to select colomn counts' ) do |string|
+        opts.on( '-s', '--stranded STRING', 'Strand attribute to select column counts' ) do |string|
             options[:stranded] = string
         end
 
