@@ -1,0 +1,24 @@
+## DAEMON VARS
+###################################
+#project_folder=`pwd`'/project_execution'
+export project_folder=$SCRATCH'/NGS_projects/aurora_omicas/executions/mRNAseq'
+export TEMPLATE=$CODE_PATH"/templates/mapping_template.txt"
+#export SAMPLES_FILE=$project_folder"/samples_to_process.lst"
+export SAMPLES_FILE=./samples_to_process.lst
+export read_layout='paired' #'single' # paired
+
+export MAPPING_RESULTS_FOLDER=$project_folder'/clean_and_map/'
+export HUNTER_RESULTS_FOLDER=$project_folder'/DEGenesHunter_results'
+export TARGET_FILE="target.txt"
+
+## WORKFLOW VARS
+##################################
+
+# General
+#-----------------
+export RESOURCES="-c 2 -t 10:00:00 -n cal"
+#export read_path=$project_folder'/raw_data'
+export read_path=/mnt/home/users/pab_001_uma/pedro/proyectos/aurora_omicas/data/reestructured/RNA_seq/data
+#export mapping_ref=$project_folder'/references'
+export mapping_ref=~/proyectos/ramon_areces19/pmm2_belen/project_execution/references/
+export stranded='yes' #no
