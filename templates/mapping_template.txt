@@ -29,7 +29,7 @@ align_rna_seq){
 	elif [ "$read_layout" == "single" ] ; then
 		STAR --runThreadN [cpu] --genomeDir $ref/index --readFilesIn clean_samples)/output_files/sequences_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate
 	fi
-	qualimap bamqc -bam Aligned.sortedByCoord.out.bam -outdir results
+	qualimap bamqc -bam Aligned.sortedByCoord.out.bam -outdir results --java-mem-size=30G
 	sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
 	#cut -f 1,$star_count_column ReadsPerGene.out.tab > selected_counts
 	select_counts.rb -i ReadsPerGene.out.tab -s $stranded > selected_counts
