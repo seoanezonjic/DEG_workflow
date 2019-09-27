@@ -1,53 +1,161 @@
-# Report showing alignment details and stats
+---
+author: "James Richard Perkins"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    df_print: paged
+    fig_width: 12
+---
 
-```{r  echo=FALSE, warning=FALSE, message=FALSE}
+<style>
+    body .main-container {
+        max-width: 90%;
+    }
+</style>
+
+```{r prior_proc, echo=FALSE, warning=FALSE, message=FALSE}
 	library(reshape2)
 	library(ggplot2)
-
 	metric_table <- data[['metric_table']]
-
-	print(names(metric_table))
-
-	make_stacked_barchart_from_df <- function(df, id, other_vars) {
-		reduced_df <- df[,c(id, other_vars)]
-		melt_df <- melt(reduced_df, id.vars = id )
-		g <- ggplot(melt_df, aes_string(x=id, y="value", fill="variable"))
-		g + geom_bar(stat='identity', position=position_dodge()) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
-	}
-
-	make_scatterplot_from_df <- function(df, var1, var2) {
-		g <- ggplot(df, aes_string(x=var1, y=var2))
-		g + geom_point()
-	}
-
-	cat("Reads before and after trimming:")
-	make_stacked_barchart_from_df(
-		df = metric_table, 
-        id = "sample", 
-        other_vars = c("initial_total_sequences", "final_total_sequences")
-    )
-
-
-
-	cat("Reads mapped to genome, those uniquely mapping, and how many overlap with features:")
-    make_stacked_barchart_from_df(
-		df = metric_table, 
-        id = "sample", 
-        other_vars = c("number_reads", "Uniquely_mapped_reads_number", "aligned_to_feature")
-    )
-
-    cat("Do samples with few aligned genes have low quality scores?:")
-    make_scatterplot_from_df(
-		df = metric_table,
-		var1 = "aligned_to_feature",
-		var2 = "initial_weigthed_qual_per_sequence"
+	metric_var_2_legend_name <- data.frame(
+		metric_var = c("initial_total_sequences", "final_total_sequences", "Uniquely_mapped_reads_.", "X._of_reads_mapped_to_multiple_loci", "X._of_reads_mapped_to_too_many_loci", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other", "Uniquely_mapped_reads_number", "aligned_to_feature", "initial_weigthed_qual_per_sequence", "number_duplicatedreads.estimated.", "final_mean_qual_per_base", "final_min_qual_per_base_in_10th_decile", "final_weigthed_qual_per_sequence"),
+		legend_name = c("Total Reads Before Trimming", "Total Reads After Trimming", "Unique Map %", "Multi Map %", "Multi Map-too many %", "Too Short %", "Other %", "Unique Map", "Aligned to Genomic Feature", "Weighted Sequence Quality Before Trimming", "Estimated Duplicated Reads", "Average Base Quality", "Min Qual per Base (Tenth Decile)", "Weighted Sequence Quality")
 	)
 
-    cat("Number of replicate reads")
-    make_stacked_barchart_from_df(
+	make_stacked_barchart_from_df <- function(df, id, other_vars, legend_names=FALSE) {
+		reduced_df <- df[,c(id, other_vars)]
+		melt_df <- melt(reduced_df, id.vars = id)
+
+		if(FALSE %in% legend_names & length(legend_names) == 1) {
+			legend_names <- other_vars
+		}
+
+		g <- ggplot(melt_df, aes_string(x=id, y="value", fill="variable"))
+		g + geom_bar(stat='identity') + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+		scale_fill_discrete(labels = legend_names) +
+		theme(legend.position="bottom", legend.title = element_blank())
+	}
+
+	make_stacked_barchart_from_df_dodge <- function(df, id, other_vars, legend_names=FALSE) {
+		reduced_df <- df[,c(id, other_vars)]
+		melt_df <- melt(reduced_df, id.vars = id)
+
+		if(FALSE %in% legend_names & length(legend_names) == 1) {
+			legend_names <- other_vars
+		}
+		g <- ggplot(melt_df, aes_string(x=id, y="value", fill="variable"))
+		g + geom_bar(stat='identity', position=position_dodge()) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+		scale_fill_discrete(labels = legend_names) +
+		theme(legend.position="bottom", legend.title = element_blank())
+	}
+
+	make_scatterplot_from_df <- function(df, var1, var2, axis_lab_name1=FALSE, axis_lab_name2=FALSE) {
+		if(axis_lab_name1 == FALSE) axis_lab_name1 <- var1
+		if(axis_lab_name2 == FALSE) axis_lab_name2 <- var2
+		g <- ggplot(df, aes_string(x=var1, y=var2))
+		g + geom_point() +
+		theme(legend.position="bottom") +
+		xlab(axis_lab_name1) + ylab(axis_lab_name2)
+	}
+
+	# this is a little like a barplot, but the absolute values are shown, with a line connecting them.
+	make_vert_line_plot_from_df <- function(df, id, other_vars, legend_names=FALSE){
+		reduced_df <- df[,c(id, other_vars)]
+		melt_df <- melt(reduced_df, id.vars = id)
+
+		if(FALSE %in% legend_names & length(legend_names) == 1) {
+			legend_names <- other_vars
+		}
+
+		ggplot(melt_df, aes(x = sample, y = value, color = variable, group = variable)) + 
+     	geom_point() + geom_line() + scale_color_discrete(labels=legend_names) +
+		theme(legend.position="bottom")
+
+	}
+
+```
+
+# **QC and Alignment Report**
+
+## **QC of reads before alignment**
+### **Total numbers of reads before and after trimming**
+
+```{r trimming, echo=FALSE, warning=FALSE, message=FALSE}
+
+	vars_trimming <- c("initial_total_sequences", "final_total_sequences")
+	# look up these vars in the legend table using match
+	vars_trimming_legend_names <- metric_var_2_legend_name[match(vars_trimming, metric_var_2_legend_name$metric_var), "legend_name" ]
+	make_stacked_barchart_from_df_dodge(
 		df = metric_table, 
         id = "sample", 
-        other_vars = c("initial_total_sequences", "number_duplicatedreads.estimated.")
+        other_vars = vars_trimming,
+        legend_names = vars_trimming_legend_names
     )
+```
 
+### **Quality scores for samples - lowest scores (min/10th decile) and weighted average**
+
+The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.
+```{r qual_scores, echo=FALSE, warning=FALSE, message=FALSE}
+	vars_perc_aligned <- c("final_min_qual_per_base_in_10th_decile", "final_mean_qual_per_base", "final_weigthed_qual_per_sequence")
+	vars_perc_aligned_legend_names <- metric_var_2_legend_name[match(vars_perc_aligned, metric_var_2_legend_name$metric_var), "legend_name" ]
+	make_vert_line_plot_from_df(
+		df = metric_table, 
+		id = "sample", 
+		other_vars = vars_perc_aligned,
+		legend_names = vars_perc_aligned_legend_names
+	)
+```
+
+### **Reads aligning to genes vs sequence quality scores**
+
+Here we plot the number of reads aligning to genomic features against the sequence quality scores
+
+```{r aligned_v_qual, echo=FALSE, warning=FALSE, message=FALSE}
+	vars_aligned_v_qual <- c("aligned_to_feature", "initial_weigthed_qual_per_sequence")
+	vars_aligned_v_qual_legend_names <- metric_var_2_legend_name[match(vars_aligned_v_qual, metric_var_2_legend_name$metric_var), "legend_name" ]
+
+    make_scatterplot_from_df(
+		df = metric_table,
+		var1 = vars_aligned_v_qual[1],
+		var2 = vars_aligned_v_qual[2],
+		axis_lab_name1 = vars_aligned_v_qual_legend_names[1],
+		axis_lab_name2 = vars_aligned_v_qual_legend_names[2]
+	)
+```
+
+## **Alignment Details**
+
+### **Trimmed reads mapping to the genome uniquely, non-uniquely, and not at all**
+
+```{r mapping, echo=FALSE, warning=FALSE, message=FALSE}
+
+	vars_perc_aligned <- c("Uniquely_mapped_reads_.", "X._of_reads_mapped_to_multiple_loci", "X._of_reads_mapped_to_too_many_loci", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other")
+	perc_aligned_metric_table <- metric_table[, vars_perc_aligned]
+	perc_aligned_metric_table <- sapply(perc_aligned_metric_table, function(x) as.numeric(gsub("\\%", "", x)))
+	perc_aligned_metric_table <- data.frame(metric_table["sample"], perc_aligned_metric_table)
+ 
+    vars_perc_aligned_legend_names <- metric_var_2_legend_name[match(vars_perc_aligned, metric_var_2_legend_name$metric_var), "legend_name" ]
+
+    make_stacked_barchart_from_df(
+		df = perc_aligned_metric_table, 
+        id = "sample", 
+        other_vars = vars_perc_aligned,
+        legend_names = vars_perc_aligned_legend_names
+    )
+```
+
+### **Overlap of the mapped reads with genomic features**
+
+```{r feature_overlap, echo=FALSE, warning=FALSE, message=FALSE}
+	vars_feature_overlap <- c("final_total_sequences", "Uniquely_mapped_reads_number", "aligned_to_feature")
+	vars_feature_overlap_legend_names <- metric_var_2_legend_name[match(vars_feature_overlap, metric_var_2_legend_name$metric_var), "legend_name" ]
+
+    make_stacked_barchart_from_df_dodge(
+		df = metric_table, 
+        id = "sample", 
+        other_vars = vars_feature_overlap,
+        legend_names = vars_feature_overlap_legend_names
+    )
 ```
