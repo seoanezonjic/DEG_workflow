@@ -19,8 +19,8 @@ output:
 	library(ggplot2)
 	metric_table <- data[['metric_table']]
 	metric_var_2_legend_name <- data.frame(
-		metric_var = c("initial_total_sequences", "final_total_sequences", "Uniquely_mapped_reads_.", "X._of_reads_mapped_to_multiple_loci", "X._of_reads_mapped_to_too_many_loci", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other", "Uniquely_mapped_reads_number", "aligned_to_feature", "initial_weigthed_qual_per_sequence", "number_duplicatedreads.estimated.", "final_mean_qual_per_base", "final_min_qual_per_base_in_10th_decile", "final_weigthed_qual_per_sequence"),
-		legend_name = c("Total Reads Before Trimming", "Total Reads After Trimming", "Unique Map %", "Multi Map %", "Multi Map-too many %", "Too Short %", "Other %", "Unique Map", "Aligned to Genomic Feature", "Weighted Sequence Quality Before Trimming", "Estimated Duplicated Reads", "Average Base Quality", "Min Qual per Base (Tenth Decile)", "Weighted Sequence Quality")
+		metric_var = c("initial_total_sequences", "final_total_sequences", "Uniquely_mapped_reads_.", "multi_map", "X._of_reads_mapped_to_multiple_loci", "X._of_reads_mapped_to_too_many_loci", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other", "Uniquely_mapped_reads_number", "aligned_to_feature", "initial_weigthed_qual_per_sequence", "number_duplicatedreads.estimated.", "final_mean_qual_per_base", "final_min_qual_per_base_in_10th_decile", "final_min_qual_per_base_in_lower_quartile", "final_weigthed_qual_per_sequence"),
+		legend_name = c("Total Reads Before Trimming", "Total Reads After Trimming", "Unique Map %", "Multi-mapping %", "Multi Map %", "Multi Map-too many %", "Unmapped: Too Short %", "Unmapped: Other %", "Unique Map", "Aligned to Genomic Feature", "Weighted Sequence Quality Before Trimming", "Estimated Duplicated Reads", "Average Base Quality", "Min Qual per Base (Tenth Decile)", "Min Qual per Base (Lower Quartile)", "Weighted Sequence Quality")
 	)
 
 	make_stacked_barchart_from_df <- function(df, id, other_vars, legend_names=FALSE) {
@@ -69,8 +69,9 @@ output:
 		}
 
 		ggplot(melt_df, aes(x = sample, y = value, color = variable, group = variable)) + 
+		theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
      	geom_point() + geom_line() + scale_color_discrete(labels=legend_names) +
-		theme(legend.position="bottom")
+		theme(legend.position="bottom", legend.title = element_blank())
 
 	}
 
@@ -98,7 +99,7 @@ output:
 
 The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.
 ```{r qual_scores, echo=FALSE, warning=FALSE, message=FALSE}
-	vars_perc_aligned <- c("final_min_qual_per_base_in_10th_decile", "final_mean_qual_per_base", "final_weigthed_qual_per_sequence")
+	vars_perc_aligned <- c("final_min_qual_per_base_in_10th_decile", "final_min_qual_per_base_in_lower_quartile", "final_mean_qual_per_base", "final_weigthed_qual_per_sequence")
 	vars_perc_aligned_legend_names <- metric_var_2_legend_name[match(vars_perc_aligned, metric_var_2_legend_name$metric_var), "legend_name" ]
 	make_vert_line_plot_from_df(
 		df = metric_table, 
@@ -135,9 +136,14 @@ Here we plot the number of reads aligning to genomic features against the sequen
 	perc_aligned_metric_table <- metric_table[, vars_perc_aligned]
 	perc_aligned_metric_table <- sapply(perc_aligned_metric_table, function(x) as.numeric(gsub("\\%", "", x)))
 	perc_aligned_metric_table <- data.frame(metric_table["sample"], perc_aligned_metric_table)
- 
-    vars_perc_aligned_legend_names <- metric_var_2_legend_name[match(vars_perc_aligned, metric_var_2_legend_name$metric_var), "legend_name" ]
+	# Sum multimapping
+	perc_aligned_metric_table[, "multi_map"] <- perc_aligned_metric_table[,"X._of_reads_mapped_to_multiple_loci"] + perc_aligned_metric_table[,"X._of_reads_mapped_to_too_many_loci"]
+	# Reselect table
+	vars_perc_aligned <- c("Uniquely_mapped_reads_.", "multi_map", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other")
+	perc_aligned_metric_table <- perc_aligned_metric_table[, vars_perc_aligned]
+	perc_aligned_metric_table <- data.frame(metric_table["sample"], perc_aligned_metric_table)
 
+    vars_perc_aligned_legend_names <- metric_var_2_legend_name[match(vars_perc_aligned, metric_var_2_legend_name$metric_var), "legend_name" ]
     make_stacked_barchart_from_df(
 		df = perc_aligned_metric_table, 
         id = "sample", 
