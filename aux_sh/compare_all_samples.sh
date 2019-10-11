@@ -12,9 +12,9 @@ cat $INPUT_FOLDER/*/metrics | sed "s/'//g" > $RESULTS_FOLDER'/all_metrics'
 create_metric_table.rb $RESULTS_FOLDER'/all_metrics' sample $RESULTS_FOLDER'/metric_table'
 create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $RESULTS_FOLDER/alignments_report.html -d $RESULTS_FOLDER/metric_table -H t
 
-controls=`grep 'Ctrl' $TARGET_FILE | cut -f 1 | tr "\n" ","`
+controls=`awk '{if($3 == "Ctrl") print $1}' $TARGET_FILE | tr "\n" ","`
 controls=${controls%?}
-treatments=`grep 'Treat' $TARGET_FILE | cut -f 1 | tr "\n" ","`
+treatments=`awk '{if($3 == "Treat") print $1}' $TARGET_FILE | tr "\n" ","`
 treatments=${treatments%?}
 ## Join all results of each sample in a general table
 maps2DEGhunter.rb $TARGET_FILE $INPUT_FOLDER STAR_000*/selected_counts $RESULTS_FOLDER no
