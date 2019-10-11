@@ -8,9 +8,9 @@ clean_samples){
 	# AJUSTES PARA MUESTRAS EN MAL ESTADO#########      -P "contaminants_db=contaminants,cont_bacteria,cont_ribosome,cont_mitochondrias;contaminants_minratio=0.65;minlength=40"
 	if [ "$read_layout" == "paired" ]; then
 	? 
-		seqtrimbb -t transcriptomics.txt -Q $read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz' -w [cpu] -O output_files
+		seqtrimbb -t transcriptomics.txt -Q $read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz' -P "minlength=60" -w [cpu] -O output_files
 	elif [ "$read_layout" == "single" ] ; then
-		seqtrimbb -t transcriptomics.txt -Q $read_folder'/'$sample'.fastq.gz' -w [cpu] -O output_files
+		seqtrimbb -t transcriptomics.txt -Q $read_folder'/'$sample'.fastq.gz' -P "minlength=60" -w [cpu] -O output_files
 
 	fi
 	# . ~soft_bio_267/initializes/init_ruby 

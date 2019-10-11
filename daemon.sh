@@ -26,15 +26,15 @@ elif [ "$1" == "2" ] ; then
 	GENERAL_VARS="\$read_folder=$read_path,\$stranded=$stranded" 
 	trim_and_map.sh $TEMPLATE $MAPPING_RESULTS_FOLDER $SAMPLES_FILE "$RESOURCES" "$GENERAL_VARS" $mapping_ref $read_layout "$2"
 
+elif [ "$1" == "2b" ] ; then
+	check_wf.sh $MAPPING_RESULTS_FOLDER $SAMPLES_FILE
+
 elif [ "$1" == "3" ] ; then
 #STAGE 2 (Sample comparison)
 	echo "Launching stage 3"
 	compare_all_samples.sh $MAPPING_RESULTS_FOLDER $HUNTER_RESULTS_FOLDER $TARGET_FILE $REPORT_TEMPLATES_FOLDER
 
 elif [ "$1" == "4" ] ; then
-	check_wf.sh $MAPPING_RESULTS_FOLDER $SAMPLES_FILE
-
-elif [ "$1" == "5" ] ; then
 	cd $HUNTER_RESULTS_FOLDER
 	#launch_fun_hun.sh
 	sbatch launch_fun_hun.sh
