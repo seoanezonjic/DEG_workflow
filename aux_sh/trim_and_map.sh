@@ -2,7 +2,7 @@
 
 VERBOSE=$1
 LOGIN=''
-if [ $launch_login ]; then
+if [ $launch_login == TRUE ]; then
 	LOGIN='-b'
 fi
 
