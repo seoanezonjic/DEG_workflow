@@ -1,6 +1,11 @@
 . ~soft_bio_267/initializes/init_autoflow
 
 VERBOSE=$1
+LOGIN=''
+if [ $launch_login ]; then
+	LOGIN='-b'
+fi
+
 mkdir $OUTPUT_FOLDER
 
 while IFS= read sample; do
@@ -14,7 +19,7 @@ while IFS= read sample; do
 	\\$ref=$mapping_ref
 	" | tr -d [:space:]`
 
-	AutoFlow -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" "$RESOURCES" $VERBOSE
+	AutoFlow -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" "$RESOURCES" $VERBOSE $LOGIN
 
 done < $SAMPLES_FILE
 
