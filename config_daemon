@@ -1,10 +1,12 @@
 ## DAEMON VARS
 ###################################
 #project_folder=`pwd`'/project_execution'
-export project_folder=$SCRATCH'/NGS_projects/aurora_omicas/executions/mRNAseq'
+#export project_folder=$SCRATCH'/NGS_projects/aurora_omicas/executions/mRNAseq'
+export project_folder=`pwd`/test
 export TEMPLATE=$CODE_PATH"/templates/mapping_template.txt"
 #export SAMPLES_FILE=$project_folder"/samples_to_process.lst"
-export SAMPLES_FILE=./samples_to_process.lst
+#export SAMPLES_FILE=./samples_to_process.lst
+export SAMPLES_FILE=./samples_to_test.lst
 export read_layout='paired' #'single' # paired
 
 export MAPPING_RESULTS_FOLDER=$project_folder'/clean_and_map/'
@@ -20,5 +22,25 @@ export RESOURCES="-c 2 -t 10:00:00 -n cal"
 #export read_path=$project_folder'/raw_data'
 export read_path=/mnt/home/users/pab_001_uma/pedro/proyectos/aurora_omicas/data/reestructured/RNA_seq/data
 #export mapping_ref=$project_folder'/references'
-export mapping_ref=~/proyectos/ramon_areces19/pmm2_belen/project_execution/references/
+export mapping_ref=~pedro/proyectos/ramon_areces19/pmm2_belen/project_execution/references/
 export stranded='yes' #no
+
+# Trimming and mapping 
+#----------------
+export MIN_READ_LENGTH=60 #DEFAULT 60 
+
+
+# DEgenesHunter comparisons
+#----------------
+export de_pvalue="0.05" #DEFAULT 0.05
+export de_packages="DELN"  # DEFAULT DELN ### D = DESeq2, E = edgeR, L = limma, N= NOISeq
+export de_min_pack="4"	#DEFAULT 4
+
+
+# Functional DEgenesHunter analysis
+#----------------
+export fun_pvalue=0.1 #DEFAULT 0.1
+export fun_an_type="GKgR" # DEFAULT GKRg ###G = GO [topGO], K = KEGG, g = GO [clusterProfiler], R [Reactome]
+export fun_an_performance="o" #DEFAULT "ogs" ### "o" for Over Representationn and "g" for GSEA
+export GO_modules="MBC" #DEFAULT MBC M = Molecular Function, B = Biological Process, C = Celular Components
+export fun_remote_mode="" #DEFAULT "" ### Use (b) to launch biomaRt translation; (k) to use Kegg remote data base
