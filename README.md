@@ -4,9 +4,13 @@ Workflow to perform Differential Expression Gene analysis from raw fastq files.
 USAGE:
 1º: Create manage_input_files.sh manually, from which all raw samples must be linked with a suitable name to another custom folder (e.g. "raw_files", "samples" or "renamed_sample"). This step must be performed for customizate samples according to the experiment and keep original sample names in order to facilitate sample backtracking (In case of failure) at same time. New sample names must be easy to interpret and short.
 
-2º: Customize all parametres from config_daemon (there you will find a more detailed description).
+2º: Create samples_to_process.lst: Is a file containing a list of new sample names. IMPORTANT: Sample name must not include paired-end related information and file extension.
 
-3º: Launch step by step all daemon modules. daemon.sh must be launched from his original location by default. The module must be indicated in the firt argument.
+3º: Customize one or more target files. A 'targte_example.txt' is provided. First column, called 'sample', must include sample names (as same as samples_to_process.lst), second column, called 'replicate', must include a replicate number and third column, called 'treat', must include a tag indicating control samples ('Ctrl') and treatment samples ('Treat').
+
+4º: Customize all parametres from config_daemon (there you will find a more detailed description).
+
+5º: Launch step by step all daemon modules. daemon.sh must be launched from his original location by default. The module must be indicated in the firt argument.
   Modules:
   1 -> Download all reference files.
   1b -> Index the reference.
