@@ -20,7 +20,7 @@ if [ "$1" == "1" ] ; then
 elif [ "$1" == "1b" ] ; then
 #STAGE 1 INDEXING REFERENCE
     echo "Launching stage 1: Indexing reference"
-	if [ $launch_loggin ]; then	
+	if [ $launch_login ]; then	
 		create_index.sh
 	else
 		sbatch create_index.sh
@@ -37,7 +37,7 @@ elif [ "$1" == "2b" ] ; then
 elif [ "$1" == "3" ] ; then
 #STAGE 3 SAMPLES COMPARISON
 	echo "Launching stage 3: Comparing samples"
-	if [ $launch_loggin ]; then
+	if [ $launch_login ]; then
 		compare_all_samples.sh
 	else
 		sbatch compare_all_samples.sh
@@ -47,7 +47,7 @@ elif [ "$1" == "4" ] ; then
 	echo "Launching stage 4: Functional analysis"
 
 	cd $HUNTER_RESULTS_FOLDER
-	if [ $fun_remote_mode ] || [ $launch_loggin ]; then	
+	if [ $fun_remote_mode ] || [ $launch_login ]; then	
 		launch_fun_hun.sh
 	else
 		sbatch launch_fun_hun.sh
