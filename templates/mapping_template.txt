@@ -41,5 +41,6 @@ align_rna_seq){
 	else
 		parse_STAR_log.R -d Log.final.out | awk '{print "$sample" "\t" $0}' >> ../metrics
 		awk 'NR>4 {sum+=$2} END {print sum}' selected_counts |  awk '{print "$sample" "\t" "aligned_to_feature" "\t" $0 }' >> ../metrics
+		rm Aligned.sortedByCoord.out.bam Aligned.toTranscriptome.out.bam
 	fi
 }
