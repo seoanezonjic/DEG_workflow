@@ -7,7 +7,7 @@ export project_folder=`pwd`'/project_execution'	#-------#	Global execution folde
 export MAPPING_RESULTS_FOLDER=$project_folder'/clean_and_map/'	#-------#	Secondary execution path
 export HUNTER_RESULTS_FOLDER=$project_folder'/DEGenesHunter_results'	#-------#	Secondary execution path
 
-export SAMPLES_FILE=$project_folder"/samples_to_process.lst"	#-------#	A list with sample names. File name must be unique and in must not include paired-end information or file extension. (e.g. For file "sample_ex_1.fastq.gz" and "sample_ex_2.fastq.gz", filename is "sample_ex")
+export SAMPLES_FILE=$CODE_PATH"/samples_to_process.lst"	#-------#	A list with sample names. File name must be unique and in must not include paired-end information or file extension. (e.g. For file "sample_ex_1.fastq.gz" and "sample_ex_2.fastq.gz", filename is "sample_ex")
 export read_layout='paired'	#-------#	Read layout must be defined as 'paired' in case of paired-end samples or 'single' in case of single-end samples
 export TARGET_FILE="target.txt"	#-------#	Target file location, including a short sample description	
 export TEMPLATE=$CODE_PATH"/templates/mapping_template.txt"	#-------#	AutoFlow mapping template. It is advisable not to modify this variable
