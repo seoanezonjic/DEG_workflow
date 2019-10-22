@@ -6,7 +6,6 @@ cat $MAPPING_HUNTER_RESULTS_FOLDER/*/metrics | sed "s/'//g" > $HUNTER_RESULTS_FO
 
 create_metric_table.rb $HUNTER_RESULTS_FOLDER'/all_metrics' sample $HUNTER_RESULTS_FOLDER'/metric_table'
 create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $HUNTER_RESULTS_FOLDER/alignments_report.html -d $HUNTER_RESULTS_FOLDER/metric_table -H t
-exit 1
 controls=`awk '{if($3 == "Ctrl") print $1}' $TARGET_FILE | tr "\n" ","`
 controls=${controls%?}
 treatments=`awk '{if($3 == "Treat") print $1}' $TARGET_FILE | tr "\n" ","`
