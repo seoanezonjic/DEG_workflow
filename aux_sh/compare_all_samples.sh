@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 source ~soft_bio_267/initializes/init_degenes_hunter
-
+REPORT_TEMPLATES_FOLDER=$CODE_PATH'/templates/report'
 mkdir $HUNTER_RESULTS_FOLDER
 cat $MAPPING_HUNTER_RESULTS_FOLDER/*/metrics | sed "s/'//g" > $HUNTER_RESULTS_FOLDER'/all_metrics'
 
