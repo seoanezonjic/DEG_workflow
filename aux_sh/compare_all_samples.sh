@@ -1,5 +1,4 @@
 #! /usr/bin/env bash
-#SBATCH --cpus=4
 #SBATCH --mem='4gb'
 #SBATCH --error=DEGenesHunter.%J.err
 #SBATCH --output=DEGenesHunter.%J.out

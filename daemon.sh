@@ -6,6 +6,7 @@ export PATH=$CODE_PATH'/aux_sh:'$PATH
 export PATH=$CODE_PATH'/aux_parsers:'$PATH
 REPORT_TEMPLATES_FOLDER=$CODE_PATH"/templates/reports"
 source $CODE_PATH'/config_daemon'
+tasks=`echo $TARGET |tr "," "\n" | wc -l`
 
 ## STAGE EXECUTION
 #######################################################################
@@ -40,7 +41,7 @@ elif [ "$1" == "3" ] ; then
 	if [ $launch_login == TRUE ]; then
 		compare_all_samples.sh
 	else
-		sbatch compare_all_samples.sh
+		sbatch -n $tasks compare_all_samples.sh
 	fi
 elif [ "$1" == "4" ] ; then
 #STAGE 4 : FUNCTIONAL ANALYSIS
@@ -50,7 +51,7 @@ elif [ "$1" == "4" ] ; then
 	if [ $fun_remote_mode ] || [ $launch_login == TRUE ]; then	
 		launch_fun_hun.sh
 	else
-		sbatch launch_fun_hun.sh
+		sbatch -n $tasks launch_fun_hun.sh
 	fi
 	cd $project_folder
 fi

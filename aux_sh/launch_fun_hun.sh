@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-#SBATCH --cpus=4
 #SBATCH --mem='4gb'
 #SBATCH --time='10:00:00'
 #SBATCH --error=functionalHunter.%J.err
