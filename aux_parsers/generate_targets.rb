@@ -14,17 +14,14 @@ TREAT = 1
 ######################################################
 
 def load_blacklist(input)
-	if File.file?(input)
-		blacklist = File.readlines(input).map {|line| line.chomp!}
-	else 
-		blacklist = input.split(",")
-	end
+	blacklist = File.readlines(input).map {|line| line.chomp!}
 	return blacklist
 end
 
-def load_table(input_file,blacklist = [])
+def load_table(input_file,blacklist = nil, filter = nil)
 	header = nil
 	table = {}
+	blacklist = [] if blacklist.nil?
 	File.open(input_file).each do |line|
 		line = line.chomp.split("\t")
 		if header.nil?
@@ -32,7 +29,8 @@ def load_table(input_file,blacklist = [])
 			header = line
 			next
 		end
-		next if blacklist.include?(line[0])
+		next if blacklist.include?(line[0]) if !blacklist.nil?
+		next if  !filter[1].include?(line[header.index(filter[0]) + 1]) if !filter.nil?
 		table = index_features(header, line, table)
 	end
 	return table
@@ -74,6 +72,7 @@ def build_targets(table, targets)
 		new_targets[target_name] = new_target
 	end	
 	return new_targets
+
 end
 
 def find_features(feature_name, features, table)
@@ -93,13 +92,18 @@ def save_targets(targets)
 				counter = 1
 				samples.each do |sample|
 					out_file.puts "#{sample}\t#{counter}\t#{treat}" if !sample.nil?
+					counter +=1 
 				end
 			end
 		end
 	end
 end
 
-
+def parse_filter(string)
+	feature_name, features = string.split("=")
+	filter = [feature_name, features.split(",")]
+	return filter
+end
 ######################################################
 ######## OPTONS
 ######################################################
@@ -112,8 +116,13 @@ OptionParser.new do |opts|
 		options[:table] = file
 	end
 
+	options[:filter] = nil
+	opts.on("-f STRING", "--filter STRING", "Set filter as string 'FEATURE_NAME=feature'") do |string|
+		options[:filter] = string
+	end
+
 	options[:targets] = nil
-	opts.on("-t STRING", "-targets STRING", "String which describes targets. EXAMPLE: 'TARGET_A>COLUMN_A:FEAT_CTL1,FEAT_TRT1;TARGET_B>COLUMN_B:FEAT_CTL1/FEAT_CTL2,FEAT_TRT1/FEAT_TRT2'") do |string|
+	opts.on("-t STRING", "--targets STRING", "String which describes targets. EXAMPLE: 'TARGET_A>COLUMN_A:FEAT_CTL1,FEAT_TRT1;TARGET_B>COLUMN_B:FEAT_CTL1/FEAT_CTL2,FEAT_TRT1/FEAT_TRT2'") do |string|
 		options[:targets] = string
 	end
 
@@ -127,9 +136,9 @@ end.parse!
 ######################################################
 ######## MAIN
 ######################################################
-blacklist = load_blacklist(options[:blacklist])
-experiment_design = load_table(options[:table], blacklist)
+blacklist = load_blacklist(options[:blacklist]) if !options[:blacklist].nil?
+filter = parse_filter(options[:filter]) if !options[:filter].nil?
+experiment_design = load_table(options[:table], blacklist, filter)
 targets = parse_targets(options[:targets])
-
 targets = build_targets(experiment_design, targets)
 save_targets(targets)
