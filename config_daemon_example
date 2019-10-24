@@ -20,7 +20,7 @@ export launch_login=FALSE 	#-------#	Login execution mode. Set this variable to 
 # General
 #-----------------
 export RESOURCES="-c 2 -t 10:00:00 -n cal" 
-export read_path=$project_folder'/raw_data'	#-------#	New path where samples were linked and renamed
+export read_path=$CODE_PATH'/raw_data'	#-------#	New path where samples were linked and renamed
 export mapping_ref=$project_folder'/references'	#-------#	References path: The references will be downloaded and indexed there. For human use mapping_ref=~pedro/proyectos/ramon_areces19/pmm2_belen/project_execution/references/
 
 export stranded='yes'	#-------#	This parametrer must be changed in case of not-stranded sequencing only (rare case)
