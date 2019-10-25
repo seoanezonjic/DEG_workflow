@@ -35,7 +35,7 @@ export MIN_READ_LENGTH=65 	#-------#	Minimun read length theshold in primming st
 export de_pvalue="0.05"	#-------#	Minimum P-value threshold 
 export de_packages="DELN"	#-------#	Gene expresion analysis algorithms to perform (D = DESeq2, E = edgeR, L = limma, N= NOISeq)
 export de_min_pack="4"	#-------#	Number of minimum packages to consider a gene as a 'PREVALENT' DEG
-
+export de_logfc="1"	#-------#	Log2FC threshold
 
 # Functional DEgenesHunter analysis
 #----------------
