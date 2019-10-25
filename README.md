@@ -10,7 +10,7 @@ USAGE:
 
 4º: Customize one or more target files. A 'targte_example.txt' is provided. First column, called 'sample', must include sample names (as same as samples_to_process.lst), second column, called 'replicate', must include a replicate number and third column, called 'treat', must include a tag indicating control samples ('Ctrl') and treatment samples ('Treat').
 
-5º: Change name of config_daemon_example to config_daemon
+5º: Change name of config_daemon_default to config_daemon
 
 6º: Customize all parametres from config_daemon (there you will find a more detailed description).
 
