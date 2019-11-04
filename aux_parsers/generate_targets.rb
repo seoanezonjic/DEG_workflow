@@ -19,7 +19,7 @@ def load_blacklist(input)
 end
 
 def load_table(input_file,blacklist = nil, filter = nil)
-	header = nil
+	header = nil 
 	table = {}
 	blacklist = [] if blacklist.nil?
 	File.open(input_file).each do |line|
