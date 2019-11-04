@@ -2,11 +2,11 @@
 
 framework_dir=`dirname $0`
 export CODE_PATH=$(readlink -f $framework_dir )
+export logs=$CODE_PATH'/execution_logs';mkdir $logs
 export PATH=$CODE_PATH'/aux_sh:'$PATH
 export PATH=$CODE_PATH'/aux_parsers:'$PATH
-REPORT_TEMPLATES_FOLDER=$CODE_PATH"/templates/reports"
 source $CODE_PATH'/config_daemon'
-tasks=`echo $TARGET |tr "," "\n" | wc -l`
+n_target=`echo $TARGET |tr "," "\n" | wc -l `;tasks=`echo $n_target"+1" | bc`
 
 ## STAGE EXECUTION
 #######################################################################
@@ -41,7 +41,7 @@ elif [ "$1" == "3" ] ; then
 	if [ $launch_login == TRUE ]; then
 		compare_all_samples.sh
 	else
-		sbatch -n $tasks compare_all_samples.sh
+		sbatch --mem=30GB -n $tasks --error=$logs'/DEGenesHunter.%J.err' --output=$logs'/DEGenesHunter.%J.out' compare_all_samples.sh
 	fi
 elif [ "$1" == "4" ] ; then
 #STAGE 4 : FUNCTIONAL ANALYSIS
@@ -51,7 +51,7 @@ elif [ "$1" == "4" ] ; then
 	if [ $fun_remote_mode ] || [ $launch_login == TRUE ]; then	
 		launch_fun_hun.sh
 	else
-		sbatch -n $tasks launch_fun_hun.sh
+		sbatch --mem-per-cpu=2GB -n $tasks --error=$logs'/functional_hunter.%J.err' --output=$logs'/functional_hunter.%J.out' launch_fun_hun.sh
 	fi
 	cd $project_folder
 fi

@@ -6,7 +6,7 @@
 #SBATCH --output=job.%J.out
 
 source_folder=~jperkins/raw-data/PMM2CDG/RNA_Seq_NEBNext\(DianaGallego\)
-project_folder='project_execution'
+project_folder='./'
 output_folder=$project_folder'/raw_data'
 
 mkdir -p $output_folder
