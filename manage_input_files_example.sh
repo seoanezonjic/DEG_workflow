@@ -1,13 +1,7 @@
 #! /usr/bin/env bash
-#SBATCH --cpus=1
-#SBATCH --mem='4gb'
-#SBATCH --time='1-00:00:00'
-#SBATCH --error=job.%J.err
-#SBATCH --output=job.%J.out
 
 source_folder=/path/to/raw/data
-project_folder='project_execution'
-output_folder=$project_folder'/raw_data'
+output_folder=`pwd`'/raw_data'
 
 mkdir -p $output_folder
 
