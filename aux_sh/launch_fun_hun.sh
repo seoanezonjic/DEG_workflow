@@ -2,7 +2,7 @@
 
 source ~soft_bio_267/initializes/init_degenes_hunter
 
-for TARGET_FILE in `echo $TARGET | tr "," " "`
+for TARGET_FILE in `echo $TARGETS | tr "," " "`
 do
 	TARGET_NAME=`echo $TARGET_FILE | sed 's/_target.txt//'`
 	target_results_folder=$HUNTER_RESULTS_FOLDER'/'$TARGET_NAME; cd $target_results_folder

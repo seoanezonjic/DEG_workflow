@@ -6,7 +6,7 @@ export logs=$CODE_PATH'/execution_logs';mkdir $logs
 export PATH=$CODE_PATH'/aux_sh:'$PATH
 export PATH=$CODE_PATH'/aux_parsers:'$PATH
 source $CODE_PATH'/config_daemon'
-n_target=`echo $TARGET |tr "," "\n" | wc -l `;tasks=`echo $n_target"+1" | bc`
+n_target=`echo $TARGETS |tr "," "\n" | wc -l `;tasks=`echo $n_target"+1" | bc`
 
 ## STAGE EXECUTION
 #######################################################################

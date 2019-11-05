@@ -8,7 +8,7 @@ cat $MAPPING_RESULTS_FOLDER/*/metrics | sed "s/'//g" > $HUNTER_RESULTS_FOLDER'/a
 
 create_metric_table.rb $HUNTER_RESULTS_FOLDER'/all_metrics' sample $HUNTER_RESULTS_FOLDER'/metric_table'
 create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $HUNTER_RESULTS_FOLDER/alignments_report.html -d $HUNTER_RESULTS_FOLDER/metric_table -H t
-for TARGET_FILE in `echo $TARGET | tr "," " "`
+for TARGET_FILE in `echo $TARGETS | tr "," " "`
 do
 	TARGET_NAME=`echo $TARGET_FILE | sed 's/_target.txt//'`
 	target_results_folder=$HUNTER_RESULTS_FOLDER'/'$TARGET_NAME
