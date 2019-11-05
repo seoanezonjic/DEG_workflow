@@ -1,9 +1,0 @@
-sample	replicate	treat
-ctrl_1	1	Ctrl
-ctrl_2	2	Ctrl
-ctrl_3	3	Ctrl
-ctrl_4	4	Ctrl
-trt_1	1	Treat
-trt_2	2	Treat
-trt_3	3	Treat
-trt_4	4	Treat
