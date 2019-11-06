@@ -24,20 +24,21 @@ clean_samples){
 align_rna_seq){ 
 	resources: -m '30gb' -c 2 -t '10:00:00'
 	module load star/2.5.3a
-	module load qualimap/2.2.1
 	module load samtools
+	module load qualimap/2.2.1
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
 	if [ "$read_layout" == "paired" ]; then
 	?
-		STAR --runThreadN [cpu] --genomeDir $ref/index --readFilesIn clean_samples)/output_files/paired_1.fastq.gz clean_samples)/output_files/paired_2.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate
+		STAR --runThreadN [cpu] --genomeDir $ref/STAR_index --readFilesIn clean_samples)/output_files/paired_1.fastq.gz clean_samples)/output_files/paired_2.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate
 	elif [ "$read_layout" == "single" ] ; then
-		STAR --runThreadN [cpu] --genomeDir $ref/index --readFilesIn clean_samples)/output_files/sequences_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate
+		STAR --runThreadN [cpu] --genomeDir $ref/STAR_index --readFilesIn clean_samples)/output_files/sequences_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate
 	fi
 	
 	qualimap bamqc -bam Aligned.sortedByCoord.out.bam -outdir results --java-mem-size=30G
 
 	if [ ! -s Log.final.out ] || [ ! -s  selected_counts ] || [ ! -s results/qualimapReport.html ]; then 
-		echo "Mapping step has failed"; exit 1
+		echo "Mapping step has failed"
+		exit 1
 	else
 		#metric extraction
 		sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics

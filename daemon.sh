@@ -26,7 +26,7 @@ elif [ "$1" == "1b" ] ; then
 	if [ $launch_login == TRUE ]; then	
 		create_index.sh
 	else
-		sbatch create_index.sh
+		sbatch --error=$logs'/indexing_reference.%J.err' --output=$logs'/indexing_reference.%J.out' create_index.sh 
 	fi
 
 elif [ "$1" == "2" ] ; then
