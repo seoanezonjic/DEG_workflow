@@ -1,13 +1,13 @@
 ###################################
 ## COMFIG VARS ##  IT SHOULD NOT BE CHANGED
 ###################################
-experiment_type="RNAseq"	#-------#	Experiment type 'miRNAseq' or 'RNAseq' 
+export experiment_type="RNAseq"	#-------#	Experiment type 'miRNAseq' or 'RNAseq' 
 
-if [ $experiment_type=="RNAseq" ];then
+if [[ $experiment_type == "RNAseq" ]];then
 	export TEMPLATE=$CODE_PATH"/templates/mapping_template.txt"	#-------#	AutoFlow mapping template. It is advisable not to modify this variable
-elif [ $experiment_type=="miRNAseq" ];then
+elif [[ $experiment_type == "miRNAseq" ]]; then
 	export TEMPLATE=$CODE_PATH"/templates/miRNA_detection.txt"	#-------#	AutoFlow mapping template. It is advisable not to modify this variable
-	export miRNA_trim_template=$CODE_PATH"/templates/trimming/miRNA.txt"
+	export MIRNA_TRIM_TEMPLATE=$CODE_PATH"/templates/trimming/miRNA.txt"
 fi
 ###################################
 ## DAEMON VARS

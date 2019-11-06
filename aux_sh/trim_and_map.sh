@@ -15,8 +15,8 @@ while IFS= read sample; do
 	\\$ref=$mapping_ref
 	" | tr -d [:space:]`
 
-	if [ $experiment_type=="miRNAseq" ]; then
-		AF_VARS="${AF_VARS},\$miRNA_trim_template=$miRNA_trim_template"
+	if [[ $experiment_type == "miRNAseq" ]]; then
+		AF_VARS="${AF_VARS},\$miRNA_trim_template=$MIRNA_TRIM_TEMPLATE"
 	fi
 
 	AutoFlow -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" "$RESOURCES" $AF_ADD_OPTIONS 
