@@ -4,7 +4,7 @@ Workflow to perform Differential Expression Gene analysis from raw fastq files.
 USAGE:
 1º: Create manage_input_files.sh manually, from which all raw samples must be linked with a suitable name to another custom folder (e.g. "raw_files", "samples" or "renamed_sample"). This step must be performed for customizate samples according to the experiment and keep original sample names in order to facilitate sample backtracking (In case of failure) at same time. New sample names must be easy to interpret and short.
 
-2º: Create an experiment design table and create all target (comparison) files using ./aux_parsers/generate_targets.rb. Experiment design table must include samples names as first column and all features as other columns, and it also must include a header with feature names.
+2º: Create an experiment design table and create all target (comparison) files using ./aux_parsers/generate_targets.rb. Experiment design table must include sample names as first column (with header: sample_name) and all features as other columns, and it also must include a header with feature names.
 
 3º: Create samples_to_process.lst: Is a file containing a list of new sample names. IMPORTANT: Sample name must not include paired-end related information and file extension.
 
