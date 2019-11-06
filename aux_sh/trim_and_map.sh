@@ -1,10 +1,6 @@
 . ~soft_bio_267/initializes/init_autoflow
 
-VERBOSE=$1
-LOGIN=''
-if [ $launch_login == TRUE ]; then
-	LOGIN='-b'
-fi
+AF_ADD_OPTIONS=$1
 
 mkdir $OUTPUT_FOLDER
 
@@ -25,7 +21,7 @@ while IFS= read sample; do
 		AF_VARS="${AF_VARS},\$miRNA_trim_template=$miRNA_trim_template"
 	fi
 
-	AutoFlow -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" "$RESOURCES" $VERBOSE $LOGIN
+	AutoFlow -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" "$RESOURCES" $AF_ADD_OPTIONS 
 
 done < $SAMPLES_FILE
 
