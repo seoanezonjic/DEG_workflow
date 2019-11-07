@@ -89,7 +89,7 @@ output:
 	vars_feature_overlap <- c("final_total_sequences", "Uniquely_mapped_reads_number", "aligned_to_feature")
 	execute_feature_overlap <- all(vars_feature_overlap %in% colnames(metric_table))
 	vars_mirna_mapping <- c("aligned_reads_percentage", "unaligned_reads_percentage", "multimapping_filtered_percentage")
-
+	execute_mirna_mapping <- all(vars_mirna_mapping %in% colnames(metric_table))
 	##############################
 	## REPORT BEGINING
 	##############################
@@ -182,7 +182,7 @@ output:
     )
 ```
 
-```{r mirna_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=vars_mirna_mapping}
+```{r mirna_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_mirna_mapping}
 	##################################################
 	###	miRNASEQ PLOTS
 	##################################################
