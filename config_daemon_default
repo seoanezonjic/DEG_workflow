@@ -56,5 +56,5 @@ elif [[ $experiment_type == "RNAseq" ]];then
 	export GO_modules="MBC"	#-------#	Gene subonthology analysis to perform (M = Molecular Function, B = Biological Process, C = Celular Components)
 	export fun_remote_mode="''"	#-------#	Remote mode. deamon.sh 4 is executed at loggin when remote mode is activated (Use (b) to launch biomaRt translation; (k) to use Kegg remote data base)
 	export custom_nomenclature="''"	#-------#	File with custom nomenclature in GMT format
-
+	export fun_organism='Human'	#-------#	Organism to perform functional analysis
 fi
