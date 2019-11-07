@@ -34,7 +34,7 @@ align_rna_seq){
 		STAR --runThreadN [cpu] --genomeDir $ref/STAR_index --readFilesIn clean_samples)/output_files/sequences_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate
 	fi
 	
-	qualimap bamqc -bam Aligned.sortedByCoord.out.bam -outdir results --java-mem-size=30G
+	qualimap bamqc -nt [cpu] -bam Aligned.sortedByCoord.out.bam -outdir results --java-mem-size=30G
 
 	if [ ! -s Log.final.out ] || [ ! -s  selected_counts ] || [ ! -s results/qualimapReport.html ]; then 
 		echo "Mapping step has failed"

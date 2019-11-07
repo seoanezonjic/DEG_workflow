@@ -1,5 +1,5 @@
-clean_samples){
-	resources: -u 1 -n cal -c 16 -t '7-0:00:00' -m '16gb'
+%clean_samples){
+	resources: -u 1 -n cal -c 1 -t '7-0:00:00' -m '16gb'
 	module load seqtrimbb/2.1.3
 	. ~soft_bio_267/initializes/init_ruby
 	?
@@ -37,7 +37,7 @@ mapping_sample){
 	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 5 --best --strata $ref'/bowtie_index/genome' --al dir_temp/sequences.fasta_mapped --un dir_temp/sequences.fasta_not_mapped ./sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
 #	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 5 --best --strata  $mapping_ref/genome --al dir_temp/sequences.fasta_mapped --un dir_temp/sequences.fasta_not_mapped ./sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
 	bowtie2sam.pl dir_temp/mappings.bwt | samtools view -h -T $ref/genome.fa | samtools sort -n -o mapping.bam
-	qualimap bamqc -bam mapping.bam -outdir results --java-mem-size=30G
+	qualimap bamqc -nt [cpu] -bam mapping.bam -outdir results --java-mem-size=30G
 	convert_bowtie_output.pl dir_temp/mappings.bwt > mapping.arf
 	
 	if [ ! -s mapping.arf ] || [ ! -s mapping.bam ] || [ ! -s qualimapReport.html ]; then
