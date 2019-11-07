@@ -20,8 +20,8 @@ output:
 
 	metric_table <- data[['metric_table']]
 	metric_var_2_legend_name <- data.frame(
-		metric_var = c("initial_total_sequences", "final_total_sequences", "Uniquely_mapped_reads_.", "multi_map", "X._of_reads_mapped_to_multiple_loci", "X._of_reads_mapped_to_too_many_loci", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other", "Uniquely_mapped_reads_number", "aligned_to_feature", "initial_weigthed_qual_per_sequence", "number_duplicatedreads.estimated.", "final_mean_qual_per_base", "final_min_qual_per_base_in_10th_decile", "final_min_qual_per_base_in_lower_quartile", "final_weigthed_qual_per_sequence"),
-		legend_name = c("Total Reads Before Trimming", "Total Reads After Trimming", "Unique Map %", "Multi-mapping %", "Multi Map %", "Multi Map-too many %", "Unmapped: Too Short %", "Unmapped: Other %", "Unique Map", "Aligned to Genomic Feature", "Weighted Sequence Quality Before Trimming", "Estimated Duplicated Reads", "Average Base Quality", "Min Qual per Base (Tenth Decile)", "Min Qual per Base (Lower Quartile)", "Weighted Sequence Quality")
+		metric_var = c("initial_total_sequences", "final_total_sequences", "Uniquely_mapped_reads_.", "multi_map", "X._of_reads_mapped_to_multiple_loci", "X._of_reads_mapped_to_too_many_loci", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other", "Uniquely_mapped_reads_number", "aligned_to_feature", "initial_weigthed_qual_per_sequence", "number_duplicatedreads.estimated.", "final_mean_qual_per_base", "final_min_qual_per_base_in_10th_decile", "final_min_qual_per_base_in_lower_quartile", "final_weigthed_qual_per_sequence", "aligned_reads_percentage", "unaligned_reads_percentage", "multimapping_filtered_percentage"),
+		legend_name = c("Total Reads Before Trimming", "Total Reads After Trimming", "Unique Map %", "Multi-mapping %", "Multi Map %", "Multi Map-too many %", "Unmapped: Too Short %", "Unmapped: Other %", "Unique Map", "Aligned to Genomic Feature", "Weighted Sequence Quality Before Trimming", "Estimated Duplicated Reads", "Average Base Quality", "Min Qual per Base (Tenth Decile)", "Min Qual per Base (Lower Quartile)", "Weighted Sequence Quality", "Aligned reads %", "Unaligned reads %", "Reads supressed by multimapping %" )
 	)
 
 	make_stacked_barchart_from_df <- function(df, id, other_vars, legend_names=FALSE) {
@@ -90,6 +90,10 @@ output:
 
 
 ```{r trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+	##################################################
+	###	GLOBAL PLOTS
+	##################################################
+
 	cat("\n\n## **QC of reads before alignment**\n\n")
 	cat("\n\n### **Total numbers of reads before and after trimming**\n\n")
 	
@@ -119,6 +123,9 @@ output:
 
 
 ```{r aligned_v_qual, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval = (experiment_type == "RNAseq")}
+	##################################################
+	###	RNASEQ PLOTS
+	##################################################
 	cat("\n\n### **Reads aligning to genes vs sequence quality scores**\n\nHere we plot the number of reads aligning to genomic features against the sequence quality scores")
 	vars_aligned_v_qual <- c("aligned_to_feature", "initial_weigthed_qual_per_sequence")
 	vars_aligned_v_qual_legend_names <- metric_var_2_legend_name[match(vars_aligned_v_qual, metric_var_2_legend_name$metric_var), "legend_name" ]
@@ -167,5 +174,30 @@ output:
         id = "sample", 
         other_vars = vars_feature_overlap,
         legend_names = vars_feature_overlap_legend_names
+    )
+```
+
+```{r mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval = (experiment_type == "miRNAseq")}
+	##################################################
+	###	miRNASEQ PLOTS
+	##################################################
+	cat("\n\n## **Alignment Details**\n\n### **Trimmed reads mapping to the genome almost once, reads mapping suppresed by multimapping threshold, and not mapped at all**\n\n")
+	vars_perc_aligned <- c("aligned_reads_percentage", "unaligned_reads_percentage", "multimapping_filtered_percentage")
+	perc_aligned_metric_table <- metric_table[, vars_perc_aligned]
+	#perc_aligned_metric_table <- sapply(perc_aligned_metric_table, function(x) as.numeric(gsub("\\%", "", x)))
+	perc_aligned_metric_table <- data.frame(metric_table["sample"], perc_aligned_metric_table)
+	# Sum multimapping
+	# perc_aligned_metric_table[, "multi_map"] <- perc_aligned_metric_table[,"X._of_reads_mapped_to_multiple_loci"] + perc_aligned_metric_table[,"X._of_reads_mapped_to_too_many_loci"]
+	# Reselect table
+	# vars_perc_aligned <- c("Uniquely_mapped_reads_.", "multi_map", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other")
+	# perc_aligned_metric_table <- perc_aligned_metric_table[, vars_perc_aligned]
+	# perc_aligned_metric_table <- data.frame(metric_table["sample"], perc_aligned_metric_table)
+
+    vars_perc_aligned_legend_names <- metric_var_2_legend_name[match(vars_perc_aligned, metric_var_2_legend_name$metric_var), "legend_name" ]
+    make_stacked_barchart_from_df(
+		df = perc_aligned_metric_table, 
+        id = "sample", 
+        other_vars = vars_perc_aligned,
+        legend_names = vars_perc_aligned_legend_names
     )
 ```
