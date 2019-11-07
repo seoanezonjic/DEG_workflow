@@ -19,7 +19,9 @@ mapping_sample){
 	module load qualimap/2.2.1
 	. ~josecordoba/proyectos/raw_code/init_mirdeep2
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
-	gunzip --force -c clean_samples)/output_files/sequences_.fastq.gz > sequences.fastq
+	if [ ! -s sequences.fastq ];then
+		gunzip -c clean_samples)/output_files/sequences_.fastq.gz > sequences.fastq
+	fi
 	# fastq2fasta.pl sequences.fastq > sequences.fasta
 	# rm sequences.fastq
 	mkdir dir_temp
@@ -34,7 +36,7 @@ mapping_sample){
 	?
 	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 5 --best --strata $ref'/bowtie_index/genome' --al dir_temp/sequences.fasta_mapped --un dir_temp/sequences.fasta_not_mapped ./sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
 #	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 5 --best --strata  $mapping_ref/genome --al dir_temp/sequences.fasta_mapped --un dir_temp/sequences.fasta_not_mapped ./sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
-	bowtie2sam.pl dir_temp/mappings.bwt | samtools view -T $ref/genome.fa | samtools sort -n -o mapping.bam
+	bowtie2sam.pl dir_temp/mappings.bwt | samtools view -h -T $ref/genome.fa | samtools sort -n -o mapping.bam
 	qualimap bamqc -bam mapping.bam -outdir results --java-mem-size=30G
 	convert_bowtie_output.pl dir_temp/mappings.bwt > mapping.arf
 	
@@ -44,50 +46,51 @@ mapping_sample){
 	else
 		sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
 		parse_bowtie_log.sh bowtie.log | awk '{print "$sample" "\t" $0}' >> ../metrics
+		rm sequences.fastq
 	fi
 }
-mapping_sample_old){
-	resources: -u 1 -c 16
-	module load samtools/1.9
-	. ~josecordoba/proyectos/raw_code/init_mirdeep2
-	gunzip --force -c clean_samples)/output_files/sequences_.fastq.gz > sequences.fastq
-	fastq2fasta.pl sequences.fastq > sequences.fasta
-	rm sequences.fastq
-	?
-	mapper.pl sequences.fasta -m -s sequences_collapsed.fasta -c -i -p $reference/genome -t mapping.arf -v -n -u -o [cpu]
-#	bowtie2sam.pl dir_*/mappings.bwt | samtools view -b > mappings.bam
-	if [ ! -s mapping.arf ]; then
-		exit 1
-	fi
-}
+# %mapping_sample_old){
+# 	resources: -u 1 -c 16
+# 	module load samtools/1.9
+# 	. ~josecordoba/proyectos/raw_code/init_mirdeep2
+# 	gunzip --force -c clean_samples)/output_files/sequences_.fastq.gz > sequences.fastq
+# 	fastq2fasta.pl sequences.fastq > sequences.fasta
+# 	rm sequences.fastq
+# 	?
+# 	mapper.pl sequences.fasta -m -s sequences_collapsed.fasta -c -i -p $reference/genome -t mapping.arf -v -n -u -o [cpu]
+# #	bowtie2sam.pl dir_*/mappings.bwt | samtools view -b > mappings.bam
+# 	if [ ! -s mapping.arf ]; then
+# 		exit 1
+# 	fi
+# }
 
-mapping_sample_brokendown){
-	resources: -u 1 -c 16
-	module load samtools/1.9
-	. ~josecordoba/proyectos/raw_code/init_mirdeep2
-	gunzip --force -c clean_samples)/output_files/sequences_.fastq.gz > sequences.fastq
-	fastq2fasta.pl sequences.fastq > sequences.fasta
-	rm sequences.fastq
-	mkdir dir_temp
-	# ############################# SCRIPT mapper.pl START ############################
-	rna2dna.pl sequences.fasta > dir_temp/reads_dna.fa
-	# # discarding short reads
-	fastaparse.pl dir_temp/reads_dna.fa -a 18 > dir_temp/reads_no_short.fa 2>dir_temp/reads_too_short
-	# # collapsing reads
-	collapse_reads_md.pl dir_temp/reads_no_short.fa seq > sequences_collapsed.fasta
-	# # mapping reads to genome index
-	?
-	bowtie -p [cpu] -f -n 0 -e 80 -l 18 -a -m 5 --best --strata $reference/genome --al dir_temp/sequences.fasta_mapped --un dir_temp/sequences.fasta_not_mapped sequences_collapsed.fasta dir_temp/mappings.bwt 2>bowtie.log
-	convert_bowtie_output.pl dir_temp/mappings.bwt > mapping.arf
-	############################# SCRIPT mapper.pl END############################
-	# bowtie2sam.pl dir_temp/mappings.bwt | samtools view -T $reference/genome.fa -b > mappings.bam
-	if [ ! -s mapping.arf ]; then
-		exit 1
-	fi
+# %mapping_sample_brokendown){
+# 	resources: -u 1 -c 16
+# 	module load samtools/1.9
+# 	. ~josecordoba/proyectos/raw_code/init_mirdeep2
+# 	gunzip --force -c clean_samples)/output_files/sequences_.fastq.gz > sequences.fastq
+# 	fastq2fasta.pl sequences.fastq > sequences.fasta
+# 	rm sequences.fastq
+# 	mkdir dir_temp
+# 	# ############################# SCRIPT mapper.pl START ############################
+# 	rna2dna.pl sequences.fasta > dir_temp/reads_dna.fa
+# 	# # discarding short reads
+# 	fastaparse.pl dir_temp/reads_dna.fa -a 18 > dir_temp/reads_no_short.fa 2>dir_temp/reads_too_short
+# 	# # collapsing reads
+# 	collapse_reads_md.pl dir_temp/reads_no_short.fa seq > sequences_collapsed.fasta
+# 	# # mapping reads to genome index
+# 	?
+# 	bowtie -p [cpu] -f -n 0 -e 80 -l 18 -a -m 5 --best --strata $reference/genome --al dir_temp/sequences.fasta_mapped --un dir_temp/sequences.fasta_not_mapped sequences_collapsed.fasta dir_temp/mappings.bwt 2>bowtie.log
+# 	convert_bowtie_output.pl dir_temp/mappings.bwt > mapping.arf
+# 	############################# SCRIPT mapper.pl END############################
+# 	# bowtie2sam.pl dir_temp/mappings.bwt | samtools view -T $reference/genome.fa -b > mappings.bam
+# 	if [ ! -s mapping.arf ]; then
+# 		exit 1
+# 	fi
 
-}
+# }
 
-miRNA_det_[JobRegExp:mapping:-]){
+%miRNA_det_[JobRegExp:mapping:-]){
 	. ~josecordoba/proyectos/raw_code/init_mirdeep2
 	?
 	miRDeep2.pl (*)/sequences_collapsed.fasta  $mapping_ref/genome.fa (*)/mapping.arf $mapping_ref$organism'_mature.fa' none  $mapping_ref/'$organism'_precursors.fa -d -v 2>report.log
