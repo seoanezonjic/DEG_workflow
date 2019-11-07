@@ -19,6 +19,7 @@ mapping_sample){
 	module load qualimap/2.2.1
 	. ~josecordoba/proyectos/raw_code/init_mirdeep2
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
+	rm -r dir_temp ./*.bam 
 	if [ ! -s sequences.fastq ];then
 		gunzip -c clean_samples)/output_files/sequences_.fastq.gz > sequences.fastq
 	fi
@@ -34,19 +35,19 @@ mapping_sample){
 	# mv dir_temp/reads_no_short.fa sequences_collapsed.fasta
 	# # mapping reads to genome index
 	?
-	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 5 --best --strata $ref'/bowtie_index/genome' --al dir_temp/sequences.fasta_mapped --un dir_temp/sequences.fasta_not_mapped ./sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
+	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 5 --best --strata $ref'/bowtie_index/genome' ./sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
 #	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 5 --best --strata  $mapping_ref/genome --al dir_temp/sequences.fasta_mapped --un dir_temp/sequences.fasta_not_mapped ./sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
-	bowtie2sam.pl dir_temp/mappings.bwt | samtools view -h -T $ref/genome.fa | samtools sort -n -o mapping.bam
-	qualimap bamqc -nt [cpu] -bam mapping.bam -outdir results --java-mem-size=30G
+	bowtie2sam.pl dir_temp/mappings.bwt | samtools view -h -T $ref/genome.fa | samtools sort -o mapping_sorted.bam
+	qualimap bamqc -nt [cpu] -bam mapping_sorted.bam -outdir results --java-mem-size=30G
 	convert_bowtie_output.pl dir_temp/mappings.bwt > mapping.arf
 	
-	if [ ! -s mapping.arf ] || [ ! -s mapping.bam ] || [ ! -s qualimapReport.html ]; then
+	if [ ! -s mapping.arf ] || [ ! -s qualimapReport.html ]; then
 		echo "Mapping has failed"
 		exit 1
 	else
 		sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
 		parse_bowtie_log.sh bowtie.log | awk '{print "$sample" "\t" $0}' >> ../metrics
-		rm sequences.fastq
+		rm -r sequences.fastq ./*.bam dir_temp  
 	fi
 }
 # %mapping_sample_old){
