@@ -13,7 +13,7 @@ clean_samples){
 	    get_fastqc_data.rb -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
 	fi
 }
-%mapping_sample){
+mapping_sample){
 	resources: -u 1 -c 16 -m '30gb'
 	module load samtools/1.9
 	module load qualimap/2.2.1
@@ -32,9 +32,9 @@ clean_samples){
 	# mv dir_temp/reads_no_short.fa sequences_collapsed.fasta
 	# # mapping reads to genome index
 	?
-	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 5 --best --strata  $mapping_ref/genome --al dir_temp/sequences.fasta_mapped --un dir_temp/sequences.fasta_not_mapped ./sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
+	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 5 --best --strata $ref'/bowtie_index/genome' --al dir_temp/sequences.fasta_mapped --un dir_temp/sequences.fasta_not_mapped ./sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
 #	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 5 --best --strata  $mapping_ref/genome --al dir_temp/sequences.fasta_mapped --un dir_temp/sequences.fasta_not_mapped ./sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
-	bowtie2sam.pl dir_temp/mappings.bwt | samtools view -T $reference/genome.fa | samtools sort -n -o mapping.bam
+	bowtie2sam.pl dir_temp/mappings.bwt | samtools view -T $ref/genome.fa | samtools sort -n -o mapping.bam
 	qualimap bamqc -bam mapping.bam -outdir results --java-mem-size=30G
 	convert_bowtie_output.pl dir_temp/mappings.bwt > mapping.arf
 	
@@ -46,7 +46,7 @@ clean_samples){
 		parse_bowtie_log.sh bowtie.log | awk '{print "$sample" "\t" $0}' >> ../metrics
 	fi
 }
-%mapping_sample_old){
+mapping_sample_old){
 	resources: -u 1 -c 16
 	module load samtools/1.9
 	. ~josecordoba/proyectos/raw_code/init_mirdeep2
@@ -61,7 +61,7 @@ clean_samples){
 	fi
 }
 
-%mapping_sample_brokendown){
+mapping_sample_brokendown){
 	resources: -u 1 -c 16
 	module load samtools/1.9
 	. ~josecordoba/proyectos/raw_code/init_mirdeep2
@@ -87,7 +87,7 @@ clean_samples){
 
 }
 
-%miRNA_det_[JobRegExp:mapping:-]){
+miRNA_det_[JobRegExp:mapping:-]){
 	. ~josecordoba/proyectos/raw_code/init_mirdeep2
 	?
 	miRDeep2.pl (*)/sequences_collapsed.fasta  $mapping_ref/genome.fa (*)/mapping.arf $mapping_ref$organism'_mature.fa' none  $mapping_ref/'$organism'_precursors.fa -d -v 2>report.log
