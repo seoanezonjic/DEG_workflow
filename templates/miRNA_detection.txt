@@ -1,4 +1,4 @@
-%clean_samples){
+clean_samples){
 	resources: -u 1 -n cal -c 1 -t '7-0:00:00' -m '16gb'
 	module load seqtrimbb/2.1.3
 	. ~soft_bio_267/initializes/init_ruby
@@ -14,7 +14,7 @@
 	fi
 }
 mapping_sample){
-	resources: -u 1 -c 16 -m '30gb'
+	resources: -u 1 -c 16 -m '30gb' -n cal
 	module load samtools/1.9
 	module load qualimap/2.2.1
 	. ~josecordoba/proyectos/raw_code/init_mirdeep2
@@ -41,7 +41,7 @@ mapping_sample){
 	qualimap bamqc -nt [cpu] -bam mapping_sorted.bam -outdir results --java-mem-size=30G
 	convert_bowtie_output.pl dir_temp/mappings.bwt > mapping.arf
 	
-	if [ ! -s mapping.arf ] || [ ! -s qualimapReport.html ]; then
+	if [ ! -s mapping.arf ] || [ ! -s results/qualimapReport.html ]; then
 		echo "Mapping has failed"
 		exit 1
 	else
