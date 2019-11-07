@@ -55,5 +55,6 @@ elif [[ $experiment_type == "RNAseq" ]];then
 	export fun_an_performance="o"	#-------#	Functional analysys type ("o" for Over Representation Analysis and "g" for Gene Set Enrichment Analysis)
 	export GO_modules="MBC"	#-------#	Gene subonthology analysis to perform (M = Molecular Function, B = Biological Process, C = Celular Components)
 	export fun_remote_mode="''"	#-------#	Remote mode. deamon.sh 4 is executed at loggin when remote mode is activated (Use (b) to launch biomaRt translation; (k) to use Kegg remote data base)
+	export custom_nomenclature="''"	#-------#	File with custom nomenclature in GMT format
 
 fi
