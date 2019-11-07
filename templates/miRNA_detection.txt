@@ -38,7 +38,7 @@ mapping_sample){
 	qualimap bamqc -bam mapping.bam -outdir results --java-mem-size=30G
 	convert_bowtie_output.pl dir_temp/mappings.bwt > mapping.arf
 	
-	if [ ! -s mapping.arf ] || [ ! -s mapping.bam ] || [ ! -s resultsQualimap.html ]; then
+	if [ ! -s mapping.arf ] || [ ! -s mapping.bam ] || [ ! -s qualimapReport.html ]; then
 		echo "Mapping has failed"
 		exit 1
 	else
