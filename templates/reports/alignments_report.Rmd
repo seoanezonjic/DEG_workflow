@@ -14,7 +14,7 @@ output:
     }
 </style>
 
-```{r prior_proc, echo=FALSE, warning=FALSE, message=FALSE}
+```{r prior_proc, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 	library(reshape2)
 	library(ggplot2)
 
@@ -80,19 +80,18 @@ output:
 	##############################
 
 	experiment_type <- Sys.getenv(x="experiment_type")
-
 	##############################
 	## REPORT BEGINING
 	##############################
 
-	cat("# **QC and Alignment Report**")
+	cat("# **QC and Alignment Report**\n\n")
 ```
 
 
 
-```{r trimming, echo=FALSE, warning=FALSE, message=FALSE}
-	cat("## **QC of reads before alignment**")
-	cat("### **Total numbers of reads before and after trimming**")
+```{r trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+	cat("\n\n## **QC of reads before alignment**\n\n")
+	cat("\n\n### **Total numbers of reads before and after trimming**\n\n")
 	
 	vars_trimming <- c("initial_total_sequences", "final_total_sequences")
 	# look up these vars in the legend table using match
@@ -105,10 +104,9 @@ output:
     )
 ```
 
-### **Quality scores for samples - lowest scores (min/10th decile) and weighted average**
-
-The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.
-```{r qual_scores, echo=FALSE, warning=FALSE, message=FALSE}
+.
+```{r qual_scores, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+	cat("\n\n### **Quality scores for samples - lowest scores (min/10th decile) and weighted average**\n\nThe weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base")
 	vars_perc_aligned <- c("final_min_qual_per_base_in_10th_decile", "final_min_qual_per_base_in_lower_quartile", "final_mean_qual_per_base", "final_weigthed_qual_per_sequence")
 	vars_perc_aligned_legend_names <- metric_var_2_legend_name[match(vars_perc_aligned, metric_var_2_legend_name$metric_var), "legend_name" ]
 	make_vert_line_plot_from_df(
@@ -119,11 +117,9 @@ The weighted average is the weighted average  quality score per sequence. Other 
 	)
 ```
 
-### **Reads aligning to genes vs sequence quality scores**
 
-Here we plot the number of reads aligning to genomic features against the sequence quality scores
-
-```{r aligned_v_qual, echo=FALSE, warning=FALSE, message=FALSE, eval = (experiment_type == "RNAseq")}
+```{r aligned_v_qual, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval = (experiment_type == "RNAseq")}
+	cat("\n\n### **Reads aligning to genes vs sequence quality scores**\n\nHere we plot the number of reads aligning to genomic features against the sequence quality scores")
 	vars_aligned_v_qual <- c("aligned_to_feature", "initial_weigthed_qual_per_sequence")
 	vars_aligned_v_qual_legend_names <- metric_var_2_legend_name[match(vars_aligned_v_qual, metric_var_2_legend_name$metric_var), "legend_name" ]
 
@@ -136,12 +132,10 @@ Here we plot the number of reads aligning to genomic features against the sequen
 	)
 ```
 
-## **Alignment Details**
 
-### **Trimmed reads mapping to the genome uniquely, non-uniquely, and not at all**
 
-```{r mapping, echo=FALSE, warning=FALSE, message=FALSE, eval = (experiment_type == "RNAseq")}
-
+```{r mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval = (experiment_type == "RNAseq")}
+	cat("\n\n## **Alignment Details**\n\n### **Trimmed reads mapping to the genome uniquely, non-uniquely, and not at all**\n\n")
 	vars_perc_aligned <- c("Uniquely_mapped_reads_.", "X._of_reads_mapped_to_multiple_loci", "X._of_reads_mapped_to_too_many_loci", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other")
 	perc_aligned_metric_table <- metric_table[, vars_perc_aligned]
 	perc_aligned_metric_table <- sapply(perc_aligned_metric_table, function(x) as.numeric(gsub("\\%", "", x)))
@@ -162,9 +156,9 @@ Here we plot the number of reads aligning to genomic features against the sequen
     )
 ```
 
-### **Overlap of the mapped reads with genomic features**
 
-```{r feature_overlap, echo=FALSE, warning=FALSE, message=FALSE, eval = (experiment_type == "RNAseq")}
+```{r feature_overlap, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval = (experiment_type == "RNAseq")}
+	cat("\n\n### **Overlap of the mapped reads with genomic features**\n\n")
 	vars_feature_overlap <- c("final_total_sequences", "Uniquely_mapped_reads_number", "aligned_to_feature")
 	vars_feature_overlap_legend_names <- metric_var_2_legend_name[match(vars_feature_overlap, metric_var_2_legend_name$metric_var), "legend_name" ]
 
