@@ -9,6 +9,7 @@ export mapping_ref=$CODE_PATH'/references/'$organism	#-------#	References path: 
 
 export project_folder=`pwd`'/project_execution'	#-------#	Global execution folder 
 export MAPPING_RESULTS_FOLDER=$project_folder'/clean_and_map/'	#-------#	Secondary execution path
+export report_folder=$project_folder'/reports'
 
 export SAMPLES_FILE=$CODE_PATH"/samples_to_process.lst"	#-------#	A list with sample names. File name must be unique and in must not include paired-end information or file extension. (e.g. For file "sample_ex_1.fastq.gz" and "sample_ex_2.fastq.gz", filename is "sample_ex")
 export REPORT_TEMPLATES_FOLDER=$CODE_PATH'/templates/reports'
