@@ -1,6 +1,5 @@
 . ~soft_bio_267/initializes/init_autoflow
 
-mkdir $OUTPUT_FOLDER
 
 while IFS= read sample; do
 
