@@ -3,12 +3,12 @@
 source ~soft_bio_267/initializes/init_degenes_hunter
 
 mkdir $report_folder
-create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $report_folder/alignments_report.html -d $HUNTER_RESULTS_FOLDER/metric_table -H t
+cat $MAPPING_RESULTS_FOLDER/*/metrics | sed "s/'//g" > $report_folder'/all_metrics'
+create_metric_table.rb $report_folder'/all_metrics' sample $report_folder'/metric_table'
+create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $report_folder/alignments_report.html -d $report_folder/metric_table -H t
 
 if [[ $experiment_type == "RNAseq" ]]; then
 	mkdir $HUNTER_RESULTS_FOLDER
-	cat $MAPPING_RESULTS_FOLDER/*/metrics | sed "s/'//g" > $HUNTER_RESULTS_FOLDER'/all_metrics'
-	create_metric_table.rb $HUNTER_RESULTS_FOLDER'/all_metrics' sample $HUNTER_RESULTS_FOLDER'/metric_table'
 	for TARGET_FILE in `echo $TARGETS | tr "," " "`
 	do
 		TARGET_NAME=`echo $TARGET_FILE | sed 's/_target.txt//'`
