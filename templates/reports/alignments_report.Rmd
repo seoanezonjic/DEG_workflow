@@ -12,16 +12,16 @@ output:
     body .main-container {
         max-width: 90%;
     }
-</style>
+</style>   
 
 ```{r prior_proc, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 	library(reshape2)
-	library(ggplot2)
+	library(ggplot2) 
 
 	metric_table <- data[['metric_table']]
 	metric_var_2_legend_name <- data.frame(
-		metric_var = c("initial_total_sequences", "final_total_sequences", "Uniquely_mapped_reads_.", "multi_map", "X._of_reads_mapped_to_multiple_loci", "X._of_reads_mapped_to_too_many_loci", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other", "Uniquely_mapped_reads_number", "aligned_to_feature", "initial_weigthed_qual_per_sequence", "number_duplicatedreads.estimated.", "final_mean_qual_per_base", "final_min_qual_per_base_in_10th_decile", "final_min_qual_per_base_in_lower_quartile", "final_weigthed_qual_per_sequence", "aligned_reads_percentage", "unaligned_reads_percentage", "multimapping_filtered_percentage"),
-		legend_name = c("Total Reads Before Trimming", "Total Reads After Trimming", "Unique Map %", "Multi-mapping %", "Multi Map %", "Multi Map-too many %", "Unmapped: Too Short %", "Unmapped: Other %", "Unique Map", "Aligned to Genomic Feature", "Weighted Sequence Quality Before Trimming", "Estimated Duplicated Reads", "Average Base Quality", "Min Qual per Base (Tenth Decile)", "Min Qual per Base (Lower Quartile)", "Weighted Sequence Quality", "Aligned reads %", "Unaligned reads %", "Reads supressed by multimapping %" )
+		metric_var = c("initial_total_sequences", "final_total_sequences", "Uniquely_mapped_reads_.", "multi_map", "X._of_reads_mapped_to_multiple_loci", "X._of_reads_mapped_to_too_many_loci", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other", "Uniquely_mapped_reads_number", "aligned_to_feature", "initial_weigthed_qual_per_sequence", "number_duplicatedreads.estimated.", "final_mean_qual_per_base", "final_min_qual_per_base_in_10th_decile", "final_min_qual_per_base_in_lower_quartile", "final_weigthed_qual_per_sequence", "aligned_reads_percentage", "unaligned_reads_percentage", "multimapping_filtered_percentage", "aligned_reads", "filtered_reads"),
+		legend_name = c("Total Reads Before Trimming", "Total Reads After Trimming", "Unique Map %", "Multi-mapping %", "Multi Map %", "Multi Map-too many %", "Unmapped: Too Short %", "Unmapped: Other %", "Unique Map", "Aligned to Genomic Feature", "Weighted Sequence Quality Before Trimming", "Estimated Duplicated Reads", "Average Base Quality", "Min Qual per Base (Tenth Decile)", "Min Qual per Base (Lower Quartile)", "Weighted Sequence Quality", "Aligned reads %", "Unaligned reads %", "Reads supressed by multimapping %", "Mapped reads", "Filtered reads")
 	)
 
 	make_stacked_barchart_from_df <- function(df, id, other_vars, legend_names=FALSE) {
@@ -90,6 +90,9 @@ output:
 	execute_feature_overlap <- all(vars_feature_overlap %in% colnames(metric_table))
 	vars_mirna_mapping <- c("aligned_reads_percentage", "unaligned_reads_percentage", "multimapping_filtered_percentage")
 	execute_mirna_mapping <- all(vars_mirna_mapping %in% colnames(metric_table))
+	vars_mirna_mapping_abs <- c("final_total_sequences", "filtered_reads", "aligned_reads")
+	execute_mirna_mapping_abs <- all(vars_mirna_mapping_abs %in% colnames(metric_table))
+
 	##############################
 	## REPORT BEGINING
 	##############################
@@ -135,7 +138,7 @@ output:
 	###	RNASEQ PLOTS
 	##################################################
 	cat("\n\n### **Reads aligning to genes vs sequence quality scores**\n\nHere we plot the number of reads aligning to genomic features against the sequence quality scores")
-	vars_aligned_v_qual_legend_names <- metric_var_2_legend_name[match(vars_aligned_v_qual, metric_var_2_legend_name$metric_var), "legend_name" ]
+	vars_aligned_v_qual_legend_names <- metric_var_2_legend_name[match(vars_aligned_v_qual, metric_var_2_legend_name$metric_var), "legend_name"]
 
     make_scatterplot_from_df(
 		df = metric_table,
@@ -188,20 +191,24 @@ output:
 	##################################################
 	cat("\n\n## **Alignment Details**\n\n### **Trimmed reads mapping to the genome almost once, reads mapping suppresed by multimapping threshold, and not mapped at all**\n\n")
 	mirna_mapping_metric_table <- metric_table[, vars_mirna_mapping]
-	#mirna_mapping_metric_table <- sapply(mirna_mapping_metric_table, function(x) as.numeric(gsub("\\%", "", x)))
 	mirna_mapping_metric_table <- data.frame(metric_table["sample"], mirna_mapping_metric_table)
-	# Sum multimapping
-	# mirna_mapping_metric_table[, "multi_map"] <- mirna_mapping_metric_table[,"X._of_reads_mapped_to_multiple_loci"] + mirna_mapping_metric_table[,"X._of_reads_mapped_to_too_many_loci"]
-	# Reselect table
-	# vars_mirna_mapping <- c("Uniquely_mapped_reads_.", "multi_map", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other")
-	# mirna_mapping_metric_table <- mirna_mapping_metric_table[, vars_mirna_mapping]
-	# mirna_mapping_metric_table <- data.frame(metric_table["sample"], mirna_mapping_metric_table)
-
     vars_mirna_mapping_legend_names <- metric_var_2_legend_name[match(vars_mirna_mapping, metric_var_2_legend_name$metric_var), "legend_name" ]
     make_stacked_barchart_from_df(
 		df = mirna_mapping_metric_table, 
         id = "sample", 
         other_vars = vars_mirna_mapping,
         legend_names = vars_mirna_mapping_legend_names
+    )
+```
+
+```{r mirna_mapping_abs, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_mirna_mapping_abs}
+	cat("\n\n### **Raw reads count mapping summary **\n\n")
+	vars_mirna_mapping_abs_legend_names <- metric_var_2_legend_name[match(vars_mirna_mapping_abs, metric_var_2_legend_name$metric_var), "legend_name" ]
+
+    make_stacked_barchart_from_df_dodge(
+		df = metric_table, 
+        id = "sample", 
+        other_vars = vars_mirna_mapping_abs,
+        legend_names = vars_mirna_mapping_abs_legend_names
     )
 ```
