@@ -1,9 +1,9 @@
 clean_samples){
-	resources: -u 1 -n cal -c 1 -t '7-0:00:00' -m '16gb'
+	resources: -u 1 -n cal -c 16 -t '7-0:00:00' -m '16gb'
 	module load seqtrimbb/2.1.3
 	. ~soft_bio_267/initializes/init_ruby
 	?
-	seqtrimbb -t $miRNA_trim_template -Q $read_folder'/'$sample'.fastq.gz' -w [cpu] -O output_files
+	seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -w [cpu] -O output_files
 	
 	if [ ! -s output_files/sequences_.fastq.gz ]; then
 		echo "Triming has failed"
@@ -11,35 +11,30 @@ clean_samples){
 	else
 		get_fastqc_data.rb -i 'output_files/initial_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tinitial_" $0 }' >> ../metrics
 	    get_fastqc_data.rb -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
+		mv output_files/report_files/* ./
 	fi
 }
+
 mapping_sample){
-	resources: -u 1 -c 16 -m '30gb' -n cal
+	resources: -u 1 -c 16 -m '20gb' -n cal
 	module load samtools/1.9
 	module load qualimap/2.2.1
-	. ~josecordoba/proyectos/raw_code/init_mirdeep2
+	. ~josecordoba/proyectos/initializes/init_mirdeep2
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
-	rm -r dir_temp ./*.bam 
-	if [ ! -s sequences.fastq ];then
-		gunzip -c clean_samples)/output_files/sequences_.fastq.gz > sequences.fastq
-	fi
-	# fastq2fasta.pl sequences.fastq > sequences.fasta
-	# rm sequences.fastq
+	
 	mkdir dir_temp
-	# ############################# SCRIPT mapper.pl START ############################
-	# rna2dna.pl sequences.fasta > dir_temp/reads_dna.fa
-	# # discarding short reads
-	# fastaparse.pl dir_temp/reads_dna.fa -a 18 > dir_temp/reads_no_short.fa 2>dir_temp/reads_too_short
-	# # collapsing reads
-	#collapse_reads_md.pl dir_temp/reads_no_short.fa seq > sequences_collapsed.fasta
-	# mv dir_temp/reads_no_short.fa sequences_collapsed.fasta
-	# # mapping reads to genome index
+	if [ ! -s sequences.fastq ];then
+		gunzip -c clean_samples)/output_files/sequences_.fastq.gz > dir_temp/sequences.fastq
+	fi
+	
+	filter_fastq.rb -i dir_temp/sequences.fastq -m 18 > filtered_sequences.fastq
 	?
-	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 5 --best --strata $ref'/bowtie_index/genome' ./sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
-#	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 5 --best --strata  $mapping_ref/genome --al dir_temp/sequences.fasta_mapped --un dir_temp/sequences.fasta_not_mapped ./sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
-	bowtie2sam.pl dir_temp/mappings.bwt | samtools view -h -T $ref/genome.fa | samtools sort -o mapping_sorted.bam
-	qualimap bamqc -nt [cpu] -bam mapping_sorted.bam -outdir results --java-mem-size=30G
-	convert_bowtie_output.pl dir_temp/mappings.bwt > mapping.arf
+	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 7 --best --strata $ref'/bowtie_index/genome' filtered_sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
+	
+	bowtie2sam.pl dir_temp/mappings.bwt | samtools view -h -T $ref/genome.fa | samtools sort -o dir_temp/mapping_sorted.bam
+	qualimap bamqc -nt [cpu] -bam dir_temp/mapping_sorted.bam -outdir results --java-mem-size=20G
+	collapse_bwt.rb dir_temp/mappings.bwt > dir_temp/collapsed_mappings.bwt 
+	convert_bowtie_output.pl dir_temp/collapsed_mappings.bwt > mapping.arf
 	
 	if [ ! -s mapping.arf ] || [ ! -s results/qualimapReport.html ]; then
 		echo "Mapping has failed"
@@ -47,55 +42,33 @@ mapping_sample){
 	else
 		sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
 		parse_bowtie_log.sh bowtie.log | awk '{print "$sample" "\t" $0}' >> ../metrics
+		echo -e "$sample\tfiltered_reads\t`grep -c ">" miRDeep2_input_reads.fasta`" >> ../metrics
+		echo -e "$sample\taligned_reads\t`cut -f1 dir_temp/mappings.bwt | sort -u | wc -l`" >> ../metrics
 		rm -r sequences.fastq ./*.bam dir_temp  
 	fi
 }
-# %mapping_sample_old){
-# 	resources: -u 1 -c 16
-# 	module load samtools/1.9
-# 	. ~josecordoba/proyectos/raw_code/init_mirdeep2
-# 	gunzip --force -c clean_samples)/output_files/sequences_.fastq.gz > sequences.fastq
-# 	fastq2fasta.pl sequences.fastq > sequences.fasta
-# 	rm sequences.fastq
-# 	?
-# 	mapper.pl sequences.fasta -m -s sequences_collapsed.fasta -c -i -p $reference/genome -t mapping.arf -v -n -u -o [cpu]
-# #	bowtie2sam.pl dir_*/mappings.bwt | samtools view -b > mappings.bam
-# 	if [ ! -s mapping.arf ]; then
-# 		exit 1
-# 	fi
-# }
 
-# %mapping_sample_brokendown){
-# 	resources: -u 1 -c 16
-# 	module load samtools/1.9
-# 	. ~josecordoba/proyectos/raw_code/init_mirdeep2
-# 	gunzip --force -c clean_samples)/output_files/sequences_.fastq.gz > sequences.fastq
-# 	fastq2fasta.pl sequences.fastq > sequences.fasta
-# 	rm sequences.fastq
-# 	mkdir dir_temp
-# 	# ############################# SCRIPT mapper.pl START ############################
-# 	rna2dna.pl sequences.fasta > dir_temp/reads_dna.fa
-# 	# # discarding short reads
-# 	fastaparse.pl dir_temp/reads_dna.fa -a 18 > dir_temp/reads_no_short.fa 2>dir_temp/reads_too_short
-# 	# # collapsing reads
-# 	collapse_reads_md.pl dir_temp/reads_no_short.fa seq > sequences_collapsed.fasta
-# 	# # mapping reads to genome index
-# 	?
-# 	bowtie -p [cpu] -f -n 0 -e 80 -l 18 -a -m 5 --best --strata $reference/genome --al dir_temp/sequences.fasta_mapped --un dir_temp/sequences.fasta_not_mapped sequences_collapsed.fasta dir_temp/mappings.bwt 2>bowtie.log
-# 	convert_bowtie_output.pl dir_temp/mappings.bwt > mapping.arf
-# 	############################# SCRIPT mapper.pl END############################
-# 	# bowtie2sam.pl dir_temp/mappings.bwt | samtools view -T $reference/genome.fa -b > mappings.bam
-# 	if [ ! -s mapping.arf ]; then
-# 		exit 1
-# 	fi
-
-# }
-
-%miRNA_det_[JobRegExp:mapping:-]){
-	. ~josecordoba/proyectos/raw_code/init_mirdeep2
+miRNA_detection){
+	resources: -m '4gb' -t '4-00:00:00'
+	. ~soft_bio_267/initializes/init_ruby
+	. ~josecordoba/proyectos/initializes/init_mirdeep2
+	mkdir dir_temp
+	fastq2fasta.pl mapping_sample)/filtered_sequences.fastq > dir_temp/filtered_sequences.fasta
+	collapse_reads_md.pl dir_temp/filtered_sequences.fasta seq > dir_temp/miRDeep2_input_reads.fasta
 	?
-	miRDeep2.pl (*)/sequences_collapsed.fasta  $mapping_ref/genome.fa (*)/mapping.arf $mapping_ref$organism'_mature.fa' none  $mapping_ref/'$organism'_precursors.fa -d -v 2>report.log
-	echo -e "id\t`pwd | tr '/' '_'`" > counts.tab
-	cat expression_analyses/expression_analyses*/miRNA_expressed.csv | tail -n +2 | awk '{print $1":"$3"\t"$2}' >> counts.tab
+	miRDeep2.pl dir_temp/miRDeep2_input_reads.fasta $ref/genome.fa mapping_sample)/mapping.arf $ref/miRNA_mature.fasta none $ref/miRNA_precursors.fasta -d -g -1	
+	# echo -e "id\t`pwd | tr '/' '_'`" > counts.tab
+	# cat expression_analyses/expression_analyses*/miRNA_expressed.csv | tail -n +2 | awk '{print $1":"$3"\t"$2}' >> counts.tab
 	#miRDeep2.pl sequences_collapsed.fasta $reference/genome.fa mapping.arf none none none 2>report.log
+	if grep -q "ended" job*out; then
+		parse_miRDeep2.rb result*csv
+		for set in novel known; do
+			tail -n +2 $set'_miRDeep_miRNAs' | awk 'BEGIN{FS="\t"}{OFS=""}{print ">",$1,"\n",$14}'> $set'_miRNAs.fasta'
+			echo -e "$sample\t"$set"_miRNAs\t`grep -c ">" $set'_miRNAs.fasta'`" >> ../metrics
+		done
+		report_html -t $REPORT_TEMPLATES_FOLDER/miRNA_report_template.erb -d novel_miRDeep_miRNAs,known_miRDeep_miRNAs -o miRNA_report
+	else
+		>&2 echo "Analysis has failed" 
+		exit 1
+	fi
 }
