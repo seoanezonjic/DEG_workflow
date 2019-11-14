@@ -25,17 +25,6 @@ After that create samples_to_process.lst: Is a file containing a list of new sam
 |ad_dis_8|patien8|diseased|adult|usa|
 |ch_hl_9|patien9|healthy|child|usa|
 
-#### samples_to_process.lst example:
-
-|ch_dis_1|
-|ad_dis_2|
-|ch_hl_3|
-|ad_hl_4|
-|ch_dis_5|
-|ad_hl_6|
-|ad_dis_7|
-|ad_dis_8|
-|ch_hl_9|
 
 2º: Create all target (comparison) files. The target comparison file is used in DEGenesHunter comparison. It consist in a table with 3 columns (sample name, replicate number and treatment). To generate target files it is recommended to use ./aux_parsers/generate_targets.rb. This script takes the experiment design table as input (***-e***), and it generate target by parsing a config string. The config string is given by ***-t*** flag and must be designed manually and it can generate all possible targets according filtering criteria (explanined later). The config string consist in information for one or more targets (divided by '**;**': "TargetA**;**TargetB"). In target information target name and conditions mus be indicated. Target name and conditions are separated by '**>**' and control and treatment features mus be indicated as feature_name**:**control_feature1**/**control_feature2**,**treatment_feature1**,**treatment_feature2. Example. For **healthy vs disease** and **child vs others** comparisons according example experimen design table, the target string should be **'**hl_vs_dis**>**clinical_status**:**healthy**,**diseased**;**ch_vs_other**>**age_group**:**child**,**adult**/**senior**'**. 
 
