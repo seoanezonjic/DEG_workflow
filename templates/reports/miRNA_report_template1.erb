@@ -1,0 +1,101 @@
+<%
+	#################################################
+	######## => INITIALIZE
+	#################################################
+
+	F_NAME = 0 
+	F_POS_IN_TABLE = 1
+
+
+	features = {
+		sample: ["Sample"],
+		final_total_sequences: ["Pre-processed reads"],
+		aligned_reads: ["Mapped reads"],
+		known_miRNAs: ["Known miRNAs"],
+		novel_miRNAs: ["Novel miRNAs"],
+		total_miRNAs: ["Total miRNAs in sample"]
+	}
+	
+	#################################################
+	######## => METHODS
+	#################################################
+
+	def copy_table(table_name)
+		table_copy = []		
+		@hash_vars[table_name].each do |row|
+			table_copy << row.dup
+		end
+		header = table_copy.shift.map!{|feature| feature.to_sym}
+		return table_copy, header
+	end
+
+	def get_features_index(features, header)
+		indexed_features = {}
+		features.each do |feature, attributes|
+			position = header.index(feature)
+			attributes[F_POS_IN_TABLE] = position
+			indexed_features[feature] = attributes
+		end
+		return indexed_features
+	end 
+
+	def extract_column(matrix, column_number)
+		column = matrix.transpose[column_number]
+		return column
+	end
+
+	def insert_column(matrix, column) # column must to be a simple array, each element coorespond to a sample
+		column.each_with_index do |element, sample|
+			matrix_sample[sample] = element
+		end 
+		return matrix
+	end
+
+	#################################################
+	######## => MAIN
+	#################################################
+
+	all_metrics, header = copy_table('metrics')
+	known_miRNAs = 
+
+
+
+	features = get_features_index(features, header)
+
+
+%>
+<h1 style="text-align:center; background-color:#d6eaf8 ">miRNA analysis workflow report</h1>
+<div style="overflow: hidden">
+	
+	<h2 style="text-align:center; background-color:#d6eaf8 ">Some text</h2>
+	<div style="overflow: hidden">
+		<%=
+		pairs = [
+			[aligned_reads:, total_miRNAs:],
+			[final_total_sequences:, total_miRNAs:],
+			[final_total_sequences:, total_miRNAs:]
+		]
+		pairs.each do |x, y|
+			cols = [data_header.index(x), data_header.index(y)]
+			x_name = features[x][F_NAME]
+			y_name = features[x][F_NAME]
+			%><%=
+			sccater2D(id: "all_info_table", fields: cols, header: false, row_names: false, 
+				responsive: false,
+				text: true,
+				height: '600px', width: '600px',
+				title: "#{x_name} VS #{y_name}",
+				x_label: x_name, y_label: y_name,
+				regressionLine: true,
+				config: {
+					'sizes' => Array.new(16, 8),
+					'graphOrientation' => 'vertical',
+					'lineDecoration' => false
+				})
+			%><%
+			end
+		%>
+		%>
+	</div>
+
+</div>
