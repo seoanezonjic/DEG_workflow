@@ -1,0 +1,143 @@
+<%
+	
+	scatter_columns = [1,4]
+	def copy_table(table_name, tag = "none")
+		table_copy = []
+		@hash_vars[table_name].each do |row|
+			table_copy << [row[0], row[1], row[4], row[2].split(" ").first, tag].flatten
+		end
+		return table_copy
+	end
+
+
+	def combine_tables(all_tables)
+		header = nil
+		combined_data = []
+		all_tables.each do |table|
+			table.each_with_index do |row, i|
+				if i == 0
+					if header.nil?
+						header = row
+					else
+						next
+					end
+				else
+					combined_data << row
+				end
+			end
+		end
+		combined_data = combined_data.unshift(header)
+		return combined_data
+	end
+
+
+	novel_mirnas = copy_table('novel_miRDeep_miRNAs',tag = "Novel")
+
+	known_mirnas = copy_table('known_miRDeep_miRNAs', tag = "Known")
+	
+	@hash_vars["novel_mirnas"] = novel_mirnas
+	@hash_vars["known_mirnas"] = known_mirnas
+	# @hash_vars["combined_data"] = combine_tables([novel_mirnas, known_mirnas])
+	@hash_vars["summary"] = [
+		["Type of miRNA discovered", "Count"],
+		["Known", known_mirnas.length],
+		["Novel", novel_mirnas.length]
+	]	
+
+%>
+<h1 style="text-align:center; background-color:#d6eaf8 ">miRNA analysis workflow report</h1>
+<div style="overflow: hidden">
+	<h2 style="text-align:center; background-color:#d6eaf8 ">miRDeep2 analysis summary table</h2>
+	<div style="overflow: hidden">
+		<%=
+			table(
+				id: "summary",
+				text: true,
+				header: true,
+				cell_align: ['left', 'right'])
+		%>
+	<h2 style="text-align:center; background-color:#d6eaf8 ">miRDeep2 score vs supporting reads</h2>
+	<div style="overflow: hidden">
+		<%=
+			sccater2D(
+				id: "novel_mirnas", 
+				header: true, 
+				row_names: true,
+				title: "Novel miRNAs discovered",
+				height: '600px', width: '600px', 
+				responsive: false, 
+				x_label: "miRDeep2 score", 
+				y_label: "Supporting reads",
+				config: {
+				"xAxis" => @hash_vars["novel_mirnas"].transpose[1],
+				"yAxis" => @hash_vars["novel_mirnas"].transpose[2]
+			})
+		%><%=
+			sccater2D(
+				id: "known_mirnas", 
+				header: true, 
+				row_names: true,
+				title: "Known miRNAs discovered",
+				height: '600px', 
+				width: '600px', 
+				responsive: false, 
+				x_label: "miRDeep2 score", 
+				y_label: "Supporting reads",
+				config: {
+				"xAxis" => @hash_vars["known_mirnas"].transpose[1],
+				"yAxis" => @hash_vars["known_mirnas"].transpose[2]
+			})
+		%>
+		<%=
+		# scatterbubble2D(
+		# 		id: "combined_data", 
+		# 		header: true, 
+		# 		row_names: true,
+		# 		title: "Novel miRNAs discovered",
+		# 		height: '600px', width: '600px', 
+		# 		responsive: false, 
+		# 		x_label: "miRDeep2 score", 
+		# 		y_label: "Supporting reads",
+		# 		config: {
+		# 		"xAxis" => @hash_vars["combined_data"].transpose[1],
+		# 		"yAxis" => @hash_vars["combined_data"].transpose[2],
+		# 		"colorBy" => @hash_vars["combined_data"].transpose[4]
+		# 	})
+		%>
+	</div>
+	<h2 style="text-align:center; background-color:#d6eaf8 ">Estimated probability that the miRNA candidate is a true positive vs suppeorting reads</h2>
+	<div style="overflow: hidden">
+		<%=
+			sccater2D(
+				id: "novel_mirnas", 
+				header: true, 
+				row_names: true,
+				title: "Novel miRNAs discovered",
+				height: '600px', width: '600px', 
+				responsive: false, 
+				x_label: "True positive probability (%)", 
+				y_label: "Supporting reads",
+				config: {
+				"xAxis" => @hash_vars["novel_mirnas"].transpose[3],
+				"yAxis" => @hash_vars["novel_mirnas"].transpose[2]
+			})
+		%><%=
+			sccater2D(
+				id: "known_mirnas", 
+				header: true, 
+				row_names: true,
+				title: "Known miRNAs discovered",
+				height: '600px', 
+				width: '600px', 
+				responsive: false, 
+				x_label: "True positive probability (%)", 
+				y_label: "Supporting reads",
+				config: {
+				"xAxis" => @hash_vars["known_mirnas"].transpose[3],
+				"yAxis" => @hash_vars["known_mirnas"].transpose[2]
+			})
+		%>
+	</div>
+
+</div>
+
