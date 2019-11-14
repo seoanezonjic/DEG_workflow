@@ -9,17 +9,7 @@
 ## wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_30/GRCh37_mapping/gencode.v30lift37.annotation.gtf.gz' -O  $1'/gencode.v30lift37.annotation.gtf.gz'
 mkdir -p $mapping_ref
 
-if [ $organism == "human" ]; then
-	if [ ! -s $mapping_ref/annotation.gtf ] || [ ! -s $mapping_ref/genome.fa ]; then
-		wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_19/gencode.v19.annotation.gtf.gz' -O $mapping_ref/annotation.gtf.gz
-		wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_19/GRCh37.p13.genome.fa.gz' -O $mapping_ref/genome.fa.gz 
-		gunzip -f $mapping_ref/*
-	else 
-		echo "$organsim genome and annotations has been downloaded"
-	fi 
-fi 
-
-if [ $experiment_type == "miRNAseq" ] ; then 
+if [ $experiment_type == "miRNAseq_detection" ] ; then 
 	. ~josecordoba/proyectos/raw_code/init_mirdeep2
 	echo "Downloading miRBASE for $organism"
 	wget "ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz" -O $mapping_ref/hairpin.fa.gz 
@@ -30,9 +20,21 @@ if [ $experiment_type == "miRNAseq" ] ; then
 	gunzip -f $mapping_ref/mature.fa.gz
 	extract_miRNAs.pl $mapping_ref/mature.fa $MIRBASE_ORGANISM > $mapping_ref/miRNA_mature.fasta
 	rm $mapping_ref/mature.fa
-	# wget "http://mirdb.org/download/miRDB_v6.0_prediction_result.txt.gz" -O miRDB_v6.0_prediction_result.txt.gz
+	
+#elif [  $experiment_type == "miRNAseq_detection" ]; then
+	# wget "http://carolina.imis.athena-innovation.gr/diana_tools/downloads/e2de248e81009d5a5s33ebe9906fa32c/TarBase_v8_download.tar.gz" -O miRNA_targets.txt.gz
 	# gunzip -f miRDB_v6.0_prediction_result.txt.gz
-	# grep $organism miRDB_v6.0_prediction_result.txt > $organism'_targets.txt'
+	# grep $MIRBASE_ORGANISM miRDB_v6.0_prediction_result.txt > targets.txt
 else 
 	echo "miRNA precursors are already downloaded"
 fi
+
+if [ $organism == "human" ]; then
+	if [ ! -s $mapping_ref/annotation.gtf ] || [ ! -s $mapping_ref/genome.fa ]; then
+		wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_19/gencode.v19.annotation.gtf.gz' -O $mapping_ref/annotation.gtf.gz
+		wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_19/GRCh37.p13.genome.fa.gz' -O $mapping_ref/genome.fa.gz 
+		gunzip -f $mapping_ref/*
+	else 
+		echo "$organsim genome and annotations has been downloaded"
+	fi 
+fi 

@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-#SBATCH --cpus=1
+#SBATCH --cpus=16
 #SBATCH --mem='20gb'
 #SBATCH --time='7-00:00:00'
 #SBATCH --error=job.%J.err
@@ -15,4 +15,9 @@ elif [ $experiment_type == "miRNAseq" ]; then
 	out=$mapping_ref'/bowtie_index'
 	mkdir -p $out
 	bowtie-build $mapping_ref'/genome.fa' $out'/genome'
+elif [ $experiment_type == "miRNAseq_DEA" ]; then
+	module load cdhit
+	out=$mapping_ref'/STAR_index'
+	cd-hit-est -M 0 -i $miRNA_fasta -o $out'/nr_miRNAs.fasta' -c 1
+	STAR --runThreadN 16 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $out'/nr_miRNAs.fasta'
 fi

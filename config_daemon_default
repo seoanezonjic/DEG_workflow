@@ -2,7 +2,7 @@
 ## GLOBAL VARS
 ###################################
 
-export experiment_type="RNAseq"	#-------#	Experiment type 'miRNAseq' or 'RNAseq'
+export experiment_type="RNAseq"	#-------#	Experiment type 'miRNAseq_detection', 'miRNA_DEA' or 'RNAseq' 
 
 export organism='human'	#-------#	Model organism: Currently only 'human' is available
 export mapping_ref=$CODE_PATH'/references/'$organism	#-------#	References path: The references will be downloaded and indexed there. For human use mapping_ref=~pedro/proyectos/ramon_areces19/pmm2_belen/project_execution/references/
@@ -21,30 +21,36 @@ export launch_login=FALSE 	#-------#	Login execution mode. Set this variable to 
 
 
 
-if [[ $experiment_type == "miRNAseq" ]]; then
-
-##################################
-## miRNA-seq variables
-##################################
+if [[ $experiment_type == "miRNAseq_detection" ]]; then
+	##################################
+	## miRNA-seq variables
+	##################################
 	export TEMPLATE=$CODE_PATH"/templates/miRNA_detection.txt"	#-------#	AutoFlow mapping template. It is advisable not to modify this variable
-	export MIRNA_TRIM_TEMPLATE=$CODE_PATH"/templates/trimming/miRNA.txt"
+	export TRIM_TEMPLATE=$CODE_PATH"/templates/trimming/miRNA.txt"
 	export MIRBASE_ORGANISM='hsa'	#--------#	STRING 	for mirbase filtering (three words code) 'hsa', 'mmu'
 
-elif [[ $experiment_type == "RNAseq" ]];then
-
-##################################
-## RNA-seq variables
-##################################
+elif [[ $experiment_type == "RNAseq" || $experiment_type == "miRNAseq_DEA" ]];then
+	##################################
+	## RNA-seq variables
+	##################################
 	# Trimming and mapping 
 	#----------------
+	export TRIM_TEMPLATE="transcriptomics.txt"
+	export HUNTER_RESULTS_FOLDER=$project_folder'/DEGenesHunter_results'	#-------#	Secondary execution path
 	export TEMPLATE=$CODE_PATH"/templates/mapping_template.txt"	#-------#	AutoFlow mapping template. It is advisable not to modify this variable
-	export stranded='yes'	#-------#	This parametrer must be changed in case of not-stranded sequencing only (rare case). It do not work for miRNAseq
+	export stranded='yes'	#-------#	This parametrer must be changed in case of not-stranded sequencing only (rare case)
 	export MIN_READ_LENGTH=65 	#-------#	Minimun read length theshold in primming step. It do not work for miRNAseq
-	export read_layout='paired'	#-------#	Read layout must be defined as 'paired' in case of paired-end samples or 'single' in case of single-end samples
+	export read_layout='single'	#-------#	Read layout must be defined as 'paired' in case of paired-end samples or 'single' in case of single-end samples
+
+	if [[ $experiment_type == "miRNAseq_DEA" ]]; then
+		export mapping_ref=$CODE_PATH'/references/'$organism/miRNA	#-------#	References path: The references will be downloaded and indexed there. For human use mapping_ref=~pedro/proyectos/ramon_areces19/pmm2_belen/project_execution/references/
+		export TRIM_TEMPLATE=$CODE_PATH"/templates/trimming/miRNA.txt"
+	fi
+
+
 
 	# DEgenesHunter comparisons
 	#----------------
-	export HUNTER_RESULTS_FOLDER=$project_folder'/DEGenesHunter_results'	#-------#	Secondary execution path
 	export TARGETS=`ls *_target.txt | tr "\n" ","` ; TARGETS=${TARGETS%?}	#-------#	Target file location, including a short sample description	
 	export de_pvalue="0.05"	#-------#	Minimum P-value threshold 
 	export de_packages="DELN"	#-------#	Gene expresion analysis algorithms to perform (D = DESeq2, E = edgeR, L = limma, N= NOISeq)
