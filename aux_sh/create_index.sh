@@ -11,13 +11,15 @@ if [ $experiment_type == "RNAseq" ]; then
 	mkdir -p $out
 	STAR --runThreadN 16 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/genome.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
 elif [ $experiment_type == "miRNAseq" ]; then
-	. ~josecordoba/proyectos/raw_code/init_mirdeep2
+	. ~josecordoba/proyectos/initializes/init_mirdeep2
 	out=$mapping_ref'/bowtie_index'
 	mkdir -p $out
 	bowtie-build $mapping_ref'/genome.fa' $out'/genome'
 elif [ $experiment_type == "miRNAseq_DEA" ]; then
 	module load cdhit
+	. ~josecordoba/proyectos/initializes/init_mirdeep2
 	out=$mapping_ref'/STAR_index'
+	mkdir -p $out
 	cd-hit-est -M 0 -i $miRNA_fasta -o $out'/nr_miRNAs.fasta' -c 1
 	STAR --runThreadN 16 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $out'/nr_miRNAs.fasta'
 fi
