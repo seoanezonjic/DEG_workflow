@@ -3,22 +3,22 @@
 
 while IFS= read sample; do
 
-	if [[ $experiment_type == "miRNAseq" ]]; then
-		AF_VARS=`echo "
-		\\$read_folder=$read_path,
-		\\$sample=$sample,
-		\\$miRNA_trim_template=$MIRNA_TRIM_TEMPLATE,
-		\\$ref=$mapping_ref
-		" | tr -d [:space:]`
-	elif [[ $experiment_type == "RNAseq" ]]; then
+	#############################################################
+	####	GLOBAL VARS
+	#############################################################
+	AF_VARS=`echo "
+	\\$read_folder=$read_path,
+	\\$trim_template=$TRIM_TEMPLATE,
+	\\$sample=$sample,
+	\\$ref=$mapping_ref
+	" | tr -d [:space:]`
 
-		AF_VARS=`echo "
-		\\$read_folder=$read_path,
-		\\$sample=$sample,
+	if [[ $experiment_type == "RNAseq" || $experiment_type == "miRNAseq_DEA" ]]; then
+
+		AF_VARS=$AF_VARS,`echo "
 		\\$stranded=$stranded,
 		\\$min_read_length=$MIN_READ_LENGTH,
-		\\$read_layout=$read_layout,
-		\\$ref=$mapping_ref
+		\\$read_layout=$read_layout
 		" | tr -d [:space:]`
 	fi
 

@@ -1,4 +1,4 @@
-###################################
+################################### 
 ## GLOBAL VARS
 ###################################
 
@@ -6,6 +6,7 @@
 export experiment_type="RNAseq"	#-------#	Experiment type 'miRNAseq_detection', 'miRNA_DEA' or 'RNAseq' 
 export organism='human'	#-------#	Model organism: Currently only 'human' is available
 export mapping_ref=$CODE_PATH'/references/'$organism	#-------#	References path: The references will be downloaded and indexed there. For human use mapping_ref=~pedro/proyectos/ramon_areces19/pmm2_belen/project_execution/references/
+export TRIM_TEMPLATE="transcriptomics.txt"	#-------#	Trimming template path. Available options are "$CODE_PATH"/templates/trimming/miRNA.txt or transcriptomics.txt
 
 ######	EXECUTION VARIABLES	#######
 export RESOURCES="-c 2 -t 10:00:00 -n cal -m 4"	#-------#	AutoFlow resources setting 
@@ -28,7 +29,6 @@ if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	## miRNA-seq variables
 	##################################
 	export TEMPLATE=$CODE_PATH"/templates/miRNA_detection.txt"	#-------#	AutoFlow mapping template. It is advisable not to modify this variable
-	export TRIM_TEMPLATE=$CODE_PATH"/templates/trimming/miRNA.txt"	#-------#	Trimming template path
 	export MIRBASE_ORGANISM='hsa'	#--------#	STRING 	for mirbase filtering (three words code) 'hsa', 'mmu'
 
 elif [[ $experiment_type == "RNAseq" || $experiment_type == "miRNAseq_DEA" ]];then
@@ -38,21 +38,17 @@ elif [[ $experiment_type == "RNAseq" || $experiment_type == "miRNAseq_DEA" ]];th
 	##################################
 	####### Trimming and mapping	#######
 
-	export TRIM_TEMPLATE="transcriptomics.txt"
 	export HUNTER_RESULTS_FOLDER=$project_folder'/DEGenesHunter_results'	#-------#	Secondary execution path
 	export TEMPLATE=$CODE_PATH"/templates/mapping_template.txt"	#-------#	AutoFlow mapping template. It is advisable not to modify this variable
 	export stranded='yes'	#-------#	This parametrer must be changed in case of not-stranded sequencing only (rare case)
-	export MIN_READ_LENGTH=65 	#-------#	Minimun read length theshold in primming step. It do not work for miRNAseq
+	export MIN_READ_LENGTH=65 	#-------#	Minimun read length theshold in primming step. Set 10 for miRNA detection or miRNA DEA analysis
 	export read_layout='single'	#-------#	Read layout must be defined as 'paired' in case of paired-end samples or 'single' in case of single-end samples
 
 	if [[ $experiment_type == "miRNAseq_DEA" ]]; then
 		###### When miRNA seq Differential expression analysis mode is habilitated, some recomnded parametres are changed: 
 		export mapping_ref=$CODE_PATH'/references/'$organism/miRNA	#-------#	References path: Path to miRNA mature sequences fasta
-		export TRIM_TEMPLATE=$CODE_PATH"/templates/trimming/miRNA.txt"
-		export MIN_READ_LENGTH=10 	#-------#	Minimun read length theshold in primming step. It do not work for miRNAseq
-	
+		export mirna_fasta=$mapping_ref/miRNA_mature.fasta
 	fi
-
 
 
 	######	DEgenesHunter comparisons	######
