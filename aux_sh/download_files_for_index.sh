@@ -10,7 +10,7 @@
 mkdir -p $mapping_ref
 
 if [ $experiment_type == "miRNAseq_detection" ] ; then 
-	. ~josecordoba/proyectos/raw_code/init_mirdeep2
+	. ~josecordoba/proyectos/initializes/init_mirdeep2
 	echo "Downloading miRBASE for $organism"
 	wget "ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz" -O $mapping_ref/hairpin.fa.gz 
 	gunzip -f $mapping_ref/hairpin.fa.gz 
