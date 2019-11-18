@@ -2,14 +2,15 @@
 ####################
 ### Trimming and mapping template. Parametres can be customized at config_deamon "Trimming and Mapping" section.
 
+
 clean_samples){
  	resources: -u 1 -n cal -c 4 -t '7-00:00:00' -m '16gb'
 	module load seqtrimbb/2.1.3
 	if [ "$read_layout" == "paired" ]; then
 	? 
-		seqtrimbb -t transcriptomics.txt -Q $read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz' -P "minlength=$min_read_length" -w [cpu] -O output_files
+		seqtrimbb -t $trim_template -Q $read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz' -P "minlength=$min_read_length" -w [cpu] -O output_files
 	elif [ "$read_layout" == "single" ] ; then
-		seqtrimbb -t transcriptomics.txt -Q $read_folder'/'$sample'.fastq.gz' -P "minlength=$min_read_length" -w [cpu] -O output_files
+		seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -P "minlength=$min_read_length" -w [cpu] -O output_files
 	fi
 
 	if { [ ! -s output_files/paired_1.fastq.gz ] || [ ! -s output_files/paired_2.fastq.gz ]; } && [ ! -s output_files/sequences_.fastq.gz ]; then
@@ -17,6 +18,7 @@ clean_samples){
 	else 
 		get_fastqc_data.rb -i 'output_files/initial_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tinitial_" $0 }' >> ../metrics
 		get_fastqc_data.rb -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
+		mv output_files/report_files/* ./
 	fi
 }
 
@@ -35,16 +37,16 @@ align_rna_seq){
 	
 	qualimap bamqc -nt [cpu] -bam Aligned.sortedByCoord.out.bam -outdir results --java-mem-size=30G
 
-	if [ ! -s Log.final.out ] || [ ! -s ReadsPerGene.out.tab ] || [ ! -s results/qualimapReport.html ]; then 
+	if [ ! -s Log.final.out ] || [ ! -s  selected_counts ] || [ ! -s results/qualimapReport.html ]; then 
 		echo "Mapping step has failed"
 		exit 1
 	else
+		#creating count table
+		select_counts.rb -i ReadsPerGene.out.tab -s $stranded > selected_counts
 		#metric extraction
 		sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
 		parse_STAR_log.R -d Log.final.out | awk '{print "$sample" "\t" $0}' >> ../metrics
 		awk 'NR>4 {sum+=$2} END {print sum}' selected_counts |  awk '{print "$sample" "\t" "aligned_to_feature" "\t" $0 }' >> ../metrics
-		#creating count table
-		select_counts.rb -i ReadsPerGene.out.tab -s $stranded > selected_counts
 		#Removing temporal files
 		rm Aligned.sortedByCoord.out.bam Aligned.toTranscriptome.out.bam
 	fi
