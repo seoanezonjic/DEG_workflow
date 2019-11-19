@@ -57,7 +57,7 @@ output:
 		g <- ggplot(df, aes_string(x=var1, y=var2))
 		g + geom_point() +
 		theme(legend.position="bottom") +
-		xlab(axis_lab_name1) + ylab(axis_lab_name2)
+		xlab(axis_lab_name1) + ylab(axis_lab_name2) + ylim(0,NA)
 	}
 
 	# this is a little like a barplot, but the absolute values are shown, with a line connecting them.
