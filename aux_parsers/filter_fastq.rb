@@ -8,7 +8,7 @@ SEQUENCE = 1
 def filter_fastq(input_file, size_filter)
 	entry = []
 	attributes_parsed = 0
-	File.open(input_file).each do |line|
+	File.open(input_file).each do |line| 
         	line.chomp!
 		attributes_parsed += 1
         	if attributes_parsed < 4
