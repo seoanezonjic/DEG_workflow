@@ -8,7 +8,7 @@ POSITION = 16
 ############### =>	METHODS	
 ###################################################################
 
-def load_file(input_file)
+def load_file(input_file)  
 	raw_file = File.readlines(input_file).map{ |line| line = line.chomp.split("\t") }.reject{ |line| line.empty? }
 	return raw_file
 end
