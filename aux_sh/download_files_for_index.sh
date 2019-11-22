@@ -20,21 +20,20 @@ if [ $experiment_type == "miRNAseq_detection" ] ; then
 	gunzip -f $mapping_ref/mature.fa.gz
 	extract_miRNAs.pl $mapping_ref/mature.fa $MIRBASE_ORGANISM > $mapping_ref/miRNA_mature.fasta
 	rm $mapping_ref/mature.fa
-	
 #elif [  $experiment_type == "miRNAseq_detection" ]; then
 	# wget "http://carolina.imis.athena-innovation.gr/diana_tools/downloads/e2de248e81009d5a5s33ebe9906fa32c/TarBase_v8_download.tar.gz" -O miRNA_targets.txt.gz
 	# gunzip -f miRDB_v6.0_prediction_result.txt.gz
 	# grep $MIRBASE_ORGANISM miRDB_v6.0_prediction_result.txt > targets.txt
-else 
-	echo "miRNA precursors are already downloaded"
 fi
 
-if [ $organism == "human" ]; then
-	if [ ! -s $mapping_ref/annotation.gtf ] || [ ! -s $mapping_ref/genome.fa ]; then
-		wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_19/gencode.v19.annotation.gtf.gz' -O $mapping_ref/annotation.gtf.gz
-		wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_19/GRCh37.p13.genome.fa.gz' -O $mapping_ref/genome.fa.gz 
-		gunzip -f $mapping_ref/*
-	else 
-		echo "$organsim genome and annotations has been downloaded"
-	fi 
+if [[ $experiment_type == "RNAseq_genome" || $experiment_type == "miRNAseq_detection" ]];then
+	if [ $organism == "human" ]; then
+		if [ ! -s $mapping_ref/annotation.gtf ] || [ ! -s $mapping_ref/genome.fa ]; then
+			wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_19/gencode.v19.annotation.gtf.gz' -O $mapping_ref/annotation.gtf.gz
+			wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_19/GRCh37.p13.genome.fa.gz' -O $mapping_ref/genome.fa.gz 
+			gunzip -f $mapping_ref/*
+		else 
+			echo "$organsim genome and annotations has been downloaded"
+		fi 
+	fi
 fi 

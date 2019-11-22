@@ -53,7 +53,7 @@ elif [ "$1" == "4" ] ; then
 	if [ `echo $fun_remote_mode | grep -q -G "[kb]"` ] || [ $launch_login == TRUE ]; then	
 		launch_fun_hun.sh
 	else
-		sbatch --mem-per-cpu=2GB -n $tasks --error=$logs'/functional_hunter.%J.err' --output=$logs'/functional_hunter.%J.out' launch_fun_hun.sh
+		sbatch --mem-per-cpu=4GB -n $tasks --error=$logs'/functional_hunter.%J.err' --output=$logs'/functional_hunter.%J.out' launch_fun_hun.sh
 	fi
 	cd $project_folder
 fi

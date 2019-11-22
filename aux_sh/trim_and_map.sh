@@ -13,12 +13,13 @@ while IFS= read sample; do
 	\\$ref=$mapping_ref
 	" | tr -d [:space:]`
 
-	if [[ $experiment_type == "RNAseq" || $experiment_type == "miRNAseq_DEA" ]]; then
+	if [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_transcriptome" ]]; then
 
 		AF_VARS=$AF_VARS,`echo "
 		\\$stranded=$stranded,
 		\\$min_read_length=$MIN_READ_LENGTH,
-		\\$read_layout=$read_layout
+		\\$read_layout=$read_layout,
+		\\$experiment_type=$experiment_type
 		" | tr -d [:space:]`
 	fi
 

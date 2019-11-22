@@ -4,3 +4,4 @@ while read sample; do
 	echo $sample
 	flow_logger -e $MAPPING_RESULTS_FOLDER/$sample -r all $AF_ADD_OPTIONS
 done < $SAMPLES_FILE
+ 

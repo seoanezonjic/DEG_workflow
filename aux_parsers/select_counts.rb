@@ -7,7 +7,7 @@ require 'optparse'
 #################################################################################################
 def load_file(path)
 	counts = []
-	select_col = nil
+	select_col = nil 
 	File.open(path).each do |line|
 		fields = line.chomp.split("\t")
 		if fields[0] == 'N_noFeature'
