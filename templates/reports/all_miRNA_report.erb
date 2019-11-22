@@ -1,0 +1,123 @@
+<%
+	#################################################
+	######## => INITIALIZE
+	#################################################
+
+	F_NAME = 0 
+	F_POS_IN_TABLE = 1
+
+
+	features = {
+		sample: ["Sample"],
+		final_total_sequences: ["Pre-processed reads"],
+		bowtie1_mapped: ["Mapped reads"],
+		known_miRNAs: ["Known miRNAs"],
+		novel_miRNAs: ["Novel miRNAs"],
+		total_miRNAs: ["Total miRNAs in sample"]
+	}
+	
+	#################################################
+	######## => METHODS
+	#################################################
+
+	def copy_table(table_name)
+		table_copy = []		
+		@hash_vars[table_name].each do |row|
+			table_copy << row.dup
+		end
+		header = table_copy.first.map!{|feature| feature.to_sym}
+		return table_copy, header
+	end
+
+	def get_features_index(features, header)
+		indexed_features = {}
+		features.each do |feature, attributes|
+			position = header.index(feature)
+			attributes[F_POS_IN_TABLE] = position
+			indexed_features[feature] = attributes
+		end
+		return indexed_features
+	end 
+
+	def extract_column(matrix, column_number)
+		column = matrix.transpose[column_number]
+		return column
+	end
+
+	def insert_column(matrix, column) # column must to be a simple array, each element coorespond to a sample
+		column.each_with_index do |element, sample|
+			matrix_sample[sample] = element
+		end 
+		return matrix
+	end
+
+	#################################################
+	######## => MAIN
+	#################################################
+
+	all_metrics, header = copy_table('metric_table')
+	# known_miRNAs = 
+	@hash_vars["all_metrics"] = all_metrics
+
+	features = get_features_index(features, header)
+
+
+%>
+<h1 style="text-align:center; background-color:#d6eaf8 ">miRNA analysis workflow report</h1>
+<div style="overflow: hidden">
+	
+	<h2 style="text-align:center; background-color:#d6eaf8 ">Sample features compared with total miRNAs</h2>
+	<div style="overflow: hidden">
+		<%
+		pairs = [
+			[:final_total_sequences, :total_miRNAs],
+			[:bowtie1_mapped, :total_miRNAs]
+		]
+		#sizes = Array.new(16, 8)
+		pairs.each do |x, y|
+			cols = [0, header.index(x), header.index(y)]
+			x_name = features[x][F_NAME]
+			y_name = features[y][F_NAME]
+			%><%=
+			sccater2D(id: "all_metrics", fields: cols, header: true, row_names: true, 
+				responsive: false,
+				text: true,
+				height: '600px', width: '600px',
+				title: "#{x_name} VS #{y_name}",
+				x_label: x_name, y_label: y_name,
+				regressionLine: true,
+				config: {
+					#'sizes' => Array.new(16, 8),
+					'graphOrientation' => 'vertical',
+					'lineDecoration' => false
+					})
+			%><%
+			end
+		%>
+		</div>
+		<h2 style="text-align:center; background-color:#d6eaf8 ">Summary: Known and novel miRNA detected in samples</h2>
+		<div style="overflow: hidden">
+
+	    <%=
+	   
+	    cols = [:known_miRNAs, :novel_miRNAs].map{|feature| features[feature][F_POS_IN_TABLE]}
+		
+		 barplot(id: 'all_metrics', 
+		 	fields: [0].concat(cols), 
+		 	header: true, 
+		 	row_names: true,
+		    responsive: false, 
+		    title: '', 
+		    x_label: 'Sample', y_label: 'Count',
+		    height: '600px', width: '1300px',
+		    config: {
+					#'sizes' => Array.new(16, 8),
+					'graphOrientation' => 'vertical',
+					#'lineDecoration' => false
+					}
+		    )
+	    #
+		%>
+	</div>
+
+</div>
