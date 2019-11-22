@@ -1,9 +1,9 @@
 ################################### 
-## GLOBAL VARS
-###################################
+## GLOBAL VARS ##
+################################### 
 
 ######	EXPERIMENT VARIABLES	#######
-export experiment_type="RNAseq"	#-------#	Experiment type 'miRNAseq_detection', 'miRNA_DEA' or 'RNAseq' 
+export experiment_type="RNAseq_genome"	#-------#	Experiment type 'miRNAseq_detection', 'RNAseq_genome' or 'RNAseq_transcriptome'  
 export organism='human'	#-------#	Model organism: Currently only 'human' is available
 export mapping_ref=$CODE_PATH'/references/'$organism	#-------#	References path: The references will be downloaded and indexed there. For human use mapping_ref=~pedro/proyectos/ramon_areces19/pmm2_belen/project_execution/references/
 export TRIM_TEMPLATE="transcriptomics.txt"	#-------#	Trimming template path. Available options are "$CODE_PATH"/templates/trimming/miRNA.txt or transcriptomics.txt
@@ -11,7 +11,7 @@ export TRIM_TEMPLATE="transcriptomics.txt"	#-------#	Trimming template path. Ava
 ######	EXECUTION VARIABLES	#######
 export RESOURCES="-c 2 -t 10:00:00 -n cal -m 4"	#-------#	AutoFlow resources setting 
 export project_folder=`pwd`'/project_execution'	#-------#	Global execution folder 
-export MAPPING_RESULTS_FOLDER=$project_folder'/clean_and_map/'	#-------#	Secondary execution path
+export MAPPING_RESULTS_FOLDER=$project_folder'/clean_and_map'	#-------#	Secondary execution path
 export launch_login=FALSE 	#-------#	Login execution mode. Set this variable to 'TRUE' to execute all modules at login.
 
 ######	SAMPLES VARIABLES	#######
@@ -31,8 +31,7 @@ if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	export TEMPLATE=$CODE_PATH"/templates/miRNA_detection.txt"	#-------#	AutoFlow mapping template. It is advisable not to modify this variable
 	export MIRBASE_ORGANISM='hsa'	#--------#	STRING 	for mirbase filtering (three words code) 'hsa', 'mmu'
 
-elif [[ $experiment_type == "RNAseq" || $experiment_type == "miRNAseq_DEA" ]];then
-
+elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_transcriptome" ]]; then
 	##################################
 	## RNA-seq variables
 	##################################
@@ -40,16 +39,13 @@ elif [[ $experiment_type == "RNAseq" || $experiment_type == "miRNAseq_DEA" ]];th
 
 	export HUNTER_RESULTS_FOLDER=$project_folder'/DEGenesHunter_results'	#-------#	Secondary execution path
 	export TEMPLATE=$CODE_PATH"/templates/mapping_template.txt"	#-------#	AutoFlow mapping template. It is advisable not to modify this variable
-	export stranded='yes'	#-------#	This parametrer must be changed in case of not-stranded sequencing only (rare case)
 	export MIN_READ_LENGTH=65 	#-------#	Minimun read length theshold in primming step. Set 10 for miRNA detection or miRNA DEA analysis
-	export read_layout='single'	#-------#	Read layout must be defined as 'paired' in case of paired-end samples or 'single' in case of single-end samples
+	export read_layout='paired'	#-------#	Read layout must be defined as 'paired' in case of paired-end samples or 'single' in case of single-end samples
+	export stranded='yes'	#-------#	This parametrer must be changed in case of not-stranded sequencing only (rare case)
 
-	if [[ $experiment_type == "miRNAseq_DEA" ]]; then
-		###### When miRNA seq Differential expression analysis mode is habilitated, some recomnded parametres are changed: 
-		export mapping_ref=$CODE_PATH'/references/'$organism/miRNA	#-------#	References path: Path to miRNA mature sequences fasta
-		export mirna_fasta=$mapping_ref/miRNA_mature.fasta
-	fi
 
+	################## Differential expression analysis variables #####################
+	##### IMPORTANT: To delete a variable, you just have to define it as an empty string
 
 	######	DEgenesHunter comparisons	######
 
@@ -58,6 +54,7 @@ elif [[ $experiment_type == "RNAseq" || $experiment_type == "miRNAseq_DEA" ]];th
 	export de_packages="DELN"	#-------#	Gene expresion analysis algorithms to perform (D = DESeq2, E = edgeR, L = limma, N= NOISeq)
 	export de_min_pack="4"	#-------#	Number of minimum packages to consider a gene as a 'PREVALENT' DEG
 	export de_logfc="1"	#-------#	Log2FC threshold
+	export de_additional_options=''	#-------#	Additional flags for DEGenesHunter
 
 	######## Functional DEgenesHunter Analysis	#######
 	
@@ -65,8 +62,13 @@ elif [[ $experiment_type == "RNAseq" || $experiment_type == "miRNAseq_DEA" ]];th
 	export fun_an_type="GKgR"	#-------#	Ontologies or pathways analysis to perform (G = GO [topGO], K = KEGG, g = GO [clusterProfiler], R = Reactome [clusterProfiler])
 	export fun_an_performance="o"	#-------#	Functional analysys type ("o" for Over Representation Analysis and "g" for Gene Set Enrichment Analysis)
 	export GO_modules="MBC"	#-------#	Gene subonthology analysis to perform (M = Molecular Function, B = Biological Process, C = Celular Components)
-	export fun_remote_mode="''"	#-------#	Remote mode. deamon.sh 4 is executed at loggin when remote mode is activated (Use (b) to launch biomaRt translation; (k) to use Kegg remote data base)
-	export custom_nomenclature="''"	#-------#	File with custom nomenclature in GMT format
+	export fun_remote_mode=''	#-------#	Remote mode. deamon.sh 4 is executed at loggin when remote mode is activated (Use (b) to launch biomaRt translation; (k) to use Kegg remote data base)
+	export custom_nomenclature=''	#-------#	File with custom nomenclature in GMT format
 	export fun_organism='Human'	#-------#	Organism to perform functional analysis
+	export fun_additional_options=''	#-------#	Additional flags for functionalHunter
 
+	if [[ $experiment_type == "RNAseq_transcriptome" ]]; then
+		export transcriptome=$mapping_ref'/miRNA_nr.fasta'	#-------#	Transcriptome or custom fasta to use as reference. Default options is set for miRNA differential expresion analysis usin as reference the miRNAs determinated in 'miRNAseq_detection' mode
+		export annotation_list=''	#-------#	Functional annotation of transcripts based on an model organism fot functional analysis. Firts column must be ENSEMBL gene ID and secong column transcript name
+	fi
 fi
