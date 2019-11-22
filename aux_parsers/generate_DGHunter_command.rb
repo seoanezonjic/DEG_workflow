@@ -57,6 +57,7 @@ fun_variables = {
 	"fun_an_performance" => ["-A"],
 	"fun_pvalue" => ["-T"],
 	"fun_organism" => ["-m"],
+	"annotation_list" => ["-a"],
 	"fun_additional_options" => []
 }
 
