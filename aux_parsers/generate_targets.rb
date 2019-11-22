@@ -5,7 +5,7 @@
 ######## INIT
 ######################################################
 
-require "optparse"
+require "optparse" 
 CTRL = 0
 TREAT = 1
 
