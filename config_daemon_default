@@ -1,6 +1,6 @@
 ################################### 
 ## GLOBAL VARS ##
-################################### 
+###################################  
 
 ######	EXPERIMENT VARIABLES	#######
 export experiment_type="RNAseq_genome"	#-------#	Experiment type 'miRNAseq_detection', 'RNAseq_genome' or 'RNAseq_transcriptome'  
@@ -35,7 +35,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	##################################
 	## RNA-seq variables
 	##################################
-	####### Trimming and mapping	#######
+	####### Mapping	#######
 
 	export HUNTER_RESULTS_FOLDER=$project_folder'/DEGenesHunter_results'	#-------#	Secondary execution path
 	export TEMPLATE=$CODE_PATH"/templates/mapping_template.txt"	#-------#	AutoFlow mapping template. It is advisable not to modify this variable
