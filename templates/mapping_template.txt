@@ -24,11 +24,11 @@ clean_samples){
 }
 
 align_rna_seq){ 
-	resources: -m '4gb' -c 1 -t '10:00:00'
+	resources: -m '50gb' -c 10 -t '10:00:00'
 	module load samtools/1.9
 	module load qualimap/2.2.1
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
-	if [ $experiment_type == "RNAseq_transcriptome" ]; then
+	if [ "$experiment_type" == "RNAseq_transcriptome" ]; then
 		module load bowtie/2.2.9
 		module load sam2counts
 		if [ "$read_layout" == "paired" ] ; then
@@ -39,7 +39,7 @@ align_rna_seq){
 		fi
 		sam2counts_all.py -o selected_counts -b sorted_mappings.bam
 		parse_bowtie_log.sh bowtie_log | awk '{print "$sample" "\t" $0}' >> ../metrics
-	elif [ $experiment_type == "RNAseq_genome" ]; then
+	elif [ "$experiment_type" == "RNAseq_genome" ]; then
 		module load star/2.5.3a
 		if [ "$read_layout" == "paired" ]; then
 			STAR --runThreadN [cpu] --genomeDir $ref/STAR_index --readFilesIn clean_samples)/output_files/paired_1.fastq.gz clean_samples)/output_files/paired_2.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate
