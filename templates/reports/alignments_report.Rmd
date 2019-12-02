@@ -72,7 +72,7 @@ output:
 		ggplot(melt_df, aes(x = sample, y = value, color = variable, group = variable)) + 
 		theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
      	geom_point() + geom_line() + scale_color_discrete(labels=legend_names) +
-		theme(legend.position="bottom", legend.title = element_blank())
+		theme(legend.position="bottom", legend.title = element_blank()) + ylim(0,NA)
 	}
 
 	###############################
@@ -197,13 +197,13 @@ output:
 ```{r STAR_feature_overlap, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_STAR_feature_overlap}
 	cat("\n\n### **Overlap of the mapped reads with genomic features**\n\n")
 	cat("\n\nSTAR mapper used for this execution. Reads were aligned to whole genome so mapped reads can not map to genomic features")	
-	vars_feature_overlap_legend_names <- metric_var_2_legend_name[match(vars_feature_overlap, metric_var_2_legend_name$metric_var), "legend_name" ]
+	vars_STAR_feature_overlap_legend_names <- metric_var_2_legend_name[match(vars_STAR_feature_overlap, metric_var_2_legend_name$metric_var), "legend_name" ]
 
     make_stacked_barchart_from_df_dodge(
 		df = metric_table, 
         id = "sample", 
-        other_vars = vars_feature_overlap,
-        legend_names = vars_feature_overlap_legend_names
+        other_vars = vars_STAR_feature_overlap,
+        legend_names = vars_STAR_feature_overlap_legend_names
     )
 ```
 
