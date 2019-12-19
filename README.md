@@ -1,7 +1,7 @@
 # DEG_workflow
-##Workflow to perform Differential Expression Gene analysis from raw fastq files.
+## Workflow to perform Differential Expression Gene analysis from raw fastq files.
 
-##usaGE:
+## USAGE:
 
 ###	Initializing experiment: 
 Create manage_input_files.sh manually, from which all raw samples must be linked with a suitable name to another custom folder (e.g. "raw_files", "samples" or "renamed_sample"). This step must be performed for customizate samples according to the experiment and keep original sample names in order to facilitate sample backtracking (In case of failure) at same time. New sample names must be easy to interpret and it is recommended short and non redundant names. 
@@ -26,7 +26,7 @@ After that create samples_to_process.lst: Is a file containing a list of new sam
 |ch_hl_9|patien9|healthy|child|usa|
 
 
-2º: Create all target (comparison) files. The target comparison file is used in DEGenesHunter comparison. It consist in a table with 3 columns (sample name, replicate number and treatment). To generate target files it is recommended to use ./aux_parsers/generate_targets.rb. This script takes the experiment design table as input (***-e***), and it generate target by parsing a config string. The config string is given by ***-t*** flag and must be designed manually and it can generate all possible targets according filtering criteria (explanined later). The config string consist in information for one or more targets (divided by '**;**': "TargetA;TargetB"). In target information target name and conditions mus be indicated. Target name and conditions are separated by '**>**' and control and treatment features mus be indicated as feature_name**:**control_feature1**/**control_feature2**,**treatment_feature1**,**treatment_feature2. Example. For **healthy vs disease** and **child vs others** comparisons according example experimen design table, the target string should be **'**hl_vs_dis**>**clinical_status**:**healthy**,**diseased**;**ch_vs_other**>**age_group**:**child**,**adult**/**senior**'**. 
+2º: Create all target (comparison) files. The target comparison file is used in DEGenesHunter comparison. It consist in a table with 3 columns (sample name, replicate number and treatment). To generate target files it is recommended to use ./aux_parsers/generate_targets.rb. This script takes the experiment design table as input (***-e***), and it generate target by parsing a config string. The config string is given by ***-t*** flag and must be designed manually and it can generate all possible targets according filtering criteria (explanined later). The config string consist in information for one or more targets (divided by '**;**': "TargetA;TargetB"). In target information target name and conditions mus be indicated. Target name and conditions are separated by '**>**' and control and treatment features mus be indicated as feature_name **:** control_feature1**/**control_feature2**,**treatment_feature1**,**treatment_feature2. Example. For **healthy vs disease** and **child vs others** comparisons according example experimen design table, the target string should be **'**hl_vs_dis**>**clinical_status**:**healthy**,**diseased**;**ch_vs_other**>**age_group**:**child**,**adult**/**senior**'**. 
 
 Filtering criteria can also be used. You can select only samples that fulfill a specific feature using ***-f*** flag with an argument like "FEATURE_NAME**=**feature". For select only USA samples must be used ***-f*** "location**=**usa". This script also admit a blacklist file (one column table) with samples that will not be included in experiment using ***-b*** flag (This is very useful for reject noisy samples). 
 
