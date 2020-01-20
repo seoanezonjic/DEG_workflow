@@ -26,7 +26,7 @@ elif [ "$1" == "1b" ] ; then
 	if [ $launch_login == TRUE ]; then	
 		create_index.sh
 	else
-		sbatch --error=$logs'/indexing_reference.%J.err' --output=$logs'/indexing_reference.%J.out' create_index.sh -N
+		sbatch --error=$logs'/indexing_reference.%J.err' --output=$logs'/indexing_reference.%J.out' create_index.sh -N 1
 	fi
 
 elif [ "$1" == "2" ] ; then
@@ -43,7 +43,7 @@ elif [ "$1" == "3" ] ; then
 	if [ $launch_login == TRUE ]; then
 		compare_all_samples.sh
 	else
-		sbatch --mem=30GB -n $tasks --error=$logs'/DEGenesHunter.%J.err' --output=$logs'/DEGenesHunter.%J.out' compare_all_samples.sh -N
+		sbatch --mem=30GB -n $tasks --error=$logs'/DEGenesHunter.%J.err' --output=$logs'/DEGenesHunter.%J.out' compare_all_samples.sh -N 1
 	fi
 elif [ "$1" == "4" ] ; then
 #STAGE 4 : FUNCTIONAL ANALYSIS
@@ -52,6 +52,6 @@ elif [ "$1" == "4" ] ; then
 	if [ `echo $fun_remote_mode | grep -q -G "[kb]"` ] || [ $launch_login == TRUE ]; then	
 		launch_fun_hun.sh
 	else
-		sbatch --mem-per-cpu=5GB -n $tasks --error=$logs'/functional_hunter.%J.err' --output=$logs'/functional_hunter.%J.out' launch_fun_hun.sh -N
+		sbatch --mem-per-cpu=5GB -n $tasks --error=$logs'/functional_hunter.%J.err' --output=$logs'/functional_hunter.%J.out' launch_fun_hun.sh -N 1
 	fi
 fi
