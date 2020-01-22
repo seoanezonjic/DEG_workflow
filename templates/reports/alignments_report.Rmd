@@ -19,9 +19,39 @@ output:
 	library(ggplot2) 
 
 	metric_table <- data[['metric_table']]
+
+	metric_dictionary <- list(
+		"initial_total_sequences" = "Total Reads Before Trimming", 
+		"final_total_sequences" = "Total Reads After Trimming",
+		"Uniquely_mapped_reads_." = "Unique Map %",
+		"multi_map" = "Multi-mapping %",
+		"X._of_reads_mapped_to_multiple_loci" = "Multi Map %",
+		"X._of_reads_mapped_to_too_many_loci" = "Multi Map-too many %",
+		"X._of_reads_unmapped._too_short" = "Unmapped: Too Short %",
+		"X._of_reads_unmapped._other" = "Unmapped: Other %",
+		"Uniquely_mapped_reads_number" = "Unique Map",
+		"aligned_to_feature" = "Aligned to Genomic Feature",
+		"initial_weigthed_qual_per_sequence" = "Weighted Sequence Quality Before Trimming",
+		"number_duplicatedreads.estimated." = "Estimated Duplicated Reads",
+		"final_mean_qual_per_base" = "Average Base Quality",
+		"final_min_qual_per_base_in_10th_decile" = "Min Qual per Base (Tenth Decile)",
+		"final_min_qual_per_base_in_lower_quartile" = "Min Qual per Base (Lower Quartile)",
+		"final_weigthed_qual_per_sequence" = "Weighted Sequence Quality",
+		"bowtie1_mapped_per" = "Aligned reads %",
+		"bowtie1_unmapped_per" = "Unaligned reads %",
+		"bowtie1_multimapping_per" = "Reads supressed by multimapping %",
+		"bowtie1_mapped" = "Mapped reads",
+		"bowtie1_filtered_reads" = "Filtered reads",
+		"bowtie2_unmapped_per" = "Unmapped reads %",
+		"bowtie2_multimapping_per" = "Reads aligned more than once %",
+		"bowtie2_uniq_mapped_per" = "Reads aligned once %",
+		"initial_sequence_length_distribution" = "Read length distribution before trimming",
+		"final_sequence_length_distribution" = "Read length distribution after trimming"
+		)
+
 	metric_var_2_legend_name <- data.frame(
-		metric_var = c("initial_total_sequences", "final_total_sequences", "Uniquely_mapped_reads_.", "multi_map", "X._of_reads_mapped_to_multiple_loci", "X._of_reads_mapped_to_too_many_loci", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other", "Uniquely_mapped_reads_number", "aligned_to_feature", "initial_weigthed_qual_per_sequence", "number_duplicatedreads.estimated.", "final_mean_qual_per_base", "final_min_qual_per_base_in_10th_decile", "final_min_qual_per_base_in_lower_quartile", "final_weigthed_qual_per_sequence", "bowtie1_mapped_per", "bowtie1_unmapped_per", "bowtie1_multimapping_per", "bowtie1_mapped", "bowtie1_filtered_reads", "bowtie2_unmapped_per", "bowtie2_multimapping_per","bowtie2_uniq_mapped_per"),
-		legend_name = c("Total Reads Before Trimming", "Total Reads After Trimming", "Unique Map %", "Multi-mapping %", "Multi Map %", "Multi Map-too many %", "Unmapped: Too Short %", "Unmapped: Other %", "Unique Map", "Aligned to Genomic Feature", "Weighted Sequence Quality Before Trimming", "Estimated Duplicated Reads", "Average Base Quality", "Min Qual per Base (Tenth Decile)", "Min Qual per Base (Lower Quartile)", "Weighted Sequence Quality", "Aligned reads %", "Unaligned reads %", "Reads supressed by multimapping %", "Mapped reads", "Filtered reads", "Unmapped reads %", "Reads aligned more than once %", "Reads aligned once %")
+		metric_var = names(metric_dictionary),
+		legend_name = unlist(metric_dictionary)
 	)
 
 	make_stacked_barchart_from_df <- function(df, id, other_vars, legend_names=FALSE) {
@@ -75,6 +105,97 @@ output:
 		theme(legend.position="bottom", legend.title = element_blank()) + ylim(0,NA)
 	}
 
+	column_str_to_numeric <- function(column){
+    numeric_column <- as.numeric(unlist(lapply(column, function(line){
+            num_line <- unlist(strsplit(as.character(line), '-'))[1]
+            return(num_line)
+          })
+    ))
+    return(numeric_column)
+  }
+
+	make_violin_plot <- function(data_frame, title = "", y_lab = "", x_lab = ""){
+		u_labels <- unique(data_frame$metric)
+		labels_df <- data.frame(
+		  breaks = column_str_to_numeric(u_labels),
+		  labels = u_labels
+		)
+		data_frame$metric <- column_str_to_numeric(data_frame$metric)
+		save(labels_df, file = "~/test2.Rdata")
+		plot <- ggplot(data_frame, aes(y = metric, weight = count, x = pair_name, fill = sample_name)) + 
+			geom_violin(scale = "width", adjust = 1/15) +
+        	scale_y_continuous(
+				breaks = labels_df$breaks,
+				labels = labels_df$labels
+        	) + 
+        	 theme(axis.text.x = element_text(angle = 30, size = 8, hjust = 1), legend.text = element_text(size = 8)) +
+        	scale_fill_discrete(name = "Sample") +
+       		ggtitle(title) + ylab(y_lab) + xlab(x_lab) 
+       		paired <- length(unique(data_frame$pair)) / length(unique(data_frame$sample))
+       		if(paired == 1 ){
+       			plot <- plot + scale_x_discrete(name = "")
+       		}else if(paired == 2){
+       			plot <- plot + scale_x_discrete(name = "Paired-end Name")
+       		}
+       		plot
+	}
+
+	parse_ditributions_to_df <- function(all_metrics, column_name){
+		samples <- seq(nrow(all_metrics))
+		all_distribution_parsed <- as.data.frame(do.call(rbind, lapply(samples, function(sample_index){
+			sample <- all_metrics$sample[sample_index]
+			sample_distribution_str <- as.character(all_metrics[[column_name]][sample_index])
+			pairs_distribution_str <- unlist(strsplit(sample_distribution_str, ";"))
+			if(length(pairs_distribution_str) == 2){
+				pairs <- c(1,2)
+				sample_parsed_distribution <- as.data.frame(do.call(rbind, 
+					lapply(pairs, function(pair){
+						parsed_distribution <- parse_distribution(
+							distribution = pairs_distribution_str[pair], 
+							sample = sample,
+							pair = pair
+						)
+						return(parsed_distribution)
+					})
+				))
+			} else if(length(pairs_distribution_str) == 1){
+				sample_parsed_distribution <- parse_distribution(
+					distribution = sample_distribution_str,
+					sample = sample
+				)
+			}
+			return(sample_parsed_distribution)
+		})))
+		return(all_distribution_parsed)
+	}
+
+	parse_distribution <- function(distribution, sample = FALSE, pair = FALSE){
+		sample_name_str <- ""
+		pair_name_str <- ""
+		if(sample){
+			sample_name_str <- sample
+			if(pair){
+				pair_name_str <- paste(sample, pair, sep = "_")
+			}else{
+				pair_name_str <- sample
+			}
+		}
+		df_distribution <- as.data.frame(do.call(rbind, 
+			lapply(unlist(strsplit(distribution, ":")), function(row_str){
+				parsed_row <- unlist(strsplit(row_str, ","))
+				df_row <- data.frame(
+					metric = parsed_row[1],
+					count = as.numeric(parsed_row[2]),
+					sample_name= sample_name_str,
+					pair_name = pair_name_str,
+					stringsAsFactors = FALSE
+				)
+				return(df_row)
+			})
+		))
+		return(df_distribution)		
+	}
+
 	###############################
 	## CONTROL VARIABLES
 	##############################
@@ -95,21 +216,62 @@ output:
 	vars_bowtie2_mapping <- c("bowtie2_uniq_mapped_per", "bowtie2_multimapping_per","bowtie2_unmapped_per")
 	execute_bowtie2_mapping <- all(vars_bowtie2_mapping %in% colnames(metric_table))
 	vars_bowtie2_feature_overlap <- c("final_total_sequences", "aligned_to_feature")
-	execute_bowtie2_feature_overlap <- all(vars_bowtie2_feature_overlap %in% colnames(metric_table))
+	execute_bowtie2_feature_overlap <- all(c(vars_bowtie2_feature_overlap, "bowtie2_uniq_mapped_per")  %in% colnames(metric_table))
+	vars_length_trimming <- c("initial_sequence_length_distribution", "final_sequence_length_distribution")
+	execute_length_trimming <- all(vars_length_trimming %in% colnames(metric_table))
+
+
+```
+
+```{r length_before_trimming, eval=execute_length_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+
 	##############################
 	## REPORT BEGINING
 	##############################
 
 	cat("# **QC and Alignment Report**\n\n")
-```
 
-
-
-```{r trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_trimming}
 	##################################################
 	###	GLOBAL PLOTS
 	##################################################
 
+	cat("\n\n## **Length distribution before trimming**\n\n")
+	cat("\n\n### **Comprarison of samples length distribution before trimming**\n\n")
+	
+	 initial_length_distribution_df <- parse_ditributions_to_df(metric_table, 
+	 	column_name = "initial_sequence_length_distribution"
+ 	)
+
+	if(length(unique(initial_length_distribution_df$metric)) == 1){
+		cat(paste(c("\n\n All reads of all samples has", unique(initial_length_distribution_df$metric), "nt of length\n\n"), sep = ""))
+	}else{
+		make_violin_plot(data_frame = initial_length_distribution_df,
+		 	title = "Length distributions before trimming",
+		 	x_lab = "",
+		 	y_lab = "Length"
+		 	)
+	}
+
+```
+
+```{r length_after_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_length_trimming}
+
+	cat("\n\n## **Length distribution after trimming**\n\n")
+	cat("\n\n### **Comprarison of samples length distribution after trimming**\n\n")
+	
+	 final_length_distribution_df <- parse_ditributions_to_df(metric_table, 
+	 	column_name = "final_sequence_length_distribution"
+ 	)
+	 make_violin_plot(data_frame = final_length_distribution_df,
+	 	title = "Length distributions after trimming",
+	 	x_lab = "",
+	 	y_lab = "Length"
+	 	)
+
+```
+
+```{r trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_trimming}
+	
 	cat("\n\n## **QC of reads before alignment**\n\n")
 	cat("\n\n### **Total numbers of reads before and after trimming**\n\n")
 	
@@ -123,7 +285,7 @@ output:
     )
 ```
 
-.
+
 ```{r qual_scores, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_qual_scores}
 	cat("\n\n### **Quality scores for samples - lowest scores (min/10th decile) and weighted average**\n\nThe weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base")
 	vars_qual_scores_legend_names <- metric_var_2_legend_name[match(vars_qual_scores, metric_var_2_legend_name$metric_var), "legend_name" ]
