@@ -1,4 +1,3 @@
-. ~soft_bio_267/initializes/init_autoflow
 
 
 while IFS= read sample; do
@@ -13,18 +12,21 @@ while IFS= read sample; do
 	\\$ref=$mapping_ref
 	" | tr -d [:space:]`
 
-	if [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_transcriptome" ]]; then
+	if `echo $experiment_type | grep -q "^RNAseq"`; then
 
 		AF_VARS=$AF_VARS,`echo "
-		\\$stranded=$stranded,
 		\\$min_read_length=$MIN_READ_LENGTH,
 		\\$read_layout=$read_layout,
 		\\$experiment_type=$experiment_type
 		" | tr -d [:space:]`
 	fi
+	if [[ $experiment_type == "RNAseq_genome" ]]; then
+		AF_VARS=$AF_VARS,`echo "
+		\\$stranded=$stranded
+		" | tr -d [:space:]`
+	fi
 
 	AutoFlow -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" "$RESOURCES" $AF_ADD_OPTIONS 
-
 done < $SAMPLES_FILE
 
 
