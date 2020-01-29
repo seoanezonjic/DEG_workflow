@@ -24,7 +24,7 @@ clean_samples){
 }
 
 align_rna_seq){ 
-	resources: -m '20gb' -c 10 -t '10:00:00'
+	resources: -m '20gb' -c 4 -t '10:00:00'
 	module load samtools/1.9
 	module load qualimap/2.2.1
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.

@@ -26,7 +26,7 @@ while IFS= read sample; do
 		" | tr -d [:space:]`
 	fi
 
-	AutoFlow -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" "$RESOURCES" $AF_ADD_OPTIONS 
+	AutoFlow -e -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" "$RESOURCES" $AF_ADD_OPTIONS 
 done < $SAMPLES_FILE
 
 
