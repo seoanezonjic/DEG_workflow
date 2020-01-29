@@ -1,4 +1,4 @@
-
+. ~soft_bio_267/initializes/init_autoflow
 
 while IFS= read sample; do
 
