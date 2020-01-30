@@ -25,6 +25,7 @@ clean_samples){
 
 align_rna_seq){ 
 	resources: -m '20gb' -c 4 -t '10:00:00'
+	source ~soft_bio_267/initializes/init_R
 	module load samtools/1.9
 	module load qualimap/2.2.1
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
