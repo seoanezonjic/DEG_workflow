@@ -1,6 +1,5 @@
 #! /usr/bin/env bash
 
-source ~soft_bio_267/initializes/init_R
 framework_dir=`dirname $0`
 export CODE_PATH=$(readlink -f $framework_dir )
 export logs=$CODE_PATH'/execution_logs';mkdir $logs
