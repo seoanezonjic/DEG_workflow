@@ -46,6 +46,7 @@ de_variables = {
 	"de_pvalue" => ["-p"],
 	"de_packages" => ["-m"],
 	"de_min_pack" => ["-c"],
+	"de_add_factors" => ["-v"],
 	"de_additional_options" => []
 }
 

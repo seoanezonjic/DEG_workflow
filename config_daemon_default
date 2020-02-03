@@ -54,6 +54,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	export de_packages="DELN"	#-------#	Gene expresion analysis algorithms to perform (D = DESeq2, E = edgeR, L = limma, N= NOISeq)
 	export de_min_pack="4"	#-------#	Number of minimum packages to consider a gene as a 'PREVALENT' DEG
 	export de_logfc="1"	#-------#	Log2FC threshold
+	export de_add_factors=''	#-------#	Additional factors to consider in the multifactorial analysis [A comma separated list]
 	export de_additional_options=''	#-------#	Additional flags for DEGenesHunter
 
 	######## Functional DEgenesHunter Analysis	#######
