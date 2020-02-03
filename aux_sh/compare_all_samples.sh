@@ -20,19 +20,15 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	degenes_hunter_options=`generate_DGHunter_command.rb -m "degenes_Hunter"`
 	for TARGET_FILE in `echo $TARGETS | tr "," " "`
 	do
-		TARGET_NAME=`echo $TARGET_FILE | sed 's/_target.txt//'`
-		target_results_folder=$HUNTER_RESULTS_FOLDER'/'$TARGET_NAME
+		target_results_folder=$HUNTER_RESULTS_FOLDER'/'`echo $TARGET_FILE | sed 's/_target.txt//'`
 		mkdir $target_results_folder
-		## setting controls and treatments according target file
-		controls=`awk '{if($3 == "Ctrl") print $1}' $TARGET_FILE | tr "\n" ","`;controls=${controls%?}
-		treatments=`awk '{if($3 == "Treat") print $1}' $TARGET_FILE | tr "\n" ","`;treatments=${treatments%?}
 		
 		## Join all results of each sample in a general table
 		maps2DEGhunter.rb $TARGET_FILE $MAPPING_RESULTS_FOLDER qualimap_0000/selected_counts $target_results_folder no
 		grep -v '^N_' $target_results_folder'/selected_counts' | sum_counts_by_isoform.rb - > $target_results_folder'/final_counts.txt'
 
 		## Launch DEGenesHunter
-		degenes_Hunter.R $degenes_hunter_options -i $target_results_folder'/final_counts.txt' -C $controls -T $treatments -o $target_results_folder & 
+		degenes_Hunter.R $degenes_hunter_options -i $target_results_folder'/final_counts.txt' -t $TARGET_FILE -o $target_results_folder &
 	done
 	wait
 
