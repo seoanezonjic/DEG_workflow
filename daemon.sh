@@ -43,7 +43,7 @@ elif [ "$1" == "3" ] ; then
 	if [ $launch_login == TRUE ]; then
 		compare_all_samples.sh
 	else
-		sbatch --mem=30GB -c $tasks --error=$logs'/DEGenesHunter.%J.err' --output=$logs'/DEGenesHunter.%J.out' compare_all_samples.sh
+		sbatch --mem=20GB -c $tasks --error=$logs'/DEGenesHunter.%J.err' --output=$logs'/DEGenesHunter.%J.out' compare_all_samples.sh
 	fi
 elif [ "$1" == "4" ] ; then
 #STAGE 4 : FUNCTIONAL ANALYSIS
