@@ -5,6 +5,10 @@
 #SBATCH --error=job.%J.err
 #SBATCH --output=job.%J.out
 
+mv $mapping_ref/genome.fa $mapping_ref/raw_genome.fa
+fasta_editor.rb -i $mapping_ref/raw_genome.fa -r "CLEAN" -c a -o $mapping_ref/genome.fa
+rm $mapping_ref/raw_genome.fa
+
 
 if [ $experiment_type == "RNAseq_genome" ]; then
 	module load star/2.5.3a
