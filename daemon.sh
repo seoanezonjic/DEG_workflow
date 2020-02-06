@@ -3,7 +3,7 @@
 framework_dir=`dirname $0`
 export CODE_PATH=$(readlink -f $framework_dir )
 export logs=$CODE_PATH'/execution_logs';mkdir $logs
-export AF_ADD_OPTIONS=$2
+export ADD_OPTIONS=$2
 export PATH=$CODE_PATH'/aux_sh:'$PATH
 export PATH=$CODE_PATH'/aux_parsers:'$PATH
 

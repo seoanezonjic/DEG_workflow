@@ -47,7 +47,7 @@ de_variables = {
 	"de_packages" => ["-m"],
 	"de_min_pack" => ["-c"],
 	"de_add_factors" => ["-v"],
-	"de_additional_options" => []
+	"ADD_OPTIONS" => []
 }
 
 fun_variables = {
@@ -59,7 +59,7 @@ fun_variables = {
 	"fun_pvalue" => ["-T"],
 	"fun_organism" => ["-m"],
 	"annotation_list" => ["-a"],
-	"fun_additional_options" => []
+	"ADD_OPTIONS" => []
 }
 
 if options[:mode] == 'degenes_Hunter'

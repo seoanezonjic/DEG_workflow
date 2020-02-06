@@ -54,8 +54,6 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	export de_packages="WDELN"	#-------#	Gene expresion analysis algorithms to perform (D = DESeq2, E = edgeR, L = limma, N= NOISeq, W = WGCNA)
 	export de_min_pack="4"	#-------#	Number of minimum packages to consider a gene as a 'PREVALENT' DEG
 	export de_logfc="1"	#-------#	Log2FC threshold
-	export de_add_factors=''	#-------#	Additional factors to consider in the multifactorial analysis [A comma separated list]
-	export de_additional_options=''	#-------#	Additional flags for DEGenesHunter
 
 	######## Functional DEgenesHunter Analysis	#######
 	
@@ -66,7 +64,6 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	export fun_remote_mode=''	#-------#	Remote mode. deamon.sh 4 is executed at loggin when remote mode is activated (Use (b) to launch biomaRt translation; (k) to use Kegg remote data base)
 	export custom_nomenclature=''	#-------#	File with custom nomenclature in GMT format
 	export fun_organism='Human'	#-------#	Organism to perform functional analysis
-	export fun_additional_options=''	#-------#	Additional flags for functionalHunter
 
 	if [[ $experiment_type == "RNAseq_transcriptome" ]]; then
 		export transcriptome=$mapping_ref'/miRNA_nr.fasta'	#-------#	Transcriptome or custom fasta to use as reference. Default options is set for miRNA differential expresion analysis usin as reference the miRNAs determinated in 'miRNAseq_detection' mode
