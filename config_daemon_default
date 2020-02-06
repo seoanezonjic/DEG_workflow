@@ -51,7 +51,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 
 	export TARGETS=`ls *_target.txt | tr "\n" ","` ; TARGETS=${TARGETS%?}	#-------#	Target file location, including a short sample description	
 	export de_pvalue="0.05"	#-------#	Minimum P-value threshold 
-	export de_packages="DELN"	#-------#	Gene expresion analysis algorithms to perform (D = DESeq2, E = edgeR, L = limma, N= NOISeq)
+	export de_packages="WDELN"	#-------#	Gene expresion analysis algorithms to perform (D = DESeq2, E = edgeR, L = limma, N= NOISeq, W = WGCNA)
 	export de_min_pack="4"	#-------#	Number of minimum packages to consider a gene as a 'PREVALENT' DEG
 	export de_logfc="1"	#-------#	Log2FC threshold
 	export de_add_factors=''	#-------#	Additional factors to consider in the multifactorial analysis [A comma separated list]
@@ -60,7 +60,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	######## Functional DEgenesHunter Analysis	#######
 	
 	export fun_pvalue=0.1 #-------#	Minimum P-value thresholdMinimum P-value threshold
-	export fun_an_type="GKgR"	#-------#	Ontologies or pathways analysis to perform (G = GO [topGO], K = KEGG, g = GO [clusterProfiler], R = Reactome [clusterProfiler])
+	export fun_an_type="KgR"	#-------#	Ontologies or pathways analysis to perform (G = GO [topGO], K = KEGG, g = GO [clusterProfiler], R = Reactome [clusterProfiler])
 	export fun_an_performance="o"	#-------#	Functional analysys type ("o" for Over Representation Analysis and "g" for Gene Set Enrichment Analysis)
 	export GO_modules="MBC"	#-------#	Gene subonthology analysis to perform (M = Molecular Function, B = Biological Process, C = Celular Components)
 	export fun_remote_mode=''	#-------#	Remote mode. deamon.sh 4 is executed at loggin when remote mode is activated (Use (b) to launch biomaRt translation; (k) to use Kegg remote data base)
