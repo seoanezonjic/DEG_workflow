@@ -13,12 +13,14 @@ TREAT = 1
 ######## METHODS
 ######################################################
 
-def load_blacklist(input)
-	blacklist = File.readlines(input).map {|line| line.chomp!}
-	return blacklist
+def load_list(input)
+	list = File.readlines(input).map {|line| line.chomp!}
+	return list
 end
 
-def load_table(input_file, blacklist = nil, filter = nil)
+
+
+def load_table(input_file, blacklist = nil, whitelist = nil, filter = nil)
 	header = nil 
 	table = {}
 	blacklist = [] if blacklist.nil?
@@ -29,7 +31,10 @@ def load_table(input_file, blacklist = nil, filter = nil)
 			header = line
 			next
 		end
-		next if blacklist.include?(line[0]) 
+		next if blacklist.include?(line[0])
+		if !whitelist.nil?
+			next unless whitelist.include?(line[0])
+		end 
 		unless filter.nil?
 			next unless filter[1].include?(line[header.index(filter[0]) + 1]) 
 		end
@@ -147,14 +152,21 @@ OptionParser.new do |opts|
 		options[:blacklist] = file
 	end
 
+	options[:whitelist] = nil
+	opts.on("-w FILE/STRING", "--whitelist FILE/STRING", "List with samples name to acept from targets. File or comma separated string") do |file|
+		options[:whitelist] = file
+	end
+
 end.parse!
 
 ######################################################
 ######## MAIN
 ######################################################
-blacklist = load_blacklist(options[:blacklist]) if !options[:blacklist].nil?
+blacklist = load_list(options[:blacklist]) if !options[:blacklist].nil?
+whitelist = load_list(options[:whitelist]) if !options[:whitelist].nil?
+
 filter = parse_filter(options[:filter]) if !options[:filter].nil?
-experiment_design = load_table(options[:table], blacklist, filter)
+experiment_design = load_table(options[:table], blacklist, whitelist, filter)
 targets, features = parse_targets(options[:targets])
 targets = build_targets(experiment_design, targets) # meter aqui lo de guardar columnas y quitar la columna replicate
 save_targets(targets, experiment_design, options[:additional_features].map!{|feature| feature.to_sym})
