@@ -2,7 +2,6 @@
 
 framework_dir=`dirname $0`
 export CODE_PATH=$(readlink -f $framework_dir )
-export logs=$CODE_PATH'/execution_logs';mkdir $logs
 export ADD_OPTIONS=$2
 export PATH=$CODE_PATH'/aux_sh:'$PATH
 export PATH=$CODE_PATH'/aux_parsers:'$PATH
@@ -16,21 +15,21 @@ mkdir -p  $MAPPING_RESULTS_FOLDER
 
 
 if [ "$1" == "1" ] ; then
-#STAGE 1 DOWNLOADING REFERENCE
-    echo "Launching stage 1: Downloading reference"
+	#STAGE 1 DOWNLOADING REFERENCE
+	echo "Launching stage 1: Downloading reference"
 	download_files_for_index.sh 
 
 elif [ "$1" == "1b" ] ; then
-#STAGE 1 INDEXING REFERENCE
-    echo "Launching stage 1: Indexing reference"
+	#STAGE 1 INDEXING REFERENCE
+	echo "Launching stage 1: Indexing reference"
 	if [ $launch_login == TRUE ]; then	
 		create_index.sh
 	else
-		sbatch --error=$logs'/indexing_reference.%J.err' --output=$logs'/indexing_reference.%J.out' create_index.sh
+		sbatch create_index.sh
 	fi
 
 elif [ "$1" == "2" ] ; then
-#STAGE 2 TRIMMING AND MAPPING SAMPLES
+	#STAGE 2 TRIMMING AND MAPPING SAMPLES
 	echo "Launching stage 2: Trimming and mapping samples"
 	trim_and_map.sh
 
@@ -38,20 +37,20 @@ elif [ "$1" == "2b" ] ; then
 	check_wf.sh
 
 elif [ "$1" == "3" ] ; then
-#STAGE 3 SAMPLES COMPARISON
+	#STAGE 3 SAMPLES COMPARISON
 	echo "Launching stage 3: Comparing samples"
 	if [ $launch_login == TRUE ]; then
 		compare_all_samples.sh
 	else
-		sbatch --mem=20GB -c $tasks --error=$logs'/DEGenesHunter.%J.err' --output=$logs'/DEGenesHunter.%J.out' compare_all_samples.sh
+		sbatch -c $tasks compare_all_samples.sh
 	fi
 elif [ "$1" == "4" ] ; then
-#STAGE 4 : FUNCTIONAL ANALYSIS
+	#STAGE 4 : FUNCTIONAL ANALYSIS
 	echo "Launching stage 4: Functional analysis"
 
 	if [ `echo $fun_remote_mode | grep -q -G "[kb]"` ] || [ $launch_login == TRUE ]; then	
 		launch_fun_hun.sh
 	else
-		sbatch --mem-per-cpu=5GB -c $tasks --error=$logs'/functional_hunter.%J.err' --output=$logs'/functional_hunter.%J.out' launch_fun_hun.sh
+		sbatch -c $tasks launch_fun_hun.sh	
 	fi
 fi
