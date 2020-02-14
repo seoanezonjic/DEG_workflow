@@ -31,7 +31,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 		grep -v '^N_' $target_results_folder'/selected_counts' | sum_counts_by_isoform.rb - > $target_results_folder'/final_counts.txt'
 
 		## Launch DEGenesHunter
-		echo $degenes_hunter_options > $target_results_folder/'degenes_Hunter.log'
+		echo degenes_Hunter.R $degenes_hunter_options -i $target_results_folder'/final_counts.txt' -t $TARGET_FILE -o $target_results_folder > $target_results_folder/'degenes_Hunter.log'
 		/usr/bin/time -o $target_results_folder/process_data -v degenes_Hunter.R $degenes_hunter_options -i $target_results_folder'/final_counts.txt' -t $TARGET_FILE -o $target_results_folder &>>$target_results_folder/'degenes_Hunter.log' &
 	done
 	wait
