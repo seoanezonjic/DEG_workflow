@@ -47,7 +47,11 @@ de_variables = {
 	"de_packages" => ["-m"],
 	"de_min_pack" => ["-c"],
 	"de_add_factors" => ["-v"],
+	"WGCNA_mergecutHeight" => ["--WGCNA_mergecutHeight"],
+	"WGCNA_min_genes_cluster"=>["--WGCNA_min_genes_cluster"],
+	"WGCNA_detectcutHeight" => ["--WGCNA_detectcutHeight"],  
 	"ADD_OPTIONS" => []
+
 }
 
 fun_variables = {
