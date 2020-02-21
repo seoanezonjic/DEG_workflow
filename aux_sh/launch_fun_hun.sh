@@ -11,7 +11,7 @@ do
 	TARGET_NAME=`echo $TARGET_FILE | sed 's/_target.txt//'`
 	target_results_folder=$HUNTER_RESULTS_FOLDER'/'$TARGET_NAME
 	if [ $experiment_type == "Clusters_report" ]; then 
-		/usr/bin/time -o $target_results_folder/process_data_cluster_report -v render_corr_report.R -i $target_results_folder -o $target_results_folder/functional_enrichment
+		/usr/bin/time -o $target_results_folder/process_data_cluster_report -v render_corr_report.R -i $target_results_folder -o $target_results_folder/functional_enrichment &>$target_results_folder'/functional_Hunter.log'
 	else
 		/usr/bin/time -o $target_results_folder/process_data_functional_hunter -v functional_Hunter.R -c 6 $functional_hunter_options -i $target_results_folder -t E -o $target_results_folder/functional_enrichment &>$target_results_folder'/functional_Hunter.log'
 	fi
