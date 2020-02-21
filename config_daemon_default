@@ -3,7 +3,7 @@
 ###################################  
 
 ######	EXPERIMENT VARIABLES	#######
-export experiment_type="RNAseq_genome"	#-------#	Experiment type 'miRNAseq_detection', 'RNAseq_genome' or 'RNAseq_transcriptome'  
+export experiment_type="RNAseq_genome"	#-------#	Experiment type 'miRNAseq_detection', 'RNAseq_genome', 'Clusters_report' or 'RNAseq_transcriptome'  
 export organism='human'	#-------#	Model organism: Currently only 'human' is available
 export mapping_ref=$CODE_PATH'/references/'$organism	#-------#	References path: The references will be downloaded and indexed there. For human use mapping_ref=~pedro/proyectos/ramon_areces19/pmm2_belen/project_execution/references/
 export TRIM_TEMPLATE="transcriptomics.txt"	#-------#	Trimming template path. Available options are "$CODE_PATH"/templates/trimming/miRNA.txt or transcriptomics.txt
