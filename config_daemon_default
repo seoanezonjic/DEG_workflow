@@ -31,7 +31,7 @@ if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	export TEMPLATE=$CODE_PATH"/templates/miRNA_detection.txt"	#-------#	AutoFlow mapping template. It is advisable not to modify this variable
 	export MIRBASE_ORGANISM='hsa'	#--------#	STRING 	for mirbase filtering (three words code) 'hsa', 'mmu'
 
-elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_transcriptome" ]]; then
+elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_transcriptome" || $experiment_type == "Clusters_report" ]]; then
 	##################################
 	## RNA-seq variables
 	##################################
