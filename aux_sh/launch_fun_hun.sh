@@ -4,7 +4,6 @@
 hostname
 
 source ~soft_bio_267/initializes/init_degenes_hunter
-
 functional_hunter_options=`generate_DGHunter_command.rb -m "functional_Hunter"`
 for TARGET_FILE in `echo $TARGETS | tr "," " "`
 do

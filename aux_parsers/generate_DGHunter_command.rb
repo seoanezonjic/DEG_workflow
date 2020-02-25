@@ -6,11 +6,87 @@ require 'optparse'
 #####################################################
 ## METHODS
 
-def parse_env_variables(variables)
+def parse_env_variables(variables, mode)
 	variables.each do |variable, attributes|
 		attributes << ENV[variable]
 	end
 	return variables
+end
+
+def parse_string_command(cmd, mode)
+	options = {} 
+	if mode == 'degenes_Hunter'
+		optparse = OptionParser.new do |option|
+			option.on("-p pval", "--p_val_cutoff pval") do |item|
+				options["de_pvalue"] = ["-p", item]
+			end
+
+			option.on("-f lfc", "--lfc lfc") do |item|
+				options['de_logfc'] = ['-f', item]
+			end
+
+			option.on("-m MODULES", "--modules MODULES") do |item|
+				options["de_packages"] = ["-m", item]
+			end
+
+			option.on("c MINPACK_COMMON", "--minpack_common MINPACK_COMMON") do |item|
+				options["de_min_pack"] = ["-c", item]
+			end
+
+			option.on("-t TARGET", "--target_file TARGET") do |item|
+				options["target_path"] = ["-t", item]
+			end
+
+			option.on("-v VARIABLES", "--model_variables VARIABLES") do |item|
+				options["de_add_factors"] = ["-v", item]
+			end
+
+			option.on("-S FACTORS", "--string_factors FACTORS") do |item|
+				options["string_features"] = ["-S", item]
+			end
+
+			option.on("-N FACTORS", "--numeric_factors FACTORS") do |item|
+				options["numeric_features"] = ["-N", item]
+			end
+
+			option.on("--WGCNA_min_genes_cluster integer") do |item|
+				options["WGCNA_min_genes_cluster"] = ["--WGCNA_min_genes_cluster", item]
+			end
+
+			option.on("--WGCNA_detectcutHeight integer") do |item|
+				options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]  
+			end
+
+			option.on("--WGCNA_mergecutHeight integer") do |item|
+				options["WGCNA_mergecutHeight"] = ["--WGCNA_mergecutHeight", item]
+			end
+			
+			option.on("-r READS", "--reads READS") do |item|
+				options["min_reads"] =["-r", item]
+			end
+
+			################### Options to complete
+			#	-M CUSTOM_MODEL, --custom_model
+			#	-b WGCNA_MEMORY, --WGCNA_memory
+			#	--WGCNA_deepsplit
+			#	-l MINLIBRARIES, --minlibraries
+			#	-w WGCNA_ALL, --WGCNA_all
+			# --WGCNA_blockwiseNetworkType
+			# --WGCNA_blockwiseTOMType
+			
+		end
+
+	elsif mode == 'functional_Hunter'
+		optparse = OptionParser.new do |option|
+		end
+	end
+	optparse.parse!(cmd.split)
+	return options
+end
+
+def load_aux_options(aux_options_file)
+	aux_options = File.open(aux_options_file)
+	return_aux_options
 end
 
 def generate_command(variables)
@@ -18,11 +94,7 @@ def generate_command(variables)
 	variables.each do |variable, attributes|
 		flag, value = attributes
 		next if (value.nil? || value.empty?) && attributes.length > 1
-		if variable.include?("additional_options")
-			command += "#{attributes.join("")} "
-		else
-			command += "#{flag} #{value} "
-		end
+		command << "#{flag} #{value} "
 	end
 	return command
 end
@@ -50,8 +122,9 @@ de_variables = {
 	"WGCNA_mergecutHeight" => ["--WGCNA_mergecutHeight"],
 	"WGCNA_min_genes_cluster"=>["--WGCNA_min_genes_cluster"],
 	"WGCNA_detectcutHeight" => ["--WGCNA_detectcutHeight"],  
-	"ADD_OPTIONS" => []
-
+	"numeric_features" => ["-N"],
+	"string_features" => ["-S"],
+	"target_path" => ["-t"]
 }
 
 fun_variables = {
@@ -62,14 +135,27 @@ fun_variables = {
 	"fun_an_performance" => ["-A"],
 	"fun_pvalue" => ["-T"],
 	"fun_organism" => ["-m"],
-	"annotation_list" => ["-a"],
-	"ADD_OPTIONS" => []
+	"annotation_list" => ["-a"]
 }
 
 if options[:mode] == 'degenes_Hunter'
-	variables = parse_env_variables(de_variables)
+	variables = parse_env_variables(de_variables, options[:mode])
 elsif options[:mode] == 'functional_Hunter'
-	variables = parse_env_variables(fun_variables)
+	variables = parse_env_variables(fun_variables, options[:mode])
+end
+
+addition_options = ENV['ADD_OPTIONS']
+if !addition_options.nil?
+	addition_opts = parse_string_command(addition_options, options[:mode]) 
+	variables = variables.merge(addition_opts)
+end
+
+if options[:mode] == 'degenes_Hunter'
+	aux_path = variables["target_path"][1].gsub(".txt", ".aux")
+	if File.exists?(aux_path)
+		aux_opts = parse_string_command(File.open(aux_path).read.chomp, options[:mode])
+		variables = variables.merge(aux_opts)
+	end
 end
 
 command = generate_command(variables)

@@ -5,10 +5,11 @@
 #SBATCH --error=job.%J.err
 #SBATCH --output=job.%J.out
 
-mv $mapping_ref/genome.fa $mapping_ref/raw_genome.fa
-fasta_editor.rb -i $mapping_ref/raw_genome.fa -r "CLEAN" -c a -o $mapping_ref/genome.fa
-rm $mapping_ref/raw_genome.fa
-
+if [ $experiment_type == "RNAseq_genome" ] || [ $experiment_type == "miRNAseq_detection" ]; then
+	mv $mapping_ref/genome.fa $mapping_ref/raw_genome.fa
+	fasta_editor.rb -i $mapping_ref/raw_genome.fa -r "CLEAN" -c a -o $mapping_ref/genome.fa
+	rm $mapping_ref/raw_genome.fa
+fi 
 
 if [ $experiment_type == "RNAseq_genome" ]; then
 	module load star/2.5.3a
@@ -17,6 +18,9 @@ if [ $experiment_type == "RNAseq_genome" ]; then
 	STAR --runThreadN 2 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/genome.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
 elif [ $experiment_type == "RNAseq_transcriptome" ]; then
 	module load bowtie/2.2.9
+	if [ "$transcriptome" == "" ] ; then
+		transcriptome=$mapping_ref'/miRNA_nr.fasta'	#-------#	Transcriptome or custom fasta to use as reference. Default options is set for miRNA differential expresion analysis usin as reference the miRNAs determinated in 'miRNAseq_detection' mode
+	fi
 	out=$mapping_ref'/bowtie_index_tr'
 	mkdir -p $out
 	bowtie2-build -f $transcriptome $out/reference

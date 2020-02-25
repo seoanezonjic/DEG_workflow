@@ -3,11 +3,16 @@
 framework_dir=`dirname $0`
 export CODE_PATH=$(readlink -f $framework_dir )
 export ADD_OPTIONS=$2
+CONFIG_DAEMON=$CODE_PATH'/config_daemon'
+if [ "$3" != "" ] ; then
+	CONFIG_DAEMON=$3
+fi
 export PATH=$CODE_PATH'/aux_sh:'$PATH
 export PATH=$CODE_PATH'/aux_parsers:'$PATH
 
-source $CODE_PATH'/config_daemon'
-n_target=`echo $TARGETS |tr "," "\n" | wc -l `;tasks=`echo $n_target"+1" | bc`
+source $CONFIG_DAEMON
+n_target=`echo $TARGETS |tr "," "\n" | wc -l `
+tasks=`echo $n_target"+1" | bc`
 
 ## STAGE EXECUTION
 #######################################################################
@@ -39,6 +44,8 @@ elif [ "$1" == "2b" ] ; then
 elif [ "$1" == "3" ] ; then
 	#STAGE 3 SAMPLES COMPARISON
 	echo "Launching stage 3: Comparing samples"
+	eval "$generate_targets"
+	export TARGETS=`ls $TARGETS_FOLDER/*_target.txt | rev | cut -f 1 -d "/" | rev | tr "\n" ","` ; TARGETS=${TARGETS%?}	#-------#	Target file location, including a short sample description	
 	if [ $launch_login == TRUE ]; then
 		compare_all_samples.sh
 	else

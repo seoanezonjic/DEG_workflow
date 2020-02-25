@@ -6,6 +6,9 @@
 ######################################################
 
 require "optparse" 
+require 'fileutils'
+
+
 CTRL = 0
 TREAT = 1
 
@@ -89,9 +92,9 @@ def find_features(feature_name, features, table)
 	return samples_list
 end
 
-def save_targets(targets, experiment_design, additional_columns)
+def save_targets(targets, output_path, experiment_design, additional_columns)
 	targets.each do |target_name, treats|
-		File.open(target_name.to_s + "_target.txt",'w') do |out_file|
+		File.open("#{output_path}/#{target_name.to_s}_target.txt",'w') do |out_file|
 			header = "sample\ttreat"
 			header = "sample\ttreat\t#{additional_columns.join("\t")}" if additional_columns.length > 0
 
@@ -114,6 +117,17 @@ def save_targets(targets, experiment_design, additional_columns)
 		end
 	end
 end
+
+def save_aux_options(targets, output_path, aux_options)
+	FileUtils.mkdir_p output_path
+	targets.each do |target_name, treats|
+		aux_file = "#{output_path}/#{target_name}_target.aux"
+		File.open(aux_file, 'w') do |out|
+			out.puts aux_options
+		end
+	end
+end
+
 
 def parse_filter(string)
 	feature_name, features = string.split("=")
@@ -147,6 +161,11 @@ OptionParser.new do |opts|
 		options[:additional_features] = string.split(",")
 	end
 
+	options[:aux_options] = []
+	opts.on("--aux_options STRING", "String with extra options for DEGenesHunter.") do |string|
+		options[:aux_options] = string
+	end
+
 	options[:blacklist] = nil
 	opts.on("-b FILE/STRING", "--blacklist FILE/STRING", "List with samples name to exclude from targets. File or comma separated string") do |file|
 		options[:blacklist] = file
@@ -155,6 +174,11 @@ OptionParser.new do |opts|
 	options[:whitelist] = nil
 	opts.on("-w FILE/STRING", "--whitelist FILE/STRING", "List with samples name to acept from targets. File or comma separated string") do |file|
 		options[:whitelist] = file
+	end
+
+	options[:output_path] = "."
+	opts.on("-o PATH", "--output_path PATH", "Set the output path") do |path|
+		options[:output_path] = path
 	end
 
 end.parse!
@@ -169,4 +193,5 @@ filter = parse_filter(options[:filter]) if !options[:filter].nil?
 experiment_design = load_table(options[:table], blacklist, whitelist, filter)
 targets, features = parse_targets(options[:targets])
 targets = build_targets(experiment_design, targets) # meter aqui lo de guardar columnas y quitar la columna replicate
-save_targets(targets, experiment_design, options[:additional_features].map!{|feature| feature.to_sym})
+save_targets(targets, options[:output_path], experiment_design, options[:additional_features].map!{|feature| feature.to_sym})
+save_aux_options(targets, options[:output_path], options[:aux_options]) if !options[:aux_options].empty?
