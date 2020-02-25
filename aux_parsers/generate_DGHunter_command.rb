@@ -78,6 +78,52 @@ def parse_string_command(cmd, mode)
 
 	elsif mode == 'functional_Hunter'
 		optparse = OptionParser.new do |option|
+			option.on("-m MODEL_ORGANISM", "--model_organism") do |item|
+				options["fun_organism"] = ["-m", item]
+			end
+
+			option.on("-a ANNOT_FILE", "--annot_file") do |item|
+				options["annotation_list"] = ["-a", item]
+			end
+
+			option.on("-t BIOMART_FILTER", "--biomaRt_filter") do |item|
+				options["biomart_filter"] = ["-t", item]
+			end
+
+			option.on("-f FUNCTIONAL_ANALYSIS", "--functional_analysis") do |item|
+				options["fun_an_type"] = ["-f", item]
+			end
+
+			option.on("-G GO_GRAPHS", "--GO_graphs") do |item|
+				options["GO_modules"] = ["-G", item]
+			end
+
+			option.on("-A ANALYSIS", "--analysis") do |item|
+				options["fun_an_performance"] = ["-A", item]
+			end
+
+			#option.on("-K KEGG_ORGANISM", "--Kegg_organism") do |item|
+			#end
+
+			option.on("-r REMOTE", "--remote") do |item|
+				options["fun_remote_mode"] = ["-r", item]
+			end
+
+			option.on("-C CUSTOM", "--custom") do |item|
+				options["custom_nomenclature"] = ["-C", item]
+			end
+
+			option.on("-T THRESHOLD", "--threshold") do |item|
+				options["fun_pvalue"] = ["-T", item]
+			end
+
+#			option.on("-Q QTHRESHOLD", "--qthreshold") do |item|
+
+#			end
+
+			option.on("--debug") do 
+				options["debug"] = ["--debug", "BOOLEAN"]
+			end
 		end
 	end
 	optparse.parse!(cmd.split)
@@ -94,7 +140,9 @@ def generate_command(variables)
 	variables.each do |variable, attributes|
 		flag, value = attributes
 		next if (value.nil? || value.empty?) && attributes.length > 1
-		command << "#{flag} #{value} "
+		option = "#{flag} #{value} "
+		option = "#{flag} " if value == "BOOLEAN"
+		command << option
 	end
 	return command
 end
