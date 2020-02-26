@@ -7,9 +7,9 @@ source ~soft_bio_267/initializes/init_degenes_hunter
 
 mkdir $report_folder
 ## Collection information and mapping report generation
-# cat $MAPPING_RESULTS_FOLDER/*/metrics | sed "s/'//g" > $report_folder'/all_metrics'
-# create_metric_table.rb $report_folder'/all_metrics' sample $report_folder'/metric_table'
-# create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $report_folder/mapping_report.html -d $report_folder/metric_table -H t
+cat $MAPPING_RESULTS_FOLDER/*/metrics | sed "s/'//g" > $report_folder'/all_metrics'
+create_metric_table.rb $report_folder'/all_metrics' sample $report_folder'/metric_table'
+create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $report_folder/mapping_report.html -d $report_folder/metric_table -H t
 if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	. ~soft_bio_267/initializes/init_ruby
 	module load cdhit
