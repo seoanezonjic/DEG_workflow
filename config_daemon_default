@@ -1,6 +1,6 @@
 ################################### 
 ## GLOBAL VARS ##
-###################################  
+###################################   
 
 ######	EXPERIMENT VARIABLES	#######
 export experiment_type="RNAseq_genome"	#-------#	Experiment type 'miRNAseq_detection', 'RNAseq_genome', 'Clusters_report' or 'RNAseq_transcriptome'  
@@ -57,9 +57,9 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	export WGCNA_mergecutHeight="0.25"      #-------#       Value to merge two similar modules: Maximum dissimilarity (i.e., 1-correlation) 
     export WGCNA_min_genes_cluster="30"     #-------#       Minimum number of genes to keep a cluster       
     export WGCNA_detectcutHeight="0.995"    #-------#       Cut height to split modules
-    export min_reads=1.5	#------#	Used in filtering. Reads (counts per million mapped reads) per gene per sample must be higher than this value to count towards the --minlibraries value. Default=2
-	export string_features='age,treatment'	#------#	Columns in the target file to be used as categorical factors for the correlation analysis. If more than one to be used, should be comma separated
-	export numeric_features='post_mortem,2_AMINOISOBUTYR,SERINE,Creatinine,BETAINE,D_ALLO_THREONIN,NICOTINAMIDE,TAURINE,CREATINE,6_AMINOCAPROIC_,3_UREIDOPROPION,3_UREIDOPROPION_1,L_ASPARTIC_ACID,Adenine,HYPOXANTHINE_L_,HYPOXANTHINE_L__1,LYSINE,LYSINE_1,LYSINE_2,D_GLUTAMINE_L_G,D_GLUTAMIC_ACID,D_GLUTAMIC_ACID_1,METHIONINE,PYRIDOXAL_PYRID,2_PHENYLGLYCINE,XANTHINE_XANTHI,L_HISTIDINE,CARNITINE,PHENYLALANINE,4_HYDROXY_D_PHE,PRO_GLY_PROLYLG,DL_ARGININE,L_CITRULLINE,N_ACETYL_L_ASPA,COTININE,CYSTEINYLGLYCIN,PARAXANTHINE_TH,PARAXANTHINE_TH_1,L_TYROSINE,D_MANNITOL_SORB,N_ACETYL_DL_GLU,N_ACETYL_L_METH,CAFFEINE,L_RHAMNOSE_L_RH,ACETYL_L_CARNIT,DL_TRYPTOPHAN_L,L_KYNURENINE,D_DESTHIOBIOTIN,PANTOTHENIC_ACI,N_ACETYL_D_GLUC,DL_CYSTATHIONIN,L_CYSTINE,CYTIDINE,URIDINE,GAMMA_GLUTAMYLC,D_FRUCTOSE_6_PH,ADENOSINE,INOSINE,1_METHYLADENOSI,GUANOSINE,XANTHOSINE,7_METHYLGUANOSI,5_DEOXY_5_METHY,GLUTATHIONE,N_Acetylneurami,CYTIDINE_5_MONO,CYTIDINE_5_MONO_1,_NICOTINAMIDE_M,3_AMP_3_AMP_5_A,GMP,RIBOFLAVIN_B2,GLYCOCHOLIC_ACI,L_GLUTATHIONE_O,Flavin_adenine_'	#------#	Columns in the target file to be used as numeric (continuous) factors for the correlation analysis. If more than one to be used, should be comma separated
+    export min_reads=''	#------#	Used in filtering. Reads (counts per million mapped reads) per gene per sample must be higher than this value to count towards the --minlibraries value. Default=2
+	export string_features=''	#------#	Columns in the target file to be used as categorical factors for the correlation analysis. If more than one to be used, should be comma separated
+	export numeric_features=''
 	export generate_targets="
 		generate_targets.rb -e experiment_design -b blacklist -t 'target_name>factor:control_feature,treatment_feature_1/treatment_feature_2' -w whitelist 
 	"	#------#	Commands to generate target files. Whole string will be interpreted by BASH. If you need extra fields for use them in DEGENESHUNTER multifactorial or features, or define auxiliar options for DEGENSHUNTER (These auxiliar options have preference in contrast to config daemon variables and command line additional options) correlations you can tune the command using : --additional_features $numeric_features,$string_features --aux_options \"-N $numeric_features -S $string_features -v age -r 1.5\" -o $TARGETS_FOLDER \n 
