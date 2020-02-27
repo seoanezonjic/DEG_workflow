@@ -29,7 +29,7 @@ def parse_string_command(cmd, mode)
 				options["de_packages"] = ["-m", item]
 			end
 
-			option.on("c MINPACK_COMMON", "--minpack_common MINPACK_COMMON") do |item|
+			option.on("-c MINPACK_COMMON", "--minpack_common MINPACK_COMMON") do |item|
 				options["de_min_pack"] = ["-c", item]
 			end
 
