@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 #SBATCH --mem='20gb'
+#SBATCH --constraint=cal
+
 hostname
 
 

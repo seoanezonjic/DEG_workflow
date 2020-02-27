@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #SBATCH --mem='20gb'
 #SBATCH --cpus=6
+#SBATCH --constraint=cal
+
 hostname
 functional_launch=$1
 source ~soft_bio_267/initializes/init_degenes_hunter
