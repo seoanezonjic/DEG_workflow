@@ -65,6 +65,14 @@ def parse_string_command(cmd, mode)
 				options["min_reads"] =["-r", item]
 			end
 
+			option.on("-l MINLIBRARIES", "--minlibraries") do |item|
+				options["min_libraries"] =["-l", item]
+			end
+
+			option.on("-r READS", "--reads READS") do |item|
+				options["min_reads"] =["-r", item]
+			end
+
 			################### Options to complete
 			#	-M CUSTOM_MODEL, --custom_model
 			#	-b WGCNA_MEMORY, --WGCNA_memory
