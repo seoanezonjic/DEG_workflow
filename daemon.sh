@@ -50,7 +50,7 @@ elif [ "$module" == "3" ] ; then
 	if [ $launch_login == TRUE ]; then
 		compare_all_samples.sh
 	else
-		sbatch -c $tasks compare_all_samples.sh
+		sbatch compare_all_samples.sh
 	fi
 elif [ "$module" == "4a" ] ; then
 	#STAGE 4A : FUNCTIONAL ANALYSIS
