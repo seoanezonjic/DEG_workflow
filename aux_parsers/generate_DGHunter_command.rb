@@ -72,6 +72,10 @@ def parse_string_command(cmd, mode)
 			option.on("-r READS", "--reads READS") do |item|
 				options["min_reads"] =["-r", item]
 			end
+			
+			option.on("--debug") do
+                                options["debug"] = ["--debug", "BOOLEAN"]
+                        end
 
 			################### Options to complete
 			#	-M CUSTOM_MODEL, --custom_model
