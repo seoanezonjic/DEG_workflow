@@ -58,7 +58,7 @@ elif [ "$module" == "4a" ] ; then
 	if [ `echo $fun_remote_mode | grep -q -G "[kb]"` ] || [ $launch_login == TRUE ]; then	
 		launch_fun_hun.sh $module
 	else
-		sbatch -c $tasks launch_fun_hun.sh $module	
+		sbatch launch_fun_hun.sh $module	
 	fi
 elif [ "$module" == "4b" ]; then
 	#STAGE 4B : Creating Clusters specific report
@@ -66,6 +66,6 @@ elif [ "$module" == "4b" ]; then
 	if [ $launch_login == TRUE ]; then	
 		launch_fun_hun.sh $module
 	else
-		sbatch -c $tasks launch_fun_hun.sh $module
+		sbatch launch_fun_hun.sh $module
 	fi
 fi
