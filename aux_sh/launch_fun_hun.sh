@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-#SBATCH --mem='20gb'
-#SBATCH --cpus=16
+#SBATCH --mem='10gb'
+#SBATCH --cpus=2
 #SBATCH --constraint=cal
 
 hostname
