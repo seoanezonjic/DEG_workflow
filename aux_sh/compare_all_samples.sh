@@ -1,17 +1,39 @@
 #! /usr/bin/env bash
-#SBATCH --mem='20gb'
+#SBATCH --mem='10gb'
 #SBATCH --constraint=cal
+#SBATCH --cpus=2
 
 hostname
 
 
-source ~soft_bio_267/initializes/init_degenes_hunter
+export PATH=~/software/DEgenesHunter/:$PATH
 
+source ~soft_bio_267/programs/x86_64/R/init_custom
+
+#source ~soft_bio_267/initializes/init_degenes_hunter
 mkdir $report_folder
 ## Collection information and mapping report generation
 cat $MAPPING_RESULTS_FOLDER/*/metrics | sed "s/'//g" > $report_folder'/all_metrics'
 create_metric_table.rb $report_folder'/all_metrics' sample $report_folder'/metric_table'
-create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $report_folder/mapping_report.html -d $report_folder/metric_table -H t
+full_path_tagets=`ls $TARGETS_FOLDER/*_target.txt | tr "\n" ","` 
+full_path_tagets=${full_path_tagets%?}
+headers="t"
+for target_path in `echo $full_path_tagets| tr "," " "`; do 
+	headers=$headers",t"
+done
+counts_tables=''
+all_samples=''
+while IFS= read sample; do
+	counts_tables=$counts_tables$MAPPING_RESULTS_FOLDER/$sample/qualimap_0000/selected_counts','
+	all_samples=$all_samples$sample,
+done < $SAMPLES_FILE
+counts_tables=${counts_tables%?}
+all_samples=${all_samples%?}
+headers=$headers",t"
+merge_count_tables.rb -i $counts_tables -t $all_samples > $report_folder/all_counts
+echo create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $report_folder/mapping_report.html -d $report_folder/metric_table,$full_path_tagets,$report_folder/all_counts -H $headers
+create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $report_folder/mapping_report.html -d $report_folder/metric_table,$full_path_tagets,$report_folder/all_counts -H $headers
+exit
 if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	. ~soft_bio_267/initializes/init_ruby
 	module load cdhit
