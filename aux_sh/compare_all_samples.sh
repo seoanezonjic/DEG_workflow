@@ -31,9 +31,7 @@ counts_tables=${counts_tables%?}
 all_samples=${all_samples%?}
 headers=$headers",t"
 merge_count_tables.rb -i $counts_tables -t $all_samples > $report_folder/all_counts
-echo create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $report_folder/mapping_report.html -d $report_folder/metric_table,$full_path_tagets,$report_folder/all_counts -H $headers
 create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $report_folder/mapping_report.html -d $report_folder/metric_table,$full_path_tagets,$report_folder/all_counts -H $headers
-exit
 if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	. ~soft_bio_267/initializes/init_ruby
 	module load cdhit
