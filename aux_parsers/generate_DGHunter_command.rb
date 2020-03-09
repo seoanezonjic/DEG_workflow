@@ -72,17 +72,20 @@ def parse_string_command(cmd, mode)
 			option.on("-r READS", "--reads READS") do |item|
 				options["min_reads"] =["-r", item]
 			end
-			
+
+			options["WGCNA_ALL"] = "FALSE"
+			option.on("-w WGCNA_ALL", "--WGCNA_all") do |item|
+				options["WGCNA_ALL"] = ["-w", item]
+			end			
 			option.on("--debug") do
-                                options["debug"] = ["--debug", "BOOLEAN"]
-                        end
+                options["debug"] = ["--debug", "BOOLEAN"]
+            end
 
 			################### Options to complete
 			#	-M CUSTOM_MODEL, --custom_model
 			#	-b WGCNA_MEMORY, --WGCNA_memory
 			#	--WGCNA_deepsplit
 			#	-l MINLIBRARIES, --minlibraries
-			#	-w WGCNA_ALL, --WGCNA_all
 			# --WGCNA_blockwiseNetworkType
 			# --WGCNA_blockwiseTOMType
 			
