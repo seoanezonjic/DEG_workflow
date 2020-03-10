@@ -2,15 +2,10 @@
 #SBATCH --mem='10gb'
 #SBATCH --constraint=cal
 #SBATCH --cpus=2
-
 hostname
 
+source ~soft_bio_267/initializes/init_degenes_hunter
 
-export PATH=~/software/DEgenesHunter/:$PATH
-
-source ~soft_bio_267/programs/x86_64/R/init_custom
-
-#source ~soft_bio_267/initializes/init_degenes_hunter
 mkdir $report_folder
 ## Collection information and mapping report generation
 cat $MAPPING_RESULTS_FOLDER/*/metrics | sed "s/'//g" > $report_folder'/all_metrics'
