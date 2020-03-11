@@ -73,7 +73,7 @@ def parse_string_command(cmd, mode)
 				options["min_reads"] =["-r", item]
 			end
 
-			options["WGCNA_ALL"] = "FALSE"
+			options["WGCNA_ALL"] = ["-w", "FALSE"]
 			option.on("-w WGCNA_ALL", "--WGCNA_all") do |item|
 				options["WGCNA_ALL"] = ["-w", item]
 			end			
