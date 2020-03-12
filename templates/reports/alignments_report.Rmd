@@ -505,7 +505,7 @@ output:
 ```
 	
 ```{r samples_clustering, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-save.image("/home/bio267lab/proyectos/pmm2_belen/mRNAseq_2016/analysis/DEG_workflow/test.RData")
+# save.image("/home/bio267lab/proyectos/pmm2_belen/mRNAseq_2016/analysis/DEG_workflow/test.RData")
 out_clustering <- NULL
 invisible(lapply(names(targets),function(target_name){
 	# Take results
