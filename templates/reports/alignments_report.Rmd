@@ -1,5 +1,5 @@
 ---
-author: "James Richard Perkins"
+author: "José Córdoba Caballero"
 output:
   html_document:
     toc: true
@@ -8,18 +8,36 @@ output:
     fig_width: 12
 ---
 
-<style>
+<style type='text/css'>
     body .main-container {
         max-width: 90%;
     }
-</style>   
+
+    .plot_real_size {
+    	overflow: scroll;
+  		max-height: 600px;
+  	}
+
+    .plot_real_size img{
+    	max-width: none;
+    	max-height: none;
+    }
+
+    embed {
+   
+  }   
+</style>
 
 ```{r prior_proc, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 	library(reshape2)
 	library(ggplot2) 
+	library(DESeq2)
+	library(WGCNA)
+	library(stringr)
 
 	metric_table <- data[['metric_table']]
-
+	targets <- data[names(data)[grepl("_target.txt", names(data))]] 
+	count_data <- data[['all_counts']]
 	metric_dictionary <- list(
 		"initial_total_sequences" = "Total Reads Before Trimming", 
 		"final_total_sequences" = "Total Reads After Trimming",
@@ -49,10 +67,43 @@ output:
 		"final_sequence_length_distribution" = "Read length distribution after trimming"
 		)
 
+
+
 	metric_var_2_legend_name <- data.frame(
 		metric_var = names(metric_dictionary),
 		legend_name = unlist(metric_dictionary)
 	)
+
+	create_clustering <- function(target, all_metrics, metrics_to_process, count_data){
+		metrics_to_process <- c(metrics_to_process, "sample")	
+		samples <- target$sample
+		samples_metrics <- all_metrics[all_metrics$sample %in% samples,colnames(all_metrics) %in% metrics_to_process]
+		message(print("test1"))
+		rownames(samples_metrics) <- samples_metrics$sample
+		samples_metrics$sample <- NULL
+		message(print("test2"))
+		samples_metrics_corrected <- sapply(samples_metrics, function(x) as.numeric(gsub("\\%", "", x)))
+		samples_metrics_corrected <- data.frame(samples_metrics_corrected)
+
+		message(print("test3"))
+		samples_count_data <- count_data[,colnames(count_data) %in% samples]
+		length(samples)
+		dds <- DESeqDataSetFromMatrix(countData = samples_count_data,
+								  colData = target,
+                                  design = formula("~ treat"))
+		dds <- DESeq(dds)
+		normalized_counts <- as.data.frame(counts(dds, normalized=TRUE)) # Getting normalized values
+		normalized_counts <- t(normalized_counts)
+		sampleTree = hclust(dist(normalized_counts), method = "average")
+		traitColors = numbers2colors(samples_metrics_corrected, signed = FALSE)
+
+		plotDendroAndColors(sampleTree, traitColors,
+		                      groupLabels = names(samples_metrics_corrected),
+ 		                      main = "Sample dendrogram and trait heatmap")
+	}
+	 ##### TEST FUNCTION
+
+	####################################################
 
 	make_stacked_barchart_from_df <- function(df, id, other_vars, legend_names=FALSE) {
 		reduced_df <- df[,c(id, other_vars)]
@@ -196,6 +247,21 @@ output:
 		return(df_distribution)		
 	}
 
+	plot_in_div <- function(g, fig_height=7, fig_width=12) {
+		cat('\n<div class="plot_real_size">\n')
+		g_deparsed <- paste0(deparse(function() {g}), collapse = '')
+		sub_chunk <- paste0("\n```{r sub_chunk_", floor(runif(1) * 10000), ", fig.height=", fig_height, ", fig.width=", fig_width, ", echo=FALSE, message= FALSE, warning= FALSE}", "\n(", g_deparsed, ")()\n```\n\n\n") 
+		cat(knitr::knit(text = knitr::knit_expand(text = sub_chunk), quiet = TRUE))
+		cat('\n</div>\n')
+	}
+	calc_width_samples <- function(elements, multiplier = 0.3){
+		width <- elements * multiplier
+		return(width)
+	}
+
+	chunks <- function(code, options = ""){paste(paste("```{r ",options,"}",sep = ""),code,"```",sep="\n")}
+	render <- function(text){paste(knit(text = paste(text,collapse = "\n")),collapse = "\n")}
+
 	###############################
 	## CONTROL VARIABLES
 	##############################
@@ -219,8 +285,9 @@ output:
 	execute_bowtie2_feature_overlap <- all(c(vars_bowtie2_feature_overlap, "bowtie2_uniq_mapped_per")  %in% colnames(metric_table))
 	vars_length_trimming <- c("initial_sequence_length_distribution", "final_sequence_length_distribution")
 	execute_length_trimming <- all(vars_length_trimming %in% colnames(metric_table))
-
-
+	vars_clustering <- c("initial_total_sequences", "final_total_sequences", "Uniquely_mapped_reads_.", "multi_map", "X._of_reads_mapped_to_multiple_loci","X._of_reads_mapped_to_too_many_loci","X._of_reads_unmapped._too_short","X._of_reads_unmapped._other","Uniquely_mapped_reads_number","aligned_to_feature","initial_weigthed_qual_per_sequence","number_duplicatedreads.estimated.","final_mean_qual_per_base","final_min_qual_per_base_in_10th_decile","final_min_qual_per_base_in_lower_quartile","final_weigthed_qual_per_sequence","bowtie1_mapped_per","bowtie1_unmapped_per","bowtie1_multimapping_per","bowtie1_mapped","bowtie1_filtered_reads","bowtie2_unmapped_per","bowtie2_multimapping_per","bowtie2_uniq_mapped_per")
+	vars_clustering <- vars_clustering[vars_clustering %in% colnames(metric_table)]	
+	#vars_clustering <- c("initial_total_sequences", "final_total_sequences")
 ```
 
 ```{r length_before_trimming, eval=execute_length_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
@@ -241,17 +308,18 @@ output:
 	 initial_length_distribution_df <- parse_ditributions_to_df(metric_table, 
 	 	column_name = "initial_sequence_length_distribution"
  	)
+	width <- calc_width_samples(nrow(initial_length_distribution_df), 0.25)
 
 	if(length(unique(initial_length_distribution_df$metric)) == 1){
 		cat(paste(c("\n\n All reads of all samples has", unique(initial_length_distribution_df$metric), "nt of length\n\n"), sep = ""))
 	}else{
-		make_violin_plot(data_frame = initial_length_distribution_df,
+		pp <- make_violin_plot(data_frame = initial_length_distribution_df,
 		 	title = "Length distributions before trimming",
 		 	x_lab = "",
 		 	y_lab = "Length"
 		 	)
+		plot_in_div(pp, fig_width= width)
 	}
-
 ```
 
 ```{r length_after_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_length_trimming}
@@ -259,21 +327,23 @@ output:
 	cat("\n\n## **Length distribution after trimming**\n\n")
 	cat("\n\n### **Comprarison of samples length distribution after trimming**\n\n")
 	
-	 final_length_distribution_df <- parse_ditributions_to_df(metric_table, 
+	final_length_distribution_df <- parse_ditributions_to_df(metric_table, 
 	 	column_name = "final_sequence_length_distribution"
  	)
-	 make_violin_plot(data_frame = final_length_distribution_df,
-	 	title = "Length distributions after trimming",
-	 	x_lab = "",
-	 	y_lab = "Length"
-	 	)
-
+ 
+ 	pp <- make_violin_plot(data_frame = final_length_distribution_df,
+						 	title = "Length distributions after trimming",
+						 	x_lab = "",
+						 	y_lab = "Length"
+						 	)
+ 	width <- calc_width_samples(nrow(initial_length_distribution_df), 0.25)
+	plot_in_div(pp, fig_width= width)
 ```
 
 ```{r trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_trimming}
 	
 	cat("\n\n## **QC of reads before alignment**\n\n")
-	cat("\n\n### **Total numbers of reads before and after trimming**\n\n")
+	cat("\n\n### **Total num bers of reads before and after trimming**\n\n")
 	
 	# look up these vars in the legend table using match
 	vars_trimming_legend_names <- metric_var_2_legend_name[match(vars_trimming, metric_var_2_legend_name$metric_var), "legend_name" ]
@@ -412,3 +482,33 @@ output:
     )
 ```
 	
+```{r samples_clustering, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+save.image("/mnt/home/users/bio_267_uma/josecordoba/proyectos/aurora_omicas/analysis/mRNAseq/DEG_workflow/test.RData")
+
+out_clustering <- NULL
+invisible(lapply(names(targets),function(target_name){
+	# Take results
+	# Check and generate info
+	body <- "
+	target_readable <- str_remove('{{target_name}}', '_target.txt')
+	cat(paste(c('\n\n### **Sample clustering for ', target_readable, ' comparison **\n\n'),collapse = ''))
+	target_obj <- targets[['{{target_name}}']]
+	sample_counts <- length(target_obj)
+	
+
+#######################
+#############
+
+	plot_in_div(create_clustering(target_obj, metric_table, vars_clustering, count_data),
+				fig_height=(7 + 0.2 * length(vars_clustering)), 
+				fig_width=calc_width_samples(sample_counts))
+	"
+
+	out_clustering <<- c(out_clustering,paste(knit_expand(text = paste(
+															chunks(body, options = "echo = FALSE, results='asis', message= FALSE, warning= FALSE"),
+										 					"\n",sep = "\n")),
+															sep = "\n"))
+}))
+```
+
+`r paste(knit(text = paste(out_clustering,collapse = "\n")),collapse = "\n")`
