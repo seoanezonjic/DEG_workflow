@@ -1,5 +1,4 @@
 ---
-author: "José Córdoba Caballero"
 output:
   html_document:
     toc: true
@@ -32,12 +31,15 @@ output:
 	library(reshape2)
 	library(ggplot2) 
 	library(DESeq2)
+	library(edgeR)
 	library(WGCNA)
 	library(stringr)
 
 	metric_table <- data[['metric_table']]
 	targets <- data[names(data)[grepl("_target.txt", names(data))]] 
 	count_data <- data[['all_counts']]
+	rownames(count_data) <- count_data[[1]]
+	count_data[[1]] <- NULL
 	metric_dictionary <- list(
 		"initial_total_sequences" = "Total Reads Before Trimming", 
 		"final_total_sequences" = "Total Reads After Trimming",
@@ -74,32 +76,41 @@ output:
 		legend_name = unlist(metric_dictionary)
 	)
 
-	create_clustering <- function(target, all_metrics, metrics_to_process, count_data){
+	create_clustering <- function(target, all_metrics, metrics_to_process, count_data, metric_var_2_legend_name){
 		metrics_to_process <- c(metrics_to_process, "sample")	
 		samples <- target$sample
 		samples_metrics <- all_metrics[all_metrics$sample %in% samples,colnames(all_metrics) %in% metrics_to_process]
-		message(print("test1"))
 		rownames(samples_metrics) <- samples_metrics$sample
 		samples_metrics$sample <- NULL
-		message(print("test2"))
 		samples_metrics_corrected <- sapply(samples_metrics, function(x) as.numeric(gsub("\\%", "", x)))
 		samples_metrics_corrected <- data.frame(samples_metrics_corrected)
-
-		message(print("test3"))
 		samples_count_data <- count_data[,colnames(count_data) %in% samples]
-		length(samples)
+		samples_count_data <- samples_count_data[rowSums(edgeR::cpm(samples_count_data) > 0) == ncol(samples_count_data),] 
+		index_control_cols <- as.character(subset(target, treat == "Ctrl", select = sample, drop=TRUE))
+		index_treatmn_cols <- as.character(subset(target, treat == "Treat", select = sample, drop=TRUE))
+		samples_count_data <- samples_count_data[c(index_control_cols,index_treatmn_cols)]
+		cat(paste(c(nrow(samples_count_data),"has been normalized."),sep = " "))
 		dds <- DESeqDataSetFromMatrix(countData = samples_count_data,
 								  colData = target,
                                   design = formula("~ treat"))
 		dds <- DESeq(dds)
 		normalized_counts <- as.data.frame(counts(dds, normalized=TRUE)) # Getting normalized values
+		cat(paste(c(nrow(normalized_counts),"has been plotted."),sep = " "))
+
 		normalized_counts <- t(normalized_counts)
 		sampleTree = hclust(dist(normalized_counts), method = "average")
-		traitColors = numbers2colors(samples_metrics_corrected, signed = FALSE)
+		col<- colorRampPalette(c("#FFFFCC", "#FD8D3C", "#800026"))(20)
+
+		traitColors = numbers2colors(samples_metrics_corrected, signed = FALSE, colors = col)
+
+		raw_labels <- names(samples_metrics_corrected)
+		readable_labels <- metric_var_2_legend_name[match(raw_labels, metric_var_2_legend_name$metric_var), "legend_name" ]
+
 
 		plotDendroAndColors(sampleTree, traitColors,
-		                      groupLabels = names(samples_metrics_corrected),
- 		                      main = "Sample dendrogram and trait heatmap")
+							cex.colorLabels = 0.5,
+							groupLabels = readable_labels,
+ 		                    main = "Sample dendrogram and trait heatmap")
 	}
 	 ##### TEST FUNCTION
 
@@ -248,6 +259,7 @@ output:
 	}
 
 	plot_in_div <- function(g, fig_height=7, fig_width=12) {
+
 		cat('\n<div class="plot_real_size">\n')
 		g_deparsed <- paste0(deparse(function() {g}), collapse = '')
 		sub_chunk <- paste0("\n```{r sub_chunk_", floor(runif(1) * 10000), ", fig.height=", fig_height, ", fig.width=", fig_width, ", echo=FALSE, message= FALSE, warning= FALSE}", "\n(", g_deparsed, ")()\n```\n\n\n") 
@@ -309,6 +321,11 @@ output:
 	 	column_name = "initial_sequence_length_distribution"
  	)
 	width <- calc_width_samples(nrow(initial_length_distribution_df), 0.25)
+	if(width < 12){
+		width <- 12
+	} else if(width > 50 ){
+		width <- 50
+	}
 
 	if(length(unique(initial_length_distribution_df$metric)) == 1){
 		cat(paste(c("\n\n All reads of all samples has", unique(initial_length_distribution_df$metric), "nt of length\n\n"), sep = ""))
@@ -337,6 +354,11 @@ output:
 						 	y_lab = "Length"
 						 	)
  	width <- calc_width_samples(nrow(initial_length_distribution_df), 0.25)
+ 	if(width < 12){
+		width <- 12
+	} else if(width > 50 ){
+		width <- 50
+	}
 	plot_in_div(pp, fig_width= width)
 ```
 
@@ -483,7 +505,7 @@ output:
 ```
 	
 ```{r samples_clustering, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-
+save.image("/home/bio267lab/proyectos/pmm2_belen/mRNAseq_2016/analysis/DEG_workflow/test.RData")
 out_clustering <- NULL
 invisible(lapply(names(targets),function(target_name){
 	# Take results
@@ -498,9 +520,7 @@ invisible(lapply(names(targets),function(target_name){
 #######################
 #############
 
-	plot_in_div(create_clustering(target_obj, metric_table, vars_clustering, count_data),
-				fig_height=(7 + 0.2 * length(vars_clustering)), 
-				fig_width=calc_width_samples(sample_counts))
+	plot_in_div(create_clustering(target_obj, metric_table, vars_clustering, count_data, metric_var_2_legend_name)) #Nor recommended to set dinamic sizes
 	"
 
 	out_clustering <<- c(out_clustering,paste(knit_expand(text = paste(
