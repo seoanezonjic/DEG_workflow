@@ -483,7 +483,6 @@ output:
 ```
 	
 ```{r samples_clustering, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-save.image("/mnt/home/users/bio_267_uma/josecordoba/proyectos/aurora_omicas/analysis/mRNAseq/DEG_workflow/test.RData")
 
 out_clustering <- NULL
 invisible(lapply(names(targets),function(target_name){
