@@ -37,6 +37,11 @@ output:
 
 	metric_table <- data[['metric_table']]
 	targets <- data[names(data)[grepl("_target.txt", names(data))]] 
+	execute_clustering <- TRUE
+	out_clustering <- NULL
+	if(length(targets) == 0){
+		execute_clustering <- FALSE	
+	}
 	count_data <- data[['all_counts']]
 	rownames(count_data) <- count_data[[1]]
 	count_data[[1]] <- NULL
@@ -100,9 +105,10 @@ output:
 	filter_and_perform_DESeq_norm <- function(target, samples_count_data){
 		index_control_cols <- as.character(subset(target, treat == "Ctrl", select = sample, drop = TRUE))
 		index_treatmn_cols <- as.character(subset(target, treat == "Treat", select = sample, drop = TRUE))
+		message(paste(index_control_cols, index_treatmn_cols, sep =","))
 		to_keep_control <- rowSums(edgeR::cpm(samples_count_data[index_control_cols]) > 2) >= 2
-	    to_keep_treatment <- rowSums(edgeR::cpm(samples_count_data[index_treatmn_cols]) > 2) >= 2
-    	keep_cpm <- to_keep_control | to_keep_treatment
+	    	to_keep_treatment <- rowSums(edgeR::cpm(samples_count_data[index_treatmn_cols]) > 2) >= 2
+    		keep_cpm <- to_keep_control | to_keep_treatment
 		samples_count_data <- samples_count_data[keep_cpm, ]
 		samples_count_data <- samples_count_data[c(index_control_cols,index_treatmn_cols)]
 		dds <- DESeqDataSetFromMatrix(countData = samples_count_data,
@@ -504,9 +510,8 @@ output:
     )
 ```
 	
-```{r samples_clustering, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+```{r samples_clustering, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval = execute_clustering}
 # save.image("/home/bio267lab/proyectos/pmm2_belen/mRNAseq_2016/analysis/DEG_workflow/test.RData")
-out_clustering <- NULL
 invisible(lapply(names(targets),function(target_name){
 	# Take results
 	# Check and generate info
