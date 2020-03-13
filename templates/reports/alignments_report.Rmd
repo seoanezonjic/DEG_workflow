@@ -76,7 +76,7 @@ output:
 		legend_name = unlist(metric_dictionary)
 	)
 
-	create_clustering <- function(target, all_metrics, metrics_to_process, count_data, metric_var_2_legend_name){
+	create_clustering <- function(target, all_metrics, metrics_to_process, count_data, metric_var_2_legend_name, method = "complete"){ #Use of 'complete' clustering method as default, as same as DEgenesHunter
 		metrics_to_process <- c(metrics_to_process, "sample")	
 		samples <- target$sample
 		samples_metrics <- all_metrics[all_metrics$sample %in% samples,colnames(all_metrics) %in% metrics_to_process]
@@ -85,34 +85,34 @@ output:
 		samples_metrics_corrected <- sapply(samples_metrics, function(x) as.numeric(gsub("\\%", "", x)))
 		samples_metrics_corrected <- data.frame(samples_metrics_corrected)
 		samples_count_data <- count_data[,colnames(count_data) %in% samples]
-		samples_count_data <- samples_count_data[rowSums(edgeR::cpm(samples_count_data) > 0) == ncol(samples_count_data),] 
-		index_control_cols <- as.character(subset(target, treat == "Ctrl", select = sample, drop=TRUE))
-		index_treatmn_cols <- as.character(subset(target, treat == "Treat", select = sample, drop=TRUE))
-		samples_count_data <- samples_count_data[c(index_control_cols,index_treatmn_cols)]
-		cat(paste(c(nrow(samples_count_data),"has been normalized."),sep = " "))
-		dds <- DESeqDataSetFromMatrix(countData = samples_count_data,
-								  colData = target,
-                                  design = formula("~ treat"))
-		dds <- DESeq(dds)
-		normalized_counts <- as.data.frame(counts(dds, normalized=TRUE)) # Getting normalized values
-		cat(paste(c(nrow(normalized_counts),"has been plotted."),sep = " "))
-
-		normalized_counts <- t(normalized_counts)
-		sampleTree = hclust(dist(normalized_counts), method = "average")
+		normalized_counts <- t(filter_and_perform_DESeq_norm(target, samples_count_data))
+		sampleTree = hclust(dist(normalized_counts), method = "complete") 
 		col<- colorRampPalette(c("#FFFFCC", "#FD8D3C", "#800026"))(20)
-
 		traitColors = numbers2colors(samples_metrics_corrected, signed = FALSE, colors = col)
-
-		raw_labels <- names(samples_metrics_corrected)
-		readable_labels <- metric_var_2_legend_name[match(raw_labels, metric_var_2_legend_name$metric_var), "legend_name" ]
-
-
+		readable_labels <- metric_var_2_legend_name[match(names(samples_metrics_corrected), metric_var_2_legend_name$metric_var), "legend_name" ]
 		plotDendroAndColors(sampleTree, traitColors,
 							cex.colorLabels = 0.5,
 							groupLabels = readable_labels,
- 		                    main = "Sample dendrogram and trait heatmap")
+		                    main = "Sample dendrogram and trait heatmap")
+
 	}
-	 ##### TEST FUNCTION
+
+	filter_and_perform_DESeq_norm <- function(target, samples_count_data){
+		index_control_cols <- as.character(subset(target, treat == "Ctrl", select = sample, drop = TRUE))
+		index_treatmn_cols <- as.character(subset(target, treat == "Treat", select = sample, drop = TRUE))
+		to_keep_control <- rowSums(edgeR::cpm(samples_count_data[index_control_cols]) > 2) >= 2
+	    to_keep_treatment <- rowSums(edgeR::cpm(samples_count_data[index_treatmn_cols]) > 2) >= 2
+    	keep_cpm <- to_keep_control | to_keep_treatment
+		samples_count_data <- samples_count_data[keep_cpm, ]
+		samples_count_data <- samples_count_data[c(index_control_cols,index_treatmn_cols)]
+		dds <- DESeqDataSetFromMatrix(countData = samples_count_data,
+							colData = target,
+                            design = formula("~ treat"))
+		dds <- DESeq(dds)
+		normalized_counts <- as.data.frame(counts(dds, normalized=TRUE)) # Getting normalized values
+		normalized_counts <- data.frame(log10(data.matrix(normalized_counts) + 1)) # Data normalization
+		return(normalized_counts)
+	}
 
 	####################################################
 
@@ -510,6 +510,11 @@ out_clustering <- NULL
 invisible(lapply(names(targets),function(target_name){
 	# Take results
 	# Check and generate info
+	#######################3
+	library(gplots)
+	### REMOVE
+	#######################
+
 	body <- "
 	target_readable <- str_remove('{{target_name}}', '_target.txt')
 	cat(paste(c('\n\n### **Sample clustering for ', target_readable, ' comparison **\n\n'),collapse = ''))
@@ -520,7 +525,8 @@ invisible(lapply(names(targets),function(target_name){
 #######################
 #############
 
-	plot_in_div(create_clustering(target_obj, metric_table, vars_clustering, count_data, metric_var_2_legend_name)) #Nor recommended to set dinamic sizes
+	create_clustering(target_obj, metric_table, vars_clustering, count_data, metric_var_2_legend_name) #Nor recommended to set dinamic sizes
+	
 	"
 
 	out_clustering <<- c(out_clustering,paste(knit_expand(text = paste(
