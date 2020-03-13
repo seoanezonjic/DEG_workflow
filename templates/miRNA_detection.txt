@@ -3,9 +3,12 @@ clean_samples){
 	module load seqtrimbb/2.1.3
 	. ~soft_bio_267/initializes/init_ruby
 	rm -rf output_files*
+	if [ "$link_path" != "" ]; then
+                ln -s $link_path/$sample/seqtrimbb_0000/output_files ./
+        else    
 	?
-	seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -w [cpu] -O output_files
-	
+		seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -w [cpu] -O output_files
+	fi
 	if [ ! -s output_files/sequences_.fastq.gz ]; then
 		>&2 echo "Triming has failed"
 		exit 1
