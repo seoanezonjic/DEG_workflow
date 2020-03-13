@@ -8,7 +8,7 @@ source ~soft_bio_267/initializes/init_degenes_hunter
 
 mkdir $report_folder
 ## Collection information and mapping report generation
-cat $MAPPING_RESULTS_FOLDER/*/metrics | sed "s/'//g" > $report_folder'/all_metrics'
+cat $MAPPING_RESULTS_FOLDER/*/metrics | sed "s/'//g" | awk 'BEGIN {IFS="\t";OFS="\t"}{if($3 != "" )print $0}' > $report_folder'/all_metrics'
 create_metric_table.rb $report_folder'/all_metrics' sample $report_folder'/metric_table'
 full_path_tagets=`ls $TARGETS_FOLDER/*_target.txt | tr "\n" ","` 
 full_path_tagets=${full_path_tagets%?}
@@ -27,6 +27,7 @@ all_samples=${all_samples%?}
 headers=$headers",t"
 merge_count_tables.rb -i $counts_tables -t $all_samples > $report_folder/all_counts
 create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $report_folder/mapping_report.html -d $report_folder/metric_table,$full_path_tagets,$report_folder/all_counts -H $headers
+
 if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	. ~soft_bio_267/initializes/init_ruby
 	module load cdhit
