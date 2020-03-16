@@ -8,7 +8,11 @@
 if [ $experiment_type == "RNAseq_genome" ] || [ $experiment_type == "miRNAseq_detection" ]; then
 	mv $mapping_ref/genome.fa $mapping_ref/raw_genome.fa
 	fasta_editor.rb -i $mapping_ref/raw_genome.fa -r "CLEAN" -c a -o $mapping_ref/genome.fa
-	rm $mapping_ref/raw_genome.fa
+	if [ `grep -c -e '^>' $mapping_ref/raw_genome.fa` ==  `grep -c -e '^>' $mapping_ref/genome.fa` ]; then
+		rm $mapping_ref/raw_genome.fa
+	else
+		echo "IDs cleaning has faied"
+	fi
 fi 
 
 if [ $experiment_type == "RNAseq_genome" ]; then
