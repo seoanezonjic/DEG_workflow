@@ -30,7 +30,7 @@ if [ "$TARGETS" != "" ]; then
 	        headers=$headers",t"
 	done
 fi
-create_report.R -t $REPORT_TEMPLATES_FOLDER/alignments_report.Rmd -o $report_folder/mapping_report.html -d $all_report_files -H $headers
+create_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.Rmd -o $report_folder/mapping_report.html -d $all_report_files -H $headers
 if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	. ~soft_bio_267/initializes/init_ruby
 	module load cdhit
