@@ -28,12 +28,13 @@ output:
 </style>
 
 ```{r prior_proc, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-	library(reshape2)
-	library(ggplot2) 
-	library(DESeq2)
-	library(edgeR)
-	library(WGCNA)
-	library(stringr)
+	suppressPackageStartupMessages(library(reshape2))
+	suppressPackageStartupMessages(require(gplots))
+	suppressPackageStartupMessages(library(ggplot2))
+	suppressPackageStartupMessages(library(DESeq2))
+	suppressPackageStartupMessages(library(edgeR))
+	suppressPackageStartupMessages(library(WGCNA))
+	suppressPackageStartupMessages(library(stringr))
 
 	metric_table <- data[['metric_table']]
 	targets <- data[names(data)[grepl("_target.txt", names(data))]] 
@@ -105,7 +106,6 @@ output:
 	filter_and_perform_DESeq_norm <- function(target, samples_count_data){
 		index_control_cols <- as.character(subset(target, treat == "Ctrl", select = sample, drop = TRUE))
 		index_treatmn_cols <- as.character(subset(target, treat == "Treat", select = sample, drop = TRUE))
-		message(paste(index_control_cols, index_treatmn_cols, sep =","))
 		to_keep_control <- rowSums(edgeR::cpm(samples_count_data[index_control_cols]) > 2) >= 2
 	    	to_keep_treatment <- rowSums(edgeR::cpm(samples_count_data[index_treatmn_cols]) > 2) >= 2
     		keep_cpm <- to_keep_control | to_keep_treatment
@@ -516,7 +516,6 @@ invisible(lapply(names(targets),function(target_name){
 	# Take results
 	# Check and generate info
 	#######################3
-	library(gplots)
 	### REMOVE
 	#######################
 
