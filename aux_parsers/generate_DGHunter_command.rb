@@ -8,6 +8,7 @@ require 'optparse'
 
 def parse_env_variables(variables, mode)
 	variables.each do |variable, attributes|
+		puts variable
 		attributes << ENV[variable]
 	end
 	return variables
@@ -57,10 +58,11 @@ def parse_string_command(cmd, mode)
 				options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]  
 			end
 
-			option.on("--WGCNA_mergecutHeight integer") do |item|
-				options["WGCNA_mergecutHeight"] = ["--WGCNA_mergecutHeight", item]
-			end
-			
+			options["WGCNA_ALL"] = ["-w", "FALSE"]
+			option.on("-w WGCNA_ALL", "--WGCNA_all") do |item|
+				options["WGCNA_ALL"] = ["-w", item]
+			end			
+
 			option.on("-r READS", "--reads READS") do |item|
 				options["min_reads"] =["-r", item]
 			end
@@ -69,14 +71,6 @@ def parse_string_command(cmd, mode)
 				options["min_libraries"] =["-l", item]
 			end
 
-			option.on("-r READS", "--reads READS") do |item|
-				options["min_reads"] =["-r", item]
-			end
-
-			options["WGCNA_ALL"] = ["-w", "FALSE"]
-			option.on("-w WGCNA_ALL", "--WGCNA_all") do |item|
-				options["WGCNA_ALL"] = ["-w", item]
-			end			
 			option.on("--debug") do
                 options["debug"] = ["--debug", "BOOLEAN"]
             end
@@ -177,16 +171,16 @@ end.parse!
 ########################
 
 de_variables = {
-	"de_logfc" => ["-f"],
 	"de_pvalue" => ["-p"],
 	"de_packages" => ["-m"],
 	"de_min_pack" => ["-c"],
-	"de_add_factors" => ["-v"],
+	"de_logfc" => ["-f"],
 	"WGCNA_mergecutHeight" => ["--WGCNA_mergecutHeight"],
 	"WGCNA_min_genes_cluster"=>["--WGCNA_min_genes_cluster"],
 	"WGCNA_detectcutHeight" => ["--WGCNA_detectcutHeight"],  
-	"numeric_features" => ["-N"],
+	"min_reads" => ["-r"],
 	"string_features" => ["-S"],
+	"numeric_features" => ["-N"],
 	"target_path" => ["-t"]
 }
 
