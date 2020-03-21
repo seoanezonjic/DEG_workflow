@@ -8,7 +8,6 @@ require 'optparse'
 
 def parse_env_variables(variables, mode)
 	variables.each do |variable, attributes|
-		puts variable
 		attributes << ENV[variable]
 	end
 	return variables
