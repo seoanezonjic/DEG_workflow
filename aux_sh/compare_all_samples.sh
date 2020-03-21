@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-#SBATCH --mem='40gb'
+#SBATCH --mem='20gb'
 #SBATCH --constraint=cal
 #SBATCH --cpus=16
 hostname
@@ -50,7 +50,6 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 		## Join all results of each sample in a general table
 		maps2DEGhunter.rb $target_path $MAPPING_RESULTS_FOLDER qualimap_0000/selected_counts $target_results_folder no
 		grep -v '^N_' $target_results_folder'/selected_counts' | sum_counts_by_isoform.rb - > $target_results_folder'/final_counts.txt'
-
 		degenes_hunter_options=`generate_DGHunter_command.rb -m "degenes_Hunter"`
 		## Launch DEGenesHunter
 		/usr/bin/time -o $target_results_folder/process_data_degenes_hunter -v degenes_Hunter.R $degenes_hunter_options -i $target_results_folder'/final_counts.txt' -o $target_results_folder &>$target_results_folder/'degenes_Hunter.log' &
