@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 #SBATCH --mem='20gb'
-#SBATCH --constraint=cal
-#SBATCH --cpus=16
+#SBATCH --cpus=1
 hostname
+#SBATCH --constraint=cal
 
 source ~soft_bio_267/initializes/init_degenes_hunter
 
@@ -52,7 +52,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 		grep -v '^N_' $target_results_folder'/selected_counts' | sum_counts_by_isoform.rb - > $target_results_folder'/final_counts.txt'
 		degenes_hunter_options=`generate_DGHunter_command.rb -m "degenes_Hunter"`
 		## Launch DEGenesHunter
-		/usr/bin/time -o $target_results_folder/process_data_degenes_hunter -v degenes_Hunter.R $degenes_hunter_options -i $target_results_folder'/final_counts.txt' -o $target_results_folder --Debug $target_results_folder/debug_files/DH_debug_session.RData #&>$target_results_folder/'degenes_Hunter.log' #&
+		/usr/bin/time -o $target_results_folder/process_data_degenes_hunter -v degenes_Hunter.R $degenes_hunter_options -i $target_results_folder'/final_counts.txt' -o $target_results_folder --Debug $target_results_folder/debug_files/DH_debug_session.RData &>$target_results_folder/'degenes_Hunter.log' #&
 	done
 	wait
 fi
