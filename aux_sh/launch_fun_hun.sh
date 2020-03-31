@@ -6,7 +6,6 @@ hostname
 
 functional_launch=$1
 source ~soft_bio_267/initializes/init_degenes_hunter
-export PATH=~/software/merge/DEgenesHunter:$PATH
 functional_hunter_options=`generate_DGHunter_command.rb -m "functional_Hunter"`
 for TARGET_FILE in `echo $TARGETS | tr "," " "`
 do
