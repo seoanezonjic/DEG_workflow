@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 #SBATCH --mem='20gb'
 #SBATCH --cpus=1
-hostname
 #SBATCH --constraint=cal
+hostname
 
 source ~soft_bio_267/initializes/init_degenes_hunter
 
