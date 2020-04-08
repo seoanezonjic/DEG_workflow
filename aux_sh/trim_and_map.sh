@@ -10,7 +10,7 @@ while IFS= read sample; do
 	\\$trim_template=$TRIM_TEMPLATE,
 	\\$sample=$sample,
 	\\$ref=$mapping_ref,
-	\\$link_path='$link_path'
+	\\$link_path=\"$link_path\"
 	" | tr -d [:space:]`
 
 	if `echo $experiment_type | grep -q "^RNAseq"`; then
