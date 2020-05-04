@@ -5,7 +5,7 @@
 
 clean_samples){
  	resources: -u 1 -n cal -c 16 -t '7-00:00:00' -m '20gb'
-	source ~soft_cvi_114/initializes/init_stbb_last	
+	source ~soft_bio_267/initializes/init_stbb	
 	if [ $link_path != "" ]; then
 		ln -s $link_path/$sample/seqtrimbb_0000/output_files ./	
 	else
