@@ -62,7 +62,9 @@ miRNA_detection){
 	if grep -q "ended" job*out; then
 		parse_miRDeep2.rb result*csv
 		for type in novel known; do
-			tail -n +2 $type'_miRDeep_miRNAs'| cut -f 17 | tr ":" "\t"| sed -r 's/\.+/\t/' | cut -f 1,2,3 > $type'_miRNA.coord'
+			tail -n +2 $type'_miRDeep_miRNAs'| cut -f 1,17 | tr ":" "\t"| sed -r 's/\.\./\t/' | cut -f 1,2,3,4 > $type'_miRNAs'
+			cut -f 2,3,4 $type'_miRNAs' > $type'_miRNA.coord'
+			cat $type'_miRNAs' | awk 'BEGIN{IFS="\t";OFS="\t"}{print $1,$2":"$3":"$4}'
 			fasta_editor.rb -i $ref/genome.fa -f $type'_miRNA.coord' -T 0 -c a -o $type'_miRNAs.fasta'
 			echo -e "$sample\t"$type"_miRNAs\t`grep -c ">" $type'_miRNAs.fasta'`" >> ../metrics
 		done
