@@ -32,7 +32,7 @@ clean_samples){
 }
 
 align_rna_seq){ 
-	resources: -m '40gb' -c 1 -t '10:00:00'
+	resources: -m '40gb' -c 16 -t '10:00:00'
 	source ~soft_bio_267/initializes/init_R
 	module load samtools/1.9
 	module load qualimap/2.2.1
