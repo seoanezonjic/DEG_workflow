@@ -6,7 +6,7 @@ clean_samples){
                 ln -s $link_path/$sample/seqtrimbb_0000/output_files ./
         else    
 	?
-		seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -w [cpu] -O output_files
+		seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -w [cpu] -O output_files #--full_throttle
 	fi
 	if [ ! -s output_files/sequences_.fastq.gz ]; then
 		>&2 echo "Triming has failed"
