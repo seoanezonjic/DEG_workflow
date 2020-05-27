@@ -121,7 +121,7 @@ def parse_string_command(cmd, mode)
 				options["custom_nomenclature"] = ["-C", item]
 			end
 
-			option.on("-T THRESHOLD", "--threshold") do |item|
+			option.on("-P THRESHOLD", "--threshold") do |item|
 				options["fun_pvalue"] = ["-T", item]
 			end
 
