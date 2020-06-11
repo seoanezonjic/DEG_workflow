@@ -122,7 +122,7 @@ def parse_string_command(cmd, mode)
 			end
 
 			option.on("-P THRESHOLD", "--threshold") do |item|
-				options["fun_pvalue"] = ["-T", item]
+				options["fun_pvalue"] = ["-P", item]
 			end
 
 #			option.on("-Q QTHRESHOLD", "--qthreshold") do |item|
