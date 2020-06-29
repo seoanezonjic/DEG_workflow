@@ -2,8 +2,8 @@
 #SBATCH --cpus=2
 #SBATCH --mem='4gb'
 #SBATCH --time='7-00:00:00'
-#SBATCH --error=job.%J.err
-#SBATCH --output=job.%J.out
+#SBATCH --error=index.%J.err
+#SBATCH --output=index.%J.out
 
 if [ $experiment_type == "RNAseq_genome" ] || [ $experiment_type == "miRNAseq_detection" ]; then
 	mv $mapping_ref/genome.fa $mapping_ref/raw_genome.fa

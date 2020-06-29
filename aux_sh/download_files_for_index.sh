@@ -36,6 +36,7 @@ if [[ $experiment_type == "RNAseq_genome" || $experiment_type == "miRNAseq_detec
 			wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M23/GRCm38.p6.genome.fa.gz' -O $mapping_ref/genome.fa.gz 
 		fi
 		gunzip -f $mapping_ref/*
+		echo "$organism genome and annotations has been downloaded"
 	else 
 		echo "$organism genome and annotations has been downloaded"
 	fi 
