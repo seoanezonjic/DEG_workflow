@@ -23,7 +23,7 @@ tasks=`echo $n_target"+1" | bc`
 mkdir -p  $MAPPING_RESULTS_FOLDER
 
 
-if [ "$module" == "1" ] ; then
+if [ "$module" == "1a" ] ; then
 	#STAGE 1 DOWNLOADING REFERENCE
 	echo "Launching stage 1: Downloading reference"
 	download_files_for_index.sh 
