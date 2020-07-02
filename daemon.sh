@@ -37,7 +37,7 @@ elif [ "$module" == "1b" ] ; then
 		sbatch create_index.sh
 	fi
 
-elif [ "$module" == "2" ] ; then
+elif [ "$module" == "2a" ] ; then
 	#STAGE 2 TRIMMING AND MAPPING SAMPLES
 	echo "Launching stage 2: Trimming and mapping samples"
 	trim_and_map.sh
