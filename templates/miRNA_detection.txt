@@ -58,8 +58,8 @@ miRNA_detection){
 	fastq2fasta.pl mapping_sample)/filtered_sequences.fastq > dir_temp/filtered_sequences.fasta
 	collapse_reads_md.pl dir_temp/filtered_sequences.fasta seq > dir_temp/miRDeep2_input_reads.fasta
 	?
-	miRDeep2.pl dir_temp/miRDeep2_input_reads.fasta $ref/genome.fa mapping_sample)/mapping.arf $ref/miRNA_mature.fasta none $ref/miRNA_precursors.fasta -d -g -1	
-	if grep -q "ended" job*out; then
+	miRDeep2.pl dir_temp/miRDeep2_input_reads.fasta $ref/genome.fa mapping_sample)/mapping.arf $ref/miRNA_mature.fasta none $ref/miRNA_precursors.fasta -d -g -1 &>miRDeep2.log
+	if grep -q "ended" miRDeep2.log; then
 		parse_miRDeep2.rb result*csv
 		for type in novel known; do
 			tail -n +2 $type'_miRDeep_miRNAs'| cut -f 1,17 | tr ":" "\t"| sed -r 's/\.\./\t/' | cut -f 1,2,3,4 > $type'_miRNAs'
