@@ -1,4 +1,4 @@
-clean_samples){
+%clean_samples){
 	resources: -u 1 -n cal -c 16 -t '7-0:00:00' -m '16gb'
 	source ~soft_bio_267/initializes/init_stbb	
 	rm -rf output_files*
@@ -6,7 +6,7 @@ clean_samples){
                 ln -s $link_path/$sample/seqtrimbb_0000/output_files ./
         else    
 	?
-		seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -w [cpu] -O output_files #--full_throttle
+		seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -w [cpu] -O output_files --full_throttle
 	fi
 	if [ ! -s output_files/sequences_.fastq.gz ]; then
 		>&2 echo "Triming has failed"
@@ -20,11 +20,11 @@ clean_samples){
 	fi
 }
 
-mapping_sample){
+%mapping_sample){
 	resources: -u 1 -c 16 -m '20gb' -n cal
 	module load samtools/1.9
 	module load qualimap/2.2.1
-	. ~josecordoba/proyectos/initializes/init_mirdeep2
+	. ~josecordoba/software/initializes/init_mirdeep2
 	untype DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
 	mkdir dir_temp
 	if [ ! -s sequences.fastq ];then
@@ -53,23 +53,25 @@ mapping_sample){
 miRNA_detection){
 	resources: -m '4gb' -t '4-00:00:00'
 	. ~soft_bio_267/initializes/init_ruby
-	. ~josecordoba/proyectos/initializes/init_mirdeep2
+	. ~josecordoba/software/initializes/init_mirdeep2
 	mkdir dir_temp
 	fastq2fasta.pl mapping_sample)/filtered_sequences.fastq > dir_temp/filtered_sequences.fasta
 	collapse_reads_md.pl dir_temp/filtered_sequences.fasta seq > dir_temp/miRDeep2_input_reads.fasta
 	?
-	miRDeep2.pl dir_temp/miRDeep2_input_reads.fasta $ref/genome.fa mapping_sample)/mapping.arf $ref/miRNA_mature.fasta none $ref/miRNA_precursors.fasta -d -g -1	
-	if grep -q "ended" job*out; then
+	miRDeep2.pl dir_temp/miRDeep2_input_reads.fasta $ref/genome.fa mapping_sample)/mapping.arf $ref/miRNA_mature.fasta none $ref/miRNA_precursors.fasta -d -g -1 &>miRDeep2.log	
+	if grep -q "ended" miRDeep2.log; then
 		parse_miRDeep2.rb result*csv
-		for type in novel known; do
-			tail -n +2 $type'_miRDeep_miRNAs'| cut -f 1,17 | tr ":" "\t"| sed -r 's/\.\./\t/' | cut -f 1,2,3,4 > $type'_miRNAs'
-			cut -f 2,3,4 $type'_miRNAs' > $type'_miRNA.coord'
-			cat $type'_miRNAs' | awk 'BEGIN{IFS="\t";OFS="\t"}{print $1,$2":"$3":"$4}' > $type'_miRNAs.translation'
-			fasta_editor.rb -i $ref/genome.fa -f $type'_miRNA.coord' -T 0 -c a -o $type'_miRNAs.fasta'
-			echo -e "$sample\t"$type"_miRNAs\t`grep -c ">" $type'_miRNAs.fasta'`" >> ../metrics
-		done
-		cat *miRNAs.fasta > total_miRNAs.fasta
-		echo -e "$sample\ttotal_miRNAs\t`grep -c ">" total_miRNAs.fasta`" >> ../metrics
+		
+		## FORMAT KNOWN MIRNA DATA
+		tail -n +2 known_miRDeep_miRNAs | cut -f 1,17 | tr ":" "\t"| sed -r 's/\.\./\t/' | awk 'BEGIN{IFS="\t";OFS="\t"}{print $2,$3,$4,$1,$2":"$3":"$4}' > known_miRNA.coord
+		mature2miRBase.rb known_miRNA.coord $mapping_ref/aliases.txt translated_known_miRNA.coord
+		#cut -f 3,4 known_miRNA.coord > known_miRNAs.translation
+		echo -e "$sample\tknown_miRNAs\t`wc -l known_miRNA.coord`" >> ../metrics
+		
+		## FORMAT NOVEL MIRNA DATA
+		tail -n +2 novel_miRDeep_miRNAs | cut -f 1,17 | tr ":" "\t"| sed -r 's/\.\./\t/' |awk 'BEGIN{IFS="\t";OFS="\t"}{print $1,$2,$3,$1":"$2":"$3}' > novel_miRNA.coord
+		echo -e "$sample\tnovel_miRNAs\t`wc -l novel_miRNA.coord`" >> ../metrics
+		echo -e "$sample\ttotal_miRNAs\t`cat *_miRNA.coord | wc -l`" >> ../metrics
 		report_html -t $REPORT_TEMPLATES_FOLDER/miRNA_sample.erb -d novel_miRDeep_miRNAs,known_miRDeep_miRNAs -o miRNA_report
 	else
 		>&2 echo "Analysis has failed" 
