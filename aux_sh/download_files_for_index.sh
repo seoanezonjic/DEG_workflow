@@ -20,8 +20,8 @@ if [ $experiment_type == "miRNAseq_detection" ] ; then
 	gunzip -f $mapping_ref/mature.fa.gz
 	extract_miRNAs.pl $mapping_ref/mature.fa $MIRBASE_ORGANISM > $mapping_ref/miRNA_mature.fasta
 	rm $mapping_ref/mature.fa
-	wget ftp://mirbase.org/pub/mirbase/CURRENT/aliases.txt.gz -O $mapping_ref/aliases.txt
-	unzip -f $mapping_ref/aliases.txt
+	wget ftp://mirbase.org/pub/mirbase/CURRENT/aliases.txt.gz -O $mapping_ref/aliases.txt.gz
+	gunzip -f $mapping_ref/aliases.txt.gz
 #elif [  $experiment_type == "miRNAseq_detection" ]; then
 	# wget "http://carolina.imis.athena-innovation.gr/diana_tools/downloads/e2de248e81009d5a5s33ebe9906fa32c/TarBase_v8_download.tar.gz" -O miRNA_targets.txt.gz
 	# gunzip -f miRDB_v6.0_prediction_result.txt.gz
