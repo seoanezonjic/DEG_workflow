@@ -57,9 +57,8 @@ def parse_string_command(cmd, mode)
 				options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]  
 			end
 
-			options["WGCNA_ALL"] = ["-w", "FALSE"]
 			option.on("-w WGCNA_ALL", "--WGCNA_all") do |item|
-				options["WGCNA_ALL"] = ["-w", item]
+				options["WGCNA_ALL"] = ["-w", "BOOLEAN"]
 			end			
 
 			option.on("-r READS", "--reads READS") do |item|
