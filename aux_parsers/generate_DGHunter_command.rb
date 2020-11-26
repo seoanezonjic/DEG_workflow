@@ -128,9 +128,9 @@ def parse_string_command(cmd, mode)
 
 #			end
 
-			option.on("--debug") do 
-				options["debug"] = ["--debug", "BOOLEAN"]
-			end
+			#option.on("--debug") do 
+			#	options["debug"] = ["--debug", "BOOLEAN"]
+			#end
 		end
 	end
 	optparse.parse!(cmd.split)
