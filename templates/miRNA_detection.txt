@@ -58,13 +58,13 @@ miRNA_detection){
 	fastq2fasta.pl mapping_sample)/filtered_sequences.fastq > dir_temp/filtered_sequences.fasta
 	collapse_reads_md.pl dir_temp/filtered_sequences.fasta seq > dir_temp/miRDeep2_input_reads.fasta
 	?
-	miRDeep2.pl dir_temp/miRDeep2_input_reads.fasta $ref/genome.fa mapping_sample)/mapping.arf $ref/miRNA_mature.fasta none $ref/miRNA_precursors.fasta -d -g -1 &>miRDeep2.log	
+	miRDeep2.pl dir_temp/miRDeep2_input_reads.fasta $ref/genome.fa mapping_sample)/mapping.arf $ref/ref_miRNA/miRNA_mature.fasta none $ref/ref_miRNA/miRNA_precursors.fasta -d -g -1 &>miRDeep2.log	
 	if grep -q "ended" miRDeep2.log; then
 		parse_miRDeep2.rb result*csv
 		
 		## FORMAT KNOWN MIRNA DATA
 		tail -n +2 known_miRDeep_miRNAs | cut -f 1,17 | tr ":" "\t"| sed -r 's/\.\./\t/' | awk 'BEGIN{IFS="\t";OFS="\t"}{print $2,$3,$4,$1,$2":"$3":"$4}' > known_miRNA.coord
-		mature2miRBase.rb known_miRNA.coord $mapping_ref/aliases.txt translated_known_miRNA.coord
+		mature2miRBase.rb known_miRNA.coord $mapping_ref/ref_miRNA/aliases.txt translated_known_miRNA.coord
 		#cut -f 3,4 known_miRNA.coord > known_miRNAs.translation
 		echo -e "$sample\tknown_miRNAs\t`wc -l known_miRNA.coord`" >> ../metrics
 		

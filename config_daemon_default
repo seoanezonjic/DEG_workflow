@@ -5,7 +5,8 @@
 ######	EXPERIMENT VARIABLES	#######
 export experiment_type="RNAseq_genome"	#-------#	Experiment type 'miRNAseq_detection', 'RNAseq_genome', 'Clusters_report' or 'RNAseq_transcriptome'. Chose RNAseq_genome for Human or Mouse and reference will be downloaded in "./daemon.sh 1a" 
 export organism='human'	#-------#	Model organism: Currently only 'human' and 'mouse' available for download. For other genome reference you must copy the genome (fasta) and gene annotations (gtf) inside $mapping_ref as genome.fa and annotation.gtf. If you use non-model transcriptome you have to set $transcriptome variable indicating transcriptome fasat file. You can rename transcripts IDs with ENSEMBL model species ortologs or indicate a translation file in $annotation_list
-export mapping_ref=$CODE_PATH'/references/'$organism	#-------#	References path: The references will be downloaded and indexed there. For human in Picasso use mapping_ref=~pedro/proyectos/ramon_areces19/pmm2_belen/project_execution/references/
+export mapping_ref=$CODE_PATH'/references/'$organism	#-------#	References path: The references will be downloaded and indexed there.
+export only_read_ref=""        #-------#       Configure to link referneces from this folder. Missing files will be downloaded and processed.
 export TRIM_TEMPLATE="transcriptomics.txt"	#-------#	Trimming template path. Available options are "$CODE_PATH"/templates/trimming/miRNA.txt (only for small RNAseq or transcriptomics.txt
 export transcriptome=''	#-------#	In case of using transcriptome as reference, transcriptome path must be indicated.
 

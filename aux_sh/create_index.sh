@@ -6,20 +6,28 @@
 #SBATCH --output=index.%J.out
 
 if [ $experiment_type == "RNAseq_genome" ] || [ $experiment_type == "miRNAseq_detection" ]; then
-	mv $mapping_ref/genome.fa $mapping_ref/raw_genome.fa
-	fasta_editor.rb -i $mapping_ref/raw_genome.fa -r "CLEAN" -c a -o $mapping_ref/genome.fa
-	if [ `grep -c -e '^>' $mapping_ref/raw_genome.fa` ==  `grep -c -e '^>' $mapping_ref/genome.fa` ]; then
-		rm $mapping_ref/raw_genome.fa
+	if [ -L $mapping_ref/genome.fa ];then
+		echo "Genome has not been processed because has been linked from other proyect."
 	else
-		echo "IDs cleaning has faied"
+		mv $mapping_ref/genome.fa $mapping_ref/raw_genome.fa
+		fasta_editor.rb -i $mapping_ref/raw_genome.fa -r "CLEAN" -c a -o $mapping_ref/genome.fa
+		if [ `grep -c -e '^>' $mapping_ref/raw_genome.fa` ==  `grep -c -e '^>' $mapping_ref/genome.fa` ]; then
+			rm $mapping_ref/raw_genome.fa
+		else
+			echo "IDs cleaning has faied"
+		fi
 	fi
 fi 
 
 if [ $experiment_type == "RNAseq_genome" ]; then
-	module load star/2.5.3a
 	out=$mapping_ref'/STAR_index'
-	mkdir -p $out
-	STAR --runThreadN 2 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/genome.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
+	if ! [[ -d $out || -L $out ]]; then
+		module load star/2.5.3a
+		mkdir -p $out
+		STAR --runThreadN 2 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/genome.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
+	else
+		echo "Reference seems to be indexed. If not, remove "$mapping_ref'/STAR_index'" folder"
+	fi
 elif [ $experiment_type == "RNAseq_transcriptome" ]; then
 	module load bowtie/2.2.9
 	if [ "$transcriptome" == "" ] ; then
@@ -29,10 +37,14 @@ elif [ $experiment_type == "RNAseq_transcriptome" ]; then
 	mkdir -p $out
 	bowtie2-build -f $transcriptome $out/reference
 elif [ $experiment_type == "miRNAseq_detection" ]; then
-	module load samtools/1.9
-	. ~josecordoba/proyectos/initializes/init_mirdeep2
 	out=$mapping_ref'/bowtie_index_mirna'
-	mkdir -p $out
-	bowtie-build $mapping_ref'/genome.fa' $out'/genome'
-	samtools faidx $mapping_ref'/genome.fa'
+	if ! [[ -d $out || -L $out ]]; then
+		module load samtools/1.9
+		. ~josecordoba/proyectos/initializes/init_mirdeep2
+		mkdir -p $out
+		bowtie-build $mapping_ref'/genome.fa' $out'/genome'
+		samtools faidx $mapping_ref'/genome.fa'
+	else
+		echo "Reference seems to be indexed. If not, remove "$mapping_ref'/bowtie_index_mirna'" folder"
+	fi
 fi 
