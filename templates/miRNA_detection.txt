@@ -25,7 +25,7 @@ mapping_sample){
 	module load samtools/1.9
 	module load qualimap/2.2.1
 	. ~josecordoba/software/initializes/init_mirdeep2
-	untype DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
+	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
 	mkdir dir_temp
 	if [ ! -s sequences.fastq ];then
 		gunzip -c clean_samples)/output_files/sequences_.fastq.gz > dir_temp/sequences.fastq
