@@ -10,11 +10,12 @@ if [ $experiment_type == "RNAseq_genome" ] || [ $experiment_type == "miRNAseq_de
 		echo "Genome has not been processed because has been linked from other proyect."
 	else
 		mv $mapping_ref/genome.fa $mapping_ref/raw_genome.fa
-		fasta_editor.rb -i $mapping_ref/raw_genome.fa -r "CLEAN" -c a -o $mapping_ref/genome.fa
+		cut -f 1 -d " " $mapping_ref/raw_genome.fa > $mapping_ref/genome.fa 
+		#fasta_editor.rb -i $mapping_ref/raw_genome.fa -r "CLEAN" -c a -o $mapping_ref/genome.fa
 		if [ `grep -c -e '^>' $mapping_ref/raw_genome.fa` ==  `grep -c -e '^>' $mapping_ref/genome.fa` ]; then
 			rm $mapping_ref/raw_genome.fa
 		else
-			echo "IDs cleaning has faied"
+			echo "IDs cleaning has falied"
 		fi
 	fi
 fi 
