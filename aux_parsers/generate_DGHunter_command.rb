@@ -68,6 +68,10 @@ def parse_string_command(cmd, mode)
 			option.on("--WGCNA_minKMEtoStay integer") do |item|
                                 options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]
                         end
+
+			option.on("--WGCNA_deepsplit integer") do |item|
+                                options["WGCNA_deepsplit"] = ["--WGCNA_deepsplit", item]
+                        end
 			
 			option.on("-w WGCNA_ALL", "--WGCNA_all") do |item|
 				options["WGCNA_ALL"] = ["-w", "BOOLEAN"]
