@@ -189,7 +189,7 @@ output:
 		  labels = u_labels
 		)
 		data_frame$metric <- column_str_to_numeric(data_frame$metric)
-		save(labels_df, file = "~/test2.Rdata")
+		# save(labels_df, file = "~/test2.Rdata")
 		plot <- ggplot(data_frame, aes(y = metric, weight = count, x = pair_name, fill = sample_name)) + 
 			geom_violin(scale = "width", adjust = 1/15) +
         	scale_y_continuous(
@@ -210,8 +210,6 @@ output:
 
 	parse_ditributions_to_df <- function(all_metrics, column_name){
 		samples <- seq(nrow(all_metrics))
-				save(list = ls(all.names = TRUE), file = "/mnt/scratch/users/bio_267_uma/josecordoba/test_mapping_report/DEG_workflow/test.RData", envir = environment())
-
 		all_distribution_parsed <- as.data.frame(do.call(rbind, lapply(samples, function(sample_index){
 			sample <- all_metrics$sample[sample_index]
 			sample_distribution_str <- as.character(all_metrics[[column_name]][sample_index])
