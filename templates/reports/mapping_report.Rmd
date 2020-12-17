@@ -210,6 +210,8 @@ output:
 
 	parse_ditributions_to_df <- function(all_metrics, column_name){
 		samples <- seq(nrow(all_metrics))
+				save(list = ls(all.names = TRUE), file = "/mnt/scratch/users/bio_267_uma/josecordoba/test_mapping_report/DEG_workflow/test.RData", envir = environment())
+
 		all_distribution_parsed <- as.data.frame(do.call(rbind, lapply(samples, function(sample_index){
 			sample <- all_metrics$sample[sample_index]
 			sample_distribution_str <- as.character(all_metrics[[column_name]][sample_index])
@@ -237,10 +239,10 @@ output:
 		return(all_distribution_parsed)
 	}
 
-	parse_distribution <- function(distribution, sample = FALSE, pair = FALSE){
+	parse_distribution <- function(distribution, sample = NULL, pair = FALSE){
 		sample_name_str <- ""
 		pair_name_str <- ""
-		if(sample){
+		if(!is.null(sample)){
 			sample_name_str <- sample
 			if(pair){
 				pair_name_str <- paste(sample, pair, sep = "_")
@@ -248,6 +250,7 @@ output:
 				pair_name_str <- sample
 			}
 		}
+
 		df_distribution <- as.data.frame(do.call(rbind, 
 			lapply(unlist(strsplit(distribution, ":")), function(row_str){
 				parsed_row <- unlist(strsplit(row_str, ","))
