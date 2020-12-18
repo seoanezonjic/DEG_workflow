@@ -16,15 +16,15 @@ def load_all_tables(all_files)
 end
 
 def load_table(filename)
-	count_table = []
+	count_table = Hash.new(0)
 	File.open(filename).each do |line|
 		line.chomp!
 		next if line =~ /^N_/
-		line = line.split("\t")
-		line[0] = line[0].split(".").first
-		count_table << line
+		gene_id, count = line.split("\t")
+		gene_id = gene_id.split(".").first
+		count_table[gene_id] += count.to_i
 	end
-	return count_table
+	return count_table.to_a
 end
 
 def merge_all_tables(all_tables, tags)
