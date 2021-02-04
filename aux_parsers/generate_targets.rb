@@ -17,7 +17,11 @@ TREAT = 1
 ######################################################
 
 def load_list(input)
-	list = File.readlines(input).map {|line| line.chomp!}
+	if File.file?(input)
+		list = File.readlines(input).map {|line| line.chomp!}
+	else
+		list = input.split(",")
+	end
 	return list
 end
 
