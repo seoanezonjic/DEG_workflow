@@ -15,7 +15,7 @@ if [ $experiment_type == "RNAseq_genome" ] || [ $experiment_type == "miRNAseq_de
 		if [ `grep -c -e '^>' $mapping_ref/raw_genome.fa` ==  `grep -c -e '^>' $mapping_ref/genome.fa` ]; then
 			rm $mapping_ref/raw_genome.fa
 		else
-			echo "IDs cleaning has falied"
+			echo "IDs cleaning has failed"
 		fi
 	fi
 fi 
