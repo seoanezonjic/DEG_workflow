@@ -22,8 +22,8 @@ if [ $experiment_type != "miRNAseq_detection" ] ; then
 	n_target=`echo $TARGETS |tr "," "\n" | wc -l `
 	tasks=`echo $n_target"+1" | bc`
 
-	if [ "$ADD_triming_opt" != "" ]; then 
-		export ADD_triming_opt=";"$ADD_triming_opt
+	if [ "$ADD_trimming_opt" != "" ]; then 
+		export ADD_trimming_opt=";"$ADD_trimming_opt
 	fi
 fi 
 
