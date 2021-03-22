@@ -11,6 +11,8 @@ fi
 export PATH=$CODE_PATH'/aux_sh:'$PATH
 export PATH=$CODE_PATH'/aux_parsers:'$PATH
 source $CONFIG_DAEMON
+	
+
 if [ $experiment_type != "miRNAseq_detection" ] ; then 
 
 	rm -r $TARGETS_FOLDER
@@ -19,6 +21,7 @@ if [ $experiment_type != "miRNAseq_detection" ] ; then
 	export TARGETS=`ls $TARGETS_FOLDER/*_target.txt | rev | cut -f 1 -d "/" | rev | tr "\n" ","` ; TARGETS=${TARGETS%?}	#-------#	Target file location, including a short sample description	
 	n_target=`echo $TARGETS |tr "," "\n" | wc -l `
 	tasks=`echo $n_target"+1" | bc`
+	export ADD_triming_opt=\"";$ADD_triming_opt"\"
 fi
 
 ## STAGE EXECUTION

@@ -10,6 +10,7 @@ while IFS= read sample; do
 	\\$trim_template=$TRIM_TEMPLATE,
 	\\$sample=$sample,
 	\\$ref=$mapping_ref,
+	\\$ADD_triming_opt=$ADD_triming_opt,
 	\\$link_path=\"$link_path\"
 	" | tr -d [:space:]`
 
@@ -27,7 +28,7 @@ while IFS= read sample; do
 		" | tr -d [:space:]`
 	fi
 
-	AutoFlow -e -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" "$RESOURCES" $ADD_OPTIONS 
+	AutoFlow -e -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" "$RESOURCES" $ADD_OPTIONS
 done < $SAMPLES_FILE
 
 
