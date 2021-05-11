@@ -2,10 +2,10 @@
 ####################
 ### Trimming and mapping template. Parametres can be customized at config_deamon "Trimming and Mapping" section.
 
-
 clean_samples){
  	resources: -u 1 -n cal -c 16 -t '7-00:00:00' -m '20gb'
 	source ~soft_bio_267/initializes/init_stbb	
+	CPU=`echo "[cpu] - 2" | bc`
 	Add_trimming_opt=`echo "$ADD_trimming_opt" | tr ':' ','`
 	if [ $link_path != "" ]; then
 		rm -rf output_files*
@@ -13,11 +13,10 @@ clean_samples){
 	else
 		if [ "$read_layout" == "paired" ]; then
 	? 
-			seqtrimbb -t $trim_template -Q $read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz' -P "minlength=$min_read_length`echo $Add_trimming_opt`" -w [cpu] -O output_files #--full_throttle
+			seqtrimbb -t $trim_template -Q $read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz' -P "minlength=$min_read_length`echo $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
 		elif [ "$read_layout" == "single" ] ; then
-			seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -P "minlength=$min_read_length`echo $Add_trimming_opt`" -w [cpu] -O output_files #--full_throttle
-		fi
-	
+			seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -P "minlength=$min_read_length`echo $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
+		fi	
 	fi
 
 	if { [ ! -s output_files/paired_1.fastq.gz ] || [ ! -s output_files/paired_2.fastq.gz ]; } && [ ! -s output_files/sequences_.fastq.gz ]; then
