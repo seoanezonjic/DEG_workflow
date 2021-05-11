@@ -17,6 +17,27 @@ def parse_string_command(cmd, mode)
 	options = {} 
 	if mode == 'degenes_Hunter'
 		optparse = OptionParser.new do |option|
+			
+			option.on("-C string", "--Control_columns string") do |item|
+				options["Control_columns"] = ["--Control_columns", item]
+			end
+
+			option.on("-T string", "--Treatment_columns string") do |item|
+				options["Treatment_columns"] = ["--Treatment_columns", item]
+			end
+			
+			option.on("-r READS", "--reads READS") do |item|
+				options["min_reads"] =["-r", item]
+			end
+			
+			option.on("-l MINLIBRARIES", "--minlibraries") do |item|
+				options["min_libraries"] =["-l", item]
+			end
+
+			option.on("-F string", "--filter_type string") do |item|
+				options["filter_type"] = ["--filter_type", item]
+			end
+
 			option.on("-p pval", "--p_val_cutoff pval") do |item|
 				options["de_pvalue"] = ["-p", item]
 			end
@@ -37,6 +58,10 @@ def parse_string_command(cmd, mode)
 				options["target_path"] = ["-t", item]
 			end
 
+			option.on("-e external_file", "--external_DEA_file external_file") do |item|
+				options["external_DEA_file"] = ["--external_DEA_file", item]
+			end
+
 			option.on("-v VARIABLES", "--model_variables VARIABLES") do |item|
 				options["de_add_factors"] = ["-v", item]
 			end
@@ -49,6 +74,18 @@ def parse_string_command(cmd, mode)
 				options["numeric_features"] = ["-N", item]
 			end
 
+			option.on("-b WGCNA_MEMORY", "--WGCNA_memory WGCNA_MEMORY") do |item|
+                options["WGCNA_memory"] = ["--WGCNA_memory", item]
+            end
+
+            option.on("--WGCNA_norm_method string") do |item|
+				options["WGCNA_norm_method"] = ["--WGCNA_norm_method", item]
+			end
+			
+			option.on("--WGCNA_deepsplit integer") do |item|
+                options["WGCNA_deepsplit"] = ["--WGCNA_deepsplit", item]
+            end
+
 			option.on("--WGCNA_min_genes_cluster integer") do |item|
 				options["WGCNA_min_genes_cluster"] = ["--WGCNA_min_genes_cluster", item]
 			end
@@ -57,46 +94,37 @@ def parse_string_command(cmd, mode)
 				options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]  
 			end
 			
-  			option.on("--WGCNA_minCoreKME integer") do |item|
-                                options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]
-                        end
-	
-  			option.on("--WGCNA_minCoreKMESize integer") do |item|
-                                options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]
-                        end
-  			
-			option.on("--WGCNA_minKMEtoStay integer") do |item|
-                                options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]
-                        end
+			option.on("--WGCNA_mergecutHeight integer") do |item|
+				options["WGCNA_mergecutHeight"] = ["--WGCNA_mergecutHeight", item]  
+			end
 
-			option.on("--WGCNA_deepsplit integer") do |item|
-                                options["WGCNA_deepsplit"] = ["--WGCNA_deepsplit", item]
-                        end
-			
 			option.on("-w WGCNA_ALL", "--WGCNA_all") do |item|
 				options["WGCNA_ALL"] = ["-w", "BOOLEAN"]
-			end			
+			end	
 
-			option.on("-r READS", "--reads READS") do |item|
-				options["min_reads"] =["-r", item]
+            option.on("--WGCNA_blockwiseNetworkType string") do |item|
+				options["WGCNA_blockwiseNetworkType"] = ["--WGCNA_blockwiseNetworkType", item]
 			end
 
-			option.on("-l MINLIBRARIES", "--minlibraries") do |item|
-				options["min_libraries"] =["-l", item]
+			option.on("--WGCNA_blockwiseTOMType string") do |item|
+				options["WGCNA_blockwiseTOMType"] = ["--WGCNA_blockwiseTOMType", item]
 			end
 
-			#option.on("--debug") do
-            #    options["debug"] = ["--debug", "BOOLEAN"]
-            #end
-            
-			################### Options to complete
-			#	-M CUSTOM_MODEL, --custom_model
-			#	-b WGCNA_MEMORY, --WGCNA_memory
-			#	--WGCNA_deepsplit
-			#	-l MINLIBRARIES, --minlibraries
-			# --WGCNA_blockwiseNetworkType
-			# --WGCNA_blockwiseTOMType
-			
+  			option.on("--WGCNA_minCoreKME integer") do |item|
+                options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]
+            end
+	
+  			option.on("--WGCNA_minCoreKMESize integer") do |item|
+                options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]
+            end
+  			
+			option.on("--WGCNA_minKMEtoStay integer") do |item|
+                options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]
+            end
+
+			option.on("--multifactorial string") do |item|
+				options["multifactorial"] = ["--multifactorial", item]
+			end
 		end
 
 	elsif mode == 'functional_Hunter'
@@ -109,44 +137,46 @@ def parse_string_command(cmd, mode)
 				options["annotation_list"] = ["-a", item]
 			end
 
-			option.on("-t BIOMART_FILTER", "--biomaRt_filter") do |item|
-				options["biomart_filter"] = ["-t", item]
+			option.on("-t BIOMART_FILTER", "--input_gene_id") do |item|
+				options["input_gene_id"] = ["-t", item]
 			end
 
-			option.on("-f FUNCTIONAL_ANALYSIS", "--functional_analysis") do |item|
-				options["fun_an_type"] = ["-f", item]
+			option.on("-f FUNCTIONAL_ANALYSIS", "--func_annot_db") do |item|
+				options["func_annot_db"] = ["-f", item]
 			end
 
-			option.on("-G GO_GRAPHS", "--GO_graphs") do |item|
-				options["GO_modules"] = ["-G", item]
-			end
-
-			option.on("-A ANALYSIS", "--analysis") do |item|
-				options["fun_an_performance"] = ["-A", item]
-			end
-
-			#option.on("-K KEGG_ORGANISM", "--Kegg_organism") do |item|
-			#end
-
-			option.on("-r REMOTE", "--remote") do |item|
-				options["fun_remote_mode"] = ["-r", item]
+			option.on("-G GO_GRAPHS", "--GO_subont") do |item|
+				options["GO_subont"] = ["-G", item]
 			end
 
 			option.on("-C CUSTOM", "--custom") do |item|
 				options["custom_nomenclature"] = ["-C", item]
 			end
-
-			option.on("-P THRESHOLD", "--threshold") do |item|
-				options["fun_pvalue"] = ["-P", item]
+			
+			option.on("-A ANALYSIS", "--analysis") do |item|
+				options["fun_an_performance"] = ["-A", item]
 			end
 
-#			option.on("-Q QTHRESHOLD", "--qthreshold") do |item|
+		    option.on("-r REMOTE", "--remote") do |item|
+				options["fun_remote_mode"] = ["-r", item]
+			end
 
-#			end
+			option.on("-P THRESHOLD", "--pthreshold") do |item|
+				options["pthreshold"] = ["-P", item]
+			end
 
-			#option.on("--debug") do 
-			#	options["debug"] = ["--debug", "BOOLEAN"]
-			#end
+			option.on("-Q THRESHOLD", "--qthreshold") do |item|
+				options["qthreshold"] = ["-Q", item]
+			end
+
+			option.on("-c cores", "--cores") do |item|
+				options["cores"] = ["-c", item]
+			end
+
+			option.on("-s TASK_SIZE", "--task_size") do |item|
+				options["task_size"] = ["-s", item]
+			end
+
 		end
 	end
 	optparse.parse!(cmd.split)
