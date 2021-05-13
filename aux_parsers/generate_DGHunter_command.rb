@@ -22,6 +22,10 @@ def parse_string_command(cmd, mode)
 				options["Control_columns"] = ["--Control_columns", item]
 			end
 
+			option.on("--count_var_quantile integer") do |item|
+                options["count_var_quantile"] = ["--count_var_quantile", item]
+            end
+
 			option.on("-T string", "--Treatment_columns string") do |item|
 				options["Treatment_columns"] = ["--Treatment_columns", item]
 			end
