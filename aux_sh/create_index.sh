@@ -1,9 +1,11 @@
 #! /usr/bin/env bash
-#SBATCH --cpus=2
 #SBATCH --mem='4gb'
 #SBATCH --time='7-00:00:00'
 #SBATCH --error=index.%J.err
 #SBATCH --output=index.%J.out
+#SBATCH --cpus-per-task=2
+#SBATCH --constraint=sd
+
 
 if [ $experiment_type == "RNAseq_genome" ] || [ $experiment_type == "miRNAseq_detection" ]; then
 	if [ -L $mapping_ref/genome.fa ];then

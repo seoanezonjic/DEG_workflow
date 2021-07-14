@@ -11,7 +11,7 @@ export TRIM_TEMPLATE="transcriptomics.txt"	#-------#	Trimming template path. Ava
 export transcriptome=''	#-------#	In case of using transcriptome as reference, transcriptome path must be indicated.
 
 ######	EXECUTION VARIABLES	#######
-export RESOURCES="-c 2 -t 10:00:00 -n cal -m 4"	#-------#	AutoFlow resources setting 
+export RESOURCES="-c 2 -t 10:00:00 -m 10"	#-------#	AutoFlow resources setting 
 export project_folder=`pwd`'/project_execution'	#-------#	Global execution folder 
 export MAPPING_RESULTS_FOLDER=$project_folder'/clean_and_map'	#-------#	Secondary execution path
 export TARGETS_FOLDER=$CODE_PATH'/TARGETS'	#-------#	Set the folder that stores all target files. DEFAULT: TARGETS_FOLDER=$CODE_PATH'/TARGETS'

@@ -3,7 +3,7 @@
 ### Trimming and mapping template. Parametres can be customized at config_deamon "Trimming and Mapping" section.
 
 clean_samples){
- 	resources: -u 1 -n cal -c 16 -t '7-00:00:00' -m '20gb'
+ 	resources: -u 1 -n sd -c 16 -t '7-00:00:00' -m '80gb'
 	source ~soft_bio_267/initializes/init_stbb	
 	CPU=`echo "[cpu] - 2" | bc`
 	Add_trimming_opt=`echo "$ADD_trimming_opt" | tr ':' ','`
@@ -49,6 +49,7 @@ align_rna_seq){
 		sam2counts_all.py -o selected_counts -b sorted_mappings.bam
 		parse_bowtie_log.sh bowtie_log | awk '{print "$sample" "\t" $0}' >> ../metrics
 	elif [ "$experiment_type" == "RNAseq_genome" ]; then
+		module unload gcc
 		module load star/2.5.3a
 		if [ "$read_layout" == "paired" ]; then
 			STAR --runThreadN [cpu] --genomeDir $ref/STAR_index --readFilesIn clean_samples)/output_files/paired_1.fastq.gz clean_samples)/output_files/paired_2.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate

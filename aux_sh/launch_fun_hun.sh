@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 #SBATCH --mem='20gb'
-#SBATCH --cpus=6
-#SBATCH --constraint=cal
+#SBATCH --cpus-per-task=6
+#SBATCH --constraint=sd
+#SBATCH --time='02:00:00'
 hostname
 
 functional_launch=$1
