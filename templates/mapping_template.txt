@@ -6,7 +6,7 @@ clean_samples){
  	resources: -u 1 -n sd -c 16 -t '7-00:00:00' -m '80gb'
 	source ~soft_bio_267/initializes/init_stbb	
 	CPU=`echo "[cpu] - 2" | bc`
-	Add_trimming_opt=`echo "$ADD_trimming_opt" | tr ':' ','`
+	Add_trimming_opt=`echo "$ADD_trimming_opt" | tr ':' ' '`
 	if [ $link_path != "" ]; then
 		rm -rf output_files*
 		ln -s $link_path/$sample/seqtrimbb_0000/output_files ./	
@@ -15,7 +15,7 @@ clean_samples){
 	? 
 			seqtrimbb -t $trim_template -Q $read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz' -P "minlength=$min_read_length`echo $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
 		elif [ "$read_layout" == "single" ] ; then
-			seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -P "minlength=$min_read_length`echo $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
+			/usr/bin/time -o process_data -v seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -P "minlength=$min_read_length`echo -e $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
 		fi	
 	fi
 
@@ -34,7 +34,9 @@ clean_samples){
 align_rna_seq){ 
 	resources: -m '40gb' -c 16 -t '10:00:00'
 	source ~soft_bio_267/initializes/init_R
-	module load samtools/1.9
+	#module load samtools/1.9 #not available on picasso now
+	module load samtools/1.3
+	module load python/2.7.18
 	module load qualimap/2.2.1
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
 	if [ "$experiment_type" == "RNAseq_transcriptome" ]; then

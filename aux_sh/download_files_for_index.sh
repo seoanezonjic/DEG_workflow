@@ -8,7 +8,7 @@
 ### ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/_README_GRCh37_mapping.txt
 ## wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_30/GRCh37_mapping/gencode.v30lift37.annotation.gtf.gz' -O  $1'/gencode.v30lift37.annotation.gtf.gz'
 mkdir -p $mapping_ref
-if [ $only_read_ref != "" ]; then
+if [ "$only_read_ref" != "" ]; then
 	ln -s `ls -d $only_read_ref/* |tr "\n" " "` $mapping_ref/
 	# ln -s $only_read_ref/* $mapping_ref/
 fi

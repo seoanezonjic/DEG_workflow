@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-#SBATCH --mem='4gb'
+#SBATCH --mem='15gb'
 #SBATCH --time='7-00:00:00'
 #SBATCH --error=index.%J.err
 #SBATCH --output=index.%J.out
