@@ -18,15 +18,19 @@ if [ $experiment_type == "miRNAseq_detection" ] ; then
 	ref_miRNA=$mapping_ref/ref_miRNA
 	mkdir -p $ref_miRNA
 	echo "Downloading miRBASE for $organism"
-	wget "ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz" -O $ref_miRNA/hairpin.fa.gz 
+	#wget "ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz" -O $ref_miRNA/hairpin.fa.gz 
+	wget "https://www.mirbase.org/ftp/CURRENT/hairpin.fa.gz" -O $ref_miRNA/hairpin.fa.gz 
 	gunzip -f $ref_miRNA/hairpin.fa.gz 
 	extract_miRNAs.pl $ref_miRNA/hairpin.fa $MIRBASE_ORGANISM > $ref_miRNA/miRNA_precursors.fasta
 	rm $ref_miRNA/hairpin.fa
-	wget "ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz" -O $ref_miRNA/mature.fa.gz
+	#wget "ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz" -O $ref_miRNA/mature.fa.gz
+	wget "https://www.mirbase.org/ftp/CURRENT/mature.fa.gz" -O $ref_miRNA/mature.fa.gz
+
 	gunzip -f $ref_miRNA/mature.fa.gz
 	extract_miRNAs.pl $ref_miRNA/mature.fa $MIRBASE_ORGANISM > $ref_miRNA/miRNA_mature.fasta
 	rm $ref_miRNA/mature.fa
-	wget ftp://mirbase.org/pub/mirbase/CURRENT/aliases.txt.gz -O $ref_miRNA/aliases.txt.gz
+	#wget ftp://mirbase.org/pub/mirbase/CURRENT/aliases.txt.gz -O $ref_miRNA/aliases.txt.gz
+	wget "https://www.mirbase.org/ftp/CURRENT/aliases.txt.gz" -O $ref_miRNA/aliases.txt.gz
 	gunzip -f $ref_miRNA/aliases.txt.gz
 #elif [  $experiment_type == "miRNAseq_detection" ]; then
 	# wget "http://carolina.imis.athena-innovation.gr/diana_tools/downloads/e2de248e81009d5a5s33ebe9906fa32c/TarBase_v8_download.tar.gz" -O miRNA_targets.txt.gz
