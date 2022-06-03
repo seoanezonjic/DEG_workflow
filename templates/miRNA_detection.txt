@@ -22,7 +22,7 @@ clean_samples){
 
 mapping_sample){
 	resources: -u 1 -c 16 -m '20gb' -n cal
-	module load samtools/1.9
+	module load samtools/1.3
 	module load qualimap/2.2.1
 	. ~josecordoba/software/initializes/init_mirdeep2
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.

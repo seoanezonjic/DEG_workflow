@@ -2,8 +2,9 @@
 ####################
 ### Trimming and mapping template. Parametres can be customized at config_deamon "Trimming and Mapping" section.
 
-%clean_samples){
+clean_samples){
  	resources: -u 1 -n sd -c 16 -t '7-00:00:00' -m '80gb'
+	module unload java
 	source ~soft_bio_267/initializes/init_stbb	
 	CPU=`echo "[cpu] - 2" | bc`
 	Add_trimming_opt=`echo "$ADD_trimming_opt" | tr ':' ' '`
@@ -42,6 +43,7 @@ align_rna_seq){
 	if [ "$experiment_type" == "RNAseq_transcriptome" ]; then
 		module load bowtie/2.2.9
 		module load sam2counts
+		module load python/2.7.18
 		if [ "$read_layout" == "paired" ] ; then
 			bowtie2 -q -x $ref'/bowtie_index_tr/reference' -1 clean_samples)/output_files/paired_1.fastq.gz -2 clean_samples)/output_files/paired_2.fastq.gz --no-discordant --no-mixed -p [cpu] 2>bowtie_log | samtools sort -o sorted_mappings.bam
 		elif [ "$read_layout" == "single" ]; then
