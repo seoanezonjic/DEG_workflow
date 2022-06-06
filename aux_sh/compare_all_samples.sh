@@ -13,23 +13,28 @@ create_metric_table.rb $report_folder'/all_metrics' sample $report_folder'/metri
 full_path_tagets=`ls $TARGETS_FOLDER/*_target.txt | tr "\n" ","` 
 full_path_tagets=${full_path_tagets%?}
 headers="t"
-counts_tables=''
-all_samples=''
-while IFS= read sample; do
-	counts_tables=$counts_tables$MAPPING_RESULTS_FOLDER/$sample/qualimap_0000/selected_counts','
-	all_samples=$all_samples$sample,
-done < $SAMPLES_FILE
-counts_tables=${counts_tables%?}
-all_samples=${all_samples%?}
-headers=$headers",t"
-merge_count_tables.rb -i $counts_tables -t $all_samples > $report_folder/all_counts
-all_report_files=$report_folder/metric_table,$report_folder/all_counts
-if [ "$TARGETS" != "" ]; then
-	all_report_files=$all_report_files,$full_path_tagets
-	for target_path in `echo $full_path_tagets| tr "," " "`; do
-	        headers=$headers",t"
-	done
+all_report_files=$report_folder/metric_table
+
+if [[ $experiment_type != "miRNAseq_detection" ]]; then
+	counts_tables=''
+	all_samples=''
+	while IFS= read sample; do
+		counts_tables=$counts_tables$MAPPING_RESULTS_FOLDER/$sample/qualimap_0000/selected_counts','
+		all_samples=$all_samples$sample,
+	done < $SAMPLES_FILE
+	counts_tables=${counts_tables%?}
+	all_samples=${all_samples%?}
+	headers=$headers",t"
+	merge_count_tables.rb -i $counts_tables -t $all_samples > $report_folder/all_counts
+	all_report_files=$all_report_files,$report_folder/all_counts
+	if [ "$TARGETS" != "" ]; then
+		all_report_files=$all_report_files,$full_path_tagets
+		for target_path in `echo $full_path_tagets| tr "," " "`; do
+		        headers=$headers",t"
+		done
+	fi
 fi
+
 create_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.Rmd -o $report_folder/mapping_report.html -d $all_report_files -H $headers
 if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	. ~soft_bio_267/initializes/init_ruby
