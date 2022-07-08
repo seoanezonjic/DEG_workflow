@@ -13,9 +13,10 @@
 # Help: <li>PluginLowComplexity: filtering out reads with low complexity. </li>
 # Help: </ul>
 
-plugin_list = PluginAdapters,PluginPolyAt,PluginContaminants,PluginQuality
+#plugin_list = PluginAdapters,PluginPolyAt,PluginContaminants,PluginQuality
+plugin_list = PluginAdapters,PluginPolyAt,PluginQuality
 
-contaminants_db = cont_ribosome
+#contaminants_db = cont_ribosome
 
 # Minimum insert size for every trimmed sequence
 
