@@ -2,11 +2,13 @@ clean_samples){
 	resources: -u 1 -n cal -c 16 -t '7-0:00:00' -m '16gb'
 	source ~soft_bio_267/initializes/init_stbb	
 	rm -rf output_files*
+    Add_trimming_opt=`echo "$ADD_trimming_opt" | tr ':' ' '`
+
 	if [ $link_path != "" ]; then
                 ln -s $link_path/$sample/seqtrimbb_0000/output_files ./
         else    
 	?
-		seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -w [cpu] -P "$ADD_trimming_opt" -O output_files --full_throttle
+		seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -w [cpu] -P "$Add_trimming_opt" -O output_files --full_throttle
 	fi
 	if [ ! -s output_files/sequences_.fastq.gz ]; then
 		>&2 echo "Triming has failed"
