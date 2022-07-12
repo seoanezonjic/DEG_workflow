@@ -48,6 +48,8 @@ output:
 	count_data[[1]] <- NULL
 	metric_dictionary <- list(
 		"initial_total_sequences" = "Total Reads Before Trimming", 
+		"adapter_filter_passed" = "Remaining reads after adapters filter",
+		"no_contaminants_reads"= "Remaining reads after contaminants filter",
 		"final_total_sequences" = "Total Reads After Trimming",
 		"Uniquely_mapped_reads_." = "Unique Map %",
 		"multi_map" = "Multi-mapping %",
@@ -75,7 +77,7 @@ output:
 		"final_sequence_length_distribution" = "Read length distribution after trimming"
 		)
 
-
+	metric_table$no_contaminants_reads <- metric_table$adapter_filter_passed - metric_table$contaminants_reads
 
 	metric_var_2_legend_name <- data.frame(
 		metric_var = names(metric_dictionary),
@@ -284,7 +286,7 @@ output:
 	###############################
 	## CONTROL VARIABLES
 	##############################
-	vars_trimming <- c("initial_total_sequences", "final_total_sequences")
+	vars_trimming <- c("initial_total_sequences", "adapter_filter_passed", "no_contaminants_reads", "final_total_sequences")
 	execute_trimming <- all(vars_trimming %in% colnames(metric_table))
 	vars_qual_scores <- c("final_min_qual_per_base_in_10th_decile", "final_min_qual_per_base_in_lower_quartile", "final_mean_qual_per_base", "final_weigthed_qual_per_sequence")
 	execute_qual_scores <- all(vars_qual_scores %in% colnames(metric_table))
