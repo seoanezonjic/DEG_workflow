@@ -4,7 +4,7 @@
 #SBATCH --error=index.%J.err
 #SBATCH --output=index.%J.out
 #SBATCH --cpus-per-task=2
-#SBATCH --constraint=sd
+#SBATCH --constraint=cal
 
 
 if [ $experiment_type == "RNAseq_genome" ] || [ $experiment_type == "miRNAseq_detection" ]; then

@@ -61,7 +61,6 @@ elif [ "$module" == "3" ] ; then
 	if [ $launch_login == TRUE ]; then
 		compare_all_samples.sh 
 	else
-		echo `ls $TARGETS_FOLDER/ |grep -c '_target.txt'`
 		sbatch --cpus-per-task=`ls $TARGETS_FOLDER/ |grep -c '_target.txt'|tr -d "\n"` compare_all_samples.sh  
 	fi
 elif [ "$module" == "4a" ] ; then
