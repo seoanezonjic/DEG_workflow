@@ -16,7 +16,7 @@ def get_adapters_reads(files_index)
 	if reads_after_adapters.compact.min.nil?
 		reads_after_adapters = "NA" 
 	else
-		reads_after_adapters = reads_after_adapters.compact.min.nil?
+		reads_after_adapters = reads_after_adapters.compact.min
 	end
 	return reads_after_adapters
 end
