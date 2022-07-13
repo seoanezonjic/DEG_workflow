@@ -27,7 +27,7 @@ clean_samples){
 		module purge
 		. ~soft_bio_267/initializes/init_ruby
 		get_fastqc_data.rb -i 'output_files/initial_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tinitial_" $0 }' >> ../metrics
-		seqtrim_results_parser.rb -i "output_files/plugins_logs" | awk '{print "$sample" "\t" $0 }' >> ../metrics
+		seqtrim_results_parser.rb -i "output_files/plugins_logs/*" | awk '{print "$sample" "\t" $0 }' >> ../metrics
 		get_fastqc_data.rb -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
 		mv output_files/report_files/* ./
 	fi
