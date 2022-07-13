@@ -27,17 +27,16 @@ mapping_sample){
 	resources: -u 1 -c 16 -m '20gb' -n cal
 	module load samtools/1.3
 	module load qualimap/2.2.1
-	. ~josecordoba/software/initializes/init_mirdeep2
+	. ~soft_bio_267/initializes/init_mirdeep2
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
 	mkdir dir_temp
 	if [ ! -s sequences.fastq ];then
 		gunzip -c clean_samples)/output_files/sequences_.fastq.gz > dir_temp/sequences.fastq
 	fi
 	
-	filter_fastq.rb -i dir_temp/sequences.fastq -m 18 > filtered_sequences.fastq
+	filter_fastq.rb -i dir_temp/sequences.fastq -m $MIN_MIRNA_LENGTH > filtered_sequences.fastq
 	?
-	bowtie -p [cpu] -n 0 -e 80 -l 18 -a -m 7 --best --strata $ref'/bowtie_index_mirna/genome' filtered_sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
-	
+	bowtie -p [cpu] -n 0 -e 80 -l $MIN_MIRNA_LENGTH -a -m 7 --best --strata $ref'/bowtie_index_mirna/genome' filtered_sequences.fastq dir_temp/mappings.bwt 2>bowtie.log
 	bowtie2sam.pl dir_temp/mappings.bwt | samtools view -h -T $ref/genome.fa | samtools sort -o dir_temp/mapping_sorted.bam
 	qualimap bamqc -nt [cpu] -bam dir_temp/mapping_sorted.bam -outdir results --java-mem-size=20G
 	collapse_bwt.rb dir_temp/mappings.bwt > dir_temp/collapsed_mappings.bwt 

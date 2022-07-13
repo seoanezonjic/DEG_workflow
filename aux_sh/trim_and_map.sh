@@ -21,6 +21,10 @@ while IFS= read sample; do
 		\\$read_layout=$read_layout,
 		\\$experiment_type=$experiment_type
 		" | tr -d [:space:]`
+	else 
+		AF_VARS=$AF_VARS,`echo "
+		\\$MIN_MIRNA_LENGTH=$min_mirna_length
+		" | tr -d [:space:]`
 	fi
 	if [[ $experiment_type == "RNAseq_genome" ]]; then
 		AF_VARS=$AF_VARS,`echo "
