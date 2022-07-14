@@ -19,6 +19,22 @@ def sort_bwt(raw_bwt)
 	return raw_bwt
 end
 
+
+
+def load_and_index_bwt(input_file)
+	indexed_bwt = {}
+	File.open(input_file).each do |line|
+		mapping = line.chomp.split("\t")
+		id = "#{mapping[CHR]}:#{mapping[STRAND]}:#{mapping[COORD]}:#{mapping[SEQ]}".to_sym
+		if indexed_bwt[id].nil?
+			indexed_bwt[id] = [mapping,1]
+		else
+			indexed_bwt[id][1] += 1
+		end
+	end
+	return indexed_bwt
+end
+
 def index_bwt(sorted_bwt)
 	indexed_bwt = {}
 	sorted_bwt.each do |mapping|
@@ -60,8 +76,9 @@ end
 input_bwt = ARGV[0]
 abort("No input file set\n\n\tUSAGE:\tcollapse_bwt.rb uncollapsed.bwt > collapsed.bwt") if (File.size?(input_bwt)).nil?
 
-bwt = load_bwt(input_bwt)
-bwt = sort_bwt(bwt)
-indexed_bwt = index_bwt(bwt)
+# bwt = load_bwt(input_bwt)
+# bwt = sort_bwt(bwt)
+
+indexed_bwt = load_and_index_bwt(input_bwt)
 collapsed_bwt = build_collapsed_bwt(indexed_bwt)
 print_output(collapsed_bwt)
