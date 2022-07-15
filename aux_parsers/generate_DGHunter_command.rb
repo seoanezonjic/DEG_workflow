@@ -8,6 +8,7 @@ require 'optparse'
 
 def parse_env_variables(variables, mode)
 	variables.each do |variable, attributes|
+p variable
 		attributes << ENV[variable]
 	end
 	return variables
@@ -227,6 +228,8 @@ de_variables = {
 	"WGCNA_min_genes_cluster"=>["--WGCNA_min_genes_cluster"],
 	"WGCNA_detectcutHeight" => ["--WGCNA_detectcutHeight"],  
 	"min_reads" => ["-r"],
+	"filter_type" => ["--filter_type"],
+	"min_libraries" => ["-l"],
 	"string_features" => ["-S"],
 	"numeric_features" => ["-N"],
 	"target_path" => ["-t"]
@@ -249,6 +252,7 @@ elsif options[:mode] == 'functional_Hunter'
 	variables = parse_env_variables(fun_variables, options[:mode])
 end
 
+p variables
 addition_options = ENV['ADD_OPTIONS']
 if !addition_options.nil?
 	addition_opts = parse_string_command(addition_options, options[:mode]) 
