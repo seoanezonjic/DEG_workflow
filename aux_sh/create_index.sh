@@ -1,9 +1,9 @@
 #! /usr/bin/env bash
-#SBATCH --mem='15gb'
+#SBATCH --mem='40gb'
 #SBATCH --time='7-00:00:00'
 #SBATCH --error=index.%J.err
 #SBATCH --output=index.%J.out
-#SBATCH --cpus-per-task=2
+#SBATCH --cpus-per-task=16
 #SBATCH --constraint=cal
 
 
