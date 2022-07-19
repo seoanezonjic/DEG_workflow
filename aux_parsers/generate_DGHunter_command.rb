@@ -181,6 +181,10 @@ def parse_string_command(cmd, mode)
 				options["task_size"] = ["-s", item]
 			end
 
+			option.on("-u Gene_universe", "--universe") do |item|
+				options["universe"] = ["-u", item]
+			end
+
 		end
 	end
 	optparse.parse!(cmd.split)
@@ -243,7 +247,8 @@ fun_variables = {
 	"fun_an_performance" => ["-A"],
 	"fun_pvalue" => ["-P"],
 	"fun_organism" => ["-m"],
-	"annotation_list" => ["-a"]
+	"annotation_list" => ["-a"],
+	"universe" => ["-u"]
 }
 
 if options[:mode] == 'degenes_Hunter'
