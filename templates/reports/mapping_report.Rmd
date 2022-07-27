@@ -210,6 +210,16 @@ output:
        		plot
 	}
 
+	make_top_n_expression_table <- function(count_data, n=5) {
+		top_n_index <- order(rowSums(count_data), decreasing=TRUE)[1:n]
+		sample_totals <- colSums(count_data)
+		top_n_count <- count_data[top_n_index, ]
+		top_n_perc <- apply(top_n_count, 1, function(x) { 
+			round(x / sample_totals * 100, 3)
+		})
+		knitr::kable(t(top_n_perc))
+	}
+
 	parse_ditributions_to_df <- function(all_metrics, column_name){
 		samples <- seq(nrow(all_metrics))
 		all_distribution_parsed <- as.data.frame(do.call(rbind, lapply(samples, function(sample_index){
@@ -512,7 +522,11 @@ output:
         legend_names = vars_mirna_mapping_abs_legend_names
     )
 ```
-	
+```{r top_n_expression, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+	cat("\n\n### **Percentages of reads per sample mapping to the most highly expressed genes **\n\n")
+	make_top_n_expression_table(count_data=count_data, n=5)
+```
+
 ```{r samples_clustering, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval = execute_clustering}
 # save.image("/home/bio267lab/proyectos/pmm2_belen/mRNAseq_2016/analysis/DEG_workflow/test.RData")
 invisible(lapply(names(targets),function(target_name){
