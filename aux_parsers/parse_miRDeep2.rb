@@ -22,11 +22,14 @@ end
 
 def write_table(table, out_file, column_name)
 	File.open(out_file, 'w') do |output_file|
-		table.select!{ |line| line[8] == "yes" && line[3] == "-" || line[1] == "miRDeep2 score"}
+		
 		table.each_with_index do |line, i|
+			novel_to_keep = (line[8] == "yes" && line[3] == "-")
+
 			if i == 0
 				line[0] = "miRNA_name"
 			else
+				next if out_file == "novel_miRDeep_miRNAs" && !novel_to_keep 
 				line[0] = line[column_name]
 			end
 			output_file.puts line.join("\t").gsub(/ +/,'_')

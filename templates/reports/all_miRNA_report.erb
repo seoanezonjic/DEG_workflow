@@ -11,7 +11,8 @@
 		sample: ["Sample"],
 		final_total_sequences: ["Pre-processed reads"],
 		bowtie1_mapped: ["Mapped reads"],
-		known_miRNAs: ["Known miRNAs"],
+		putative_known_miRNAs: ["Known miRNAs (all posible)"],
+		miRDeep2_confirmed_known_miRNAs: ["Known miRNAs confirmed by miRDeep2"],
 		novel_miRNAs: ["Novel miRNAs"],
 		total_miRNAs: ["Total miRNAs in sample"]
 	}
@@ -100,7 +101,7 @@
 
 	    <%=
 	   
-	    cols = [:known_miRNAs, :novel_miRNAs].map{|feature| features[feature][F_POS_IN_TABLE]}
+	    cols = [:putative_known_miRNAs, :miRDeep2_confirmed_known_miRNAs, :novel_miRNAs].map{|feature| features[feature][F_POS_IN_TABLE]}
 		
 		 barplot(id: 'all_metrics', 
 		 	fields: [0].concat(cols), 
