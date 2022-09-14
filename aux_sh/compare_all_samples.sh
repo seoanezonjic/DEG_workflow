@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 #SBATCH --mem='60gb'
-#SBATCH --constraint=sd
+#SBATCH --constraint=cal
 #SBATCH --time='02:00:00'
 hostname
 

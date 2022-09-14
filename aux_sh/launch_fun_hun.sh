@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --mem='20gb'
 #SBATCH --cpus-per-task=6
-#SBATCH --constraint=sd
+#SBATCH --constraint=cal
 #SBATCH --time='02:00:00'
 hostname
 
