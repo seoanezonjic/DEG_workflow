@@ -82,7 +82,7 @@ align_rna_seq){
 	fi
 }
 
-get_variants){
+%get_variants){
         resources: -m '10gb' -c 16 -t '10:00:00'
         module load picard/2.20.2
         echo [cpu] &> /dev/null
