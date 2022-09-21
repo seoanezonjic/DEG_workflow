@@ -14,7 +14,7 @@
 # Help: </ul>
 
 #plugin_list = PluginAdapters,PluginPolyAt,PluginContaminants,PluginQuality
-plugin_list = PluginAdapters,PluginPolyAt,PluginQuality
+plugin_list = PluginAdapters,PluginQuality
 
 #contaminants_db = cont_ribosome
 
