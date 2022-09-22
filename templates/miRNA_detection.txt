@@ -64,12 +64,12 @@ miRNA_detection){
 	if grep -q "ended" miRDeep2.log; then
 		parse_miRDeep2.rb result*csv
 		
-		## FORMAT KNOWN MIRNA DATA
+		# ## FORMAT KNOWN MIRNA DATA
 		tail -n +2 known_miRDeep_miRNAs | cut -f 1,17 | tr ":" "\t"| sed -r 's/\.\./\t/' | awk 'BEGIN{IFS="\t";OFS="\t"}{print $2,$3,$4,$1,$2":"$3":"$4}' > known_miRNA.coord
 		mature2miRBase.rb known_miRNA.coord $mapping_ref/ref_miRNA/aliases.txt translated_known_miRNA.coord
-		#cut -f 3,4 known_miRNA.coord > known_miRNAs.translation
-		echo -e "$sample\tknown_miRNAs\t`wc -l known_miRNA.coord`" >> ../metrics
-		
+		echo -e "$sample\tmiRDeep2_confirmed_known_miRNAs\t`awk '{if ($2 >= 0) print $0}' < known_miRDeep_miRNAs | wc -l`" >> ../metrics
+		echo -e "$sample\tputative_known_miRNAs\t`awk '{if ($2 < 0) print $0}'  known_miRDeep_miRNAs | wc -l`" >> ../metrics
+		cut -f 4 known_miRNA.coord | sort -u | awk '{print $0"\t$sample"}' > known_per_sample
 		## FORMAT NOVEL MIRNA DATA
 		tail -n +2 novel_miRDeep_miRNAs | cut -f 1,17 | tr ":" "\t"| sed -r 's/\.\./\t/' |awk 'BEGIN{IFS="\t";OFS="\t"}{print $1,$2,$3,$1":"$2":"$3}' > novel_miRNA.coord
 		echo -e "$sample\tnovel_miRNAs\t`wc -l novel_miRNA.coord`" >> ../metrics
