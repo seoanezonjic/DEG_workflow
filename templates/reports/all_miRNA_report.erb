@@ -45,6 +45,16 @@
 		return column
 	end
 
+	def count_miRNAs(known_per_sample, top = 50)
+		miRNA_count = Hash.new(0)
+		known_per_sample.each do |miRNA, sample|
+			miRNA_count[miRNA] += 1
+		end
+		miRNA_count = miRNA_count.to_a.sort_by{|miRNA, count| -count}
+		miRNA_count = miRNA_count[1..top]
+		miRNA_count.unshift(["known_miRNA", "sample_count"])
+		return miRNA_count
+	end
 	def insert_column(matrix, column) # column must to be a simple array, each element coorespond to a sample
 		column.each_with_index do |element, sample|
 			matrix_sample[sample] = element
@@ -55,13 +65,10 @@
 	#################################################
 	######## => MAIN
 	#################################################
-
 	all_metrics, header = copy_table('metric_table')
-	# known_miRNAs = 
 	@hash_vars["all_metrics"] = all_metrics
-
+	@hash_vars['known_miRNA_per_samples'] = count_miRNAs(@hash_vars['known_per_sample'])
 	features = get_features_index(features, header)
-
 
 %>
 <h1 style="text-align:center; background-color:#d6eaf8 ">miRNA analysis workflow report</h1>
@@ -74,7 +81,6 @@
 			[:final_total_sequences, :total_miRNAs],
 			[:bowtie1_mapped, :total_miRNAs]
 		]
-		#sizes = Array.new(16, 8)
 		pairs.each do |x, y|
 			cols = [0, header.index(x), header.index(y)]
 			x_name = features[x][F_NAME]
@@ -121,4 +127,25 @@
 		%>
 	</div>
 
+	<h2 style="text-align:center; background-color:#d6eaf8 ">Frequency of the top 50 known miRNAs across samples</h2>
+		<div style="overflow: hidden">
+
+	    <%=
+	   
+	  	
+		 barplot(id: 'known_miRNA_per_samples', 
+		 	header: true, 
+		 	row_names: true,
+		    responsive: false, 
+		    title: '', 
+		    x_label: 'Frequency across samples', y_label: 'Count',
+		    height: '600px', width: '1300px',
+		    config: {
+					'smpLabelScaleFontFactor' => 0.5,
+					'graphOrientation' => 'vertical',
+					'smpLabelRotate' => 45
+					}
+		    )
+		%>
+	</div>
 </div>
