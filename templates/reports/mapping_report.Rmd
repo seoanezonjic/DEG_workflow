@@ -46,6 +46,7 @@ output:
 	count_data <- data[['all_counts']]
 	rownames(count_data) <- count_data[[1]]
 	count_data[[1]] <- NULL
+	
 	metric_dictionary <- list(
 		"initial_total_sequences" = "Total Reads Before Trimming", 
 		"adapter_filter_passed" = "Remaining reads after adapters filter",
@@ -56,6 +57,7 @@ output:
 		"X._of_reads_mapped_to_multiple_loci" = "Multi Map %",
 		"X._of_reads_mapped_to_too_many_loci" = "Multi Map-too many %",
 		"X._of_reads_unmapped._too_short" = "Unmapped: Too Short %",
+		"X._of_reads_unmapped._too_many_mismatches" = "Unmapped: To many mismatches %", 
 		"X._of_reads_unmapped._other" = "Unmapped: Other %",
 		"Uniquely_mapped_reads_number" = "Unique Map",
 		"aligned_to_feature" = "Aligned to Genomic Feature",
@@ -191,7 +193,6 @@ output:
 		  labels = u_labels
 		)
 		data_frame$metric <- column_str_to_numeric(data_frame$metric)
-		# save(labels_df, file = "~/test2.Rdata")
 		plot <- ggplot(data_frame, aes(y = metric, weight = count, x = pair_name, fill = sample_name)) + 
 			geom_violin(scale = "width", adjust = 1/15) +
         	scale_y_continuous(
@@ -302,7 +303,7 @@ output:
 	execute_qual_scores <- all(vars_qual_scores %in% colnames(metric_table))
 	vars_aligned_v_qual <- c("aligned_to_feature", "initial_weigthed_qual_per_sequence")
 	execute_aligned_v_qual <- all(vars_aligned_v_qual %in% colnames(metric_table))
-	vars_STAR_mapping <- c("Uniquely_mapped_reads_.", "X._of_reads_mapped_to_multiple_loci", "X._of_reads_mapped_to_too_many_loci", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other")
+	vars_STAR_mapping <- c("Uniquely_mapped_reads_.", "X._of_reads_mapped_to_multiple_loci", "X._of_reads_mapped_to_too_many_loci", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._too_many_mismatches", "X._of_reads_unmapped._other")
 	execute_STAR_mapping <- all(vars_STAR_mapping %in% colnames(metric_table))
 	vars_STAR_feature_overlap <- c("final_total_sequences", "Uniquely_mapped_reads_number", "aligned_to_feature")
 	execute_STAR_feature_overlap <- all(vars_STAR_feature_overlap %in% colnames(metric_table))
@@ -437,7 +438,7 @@ output:
 	# Sum multimapping
 	mapping_metric_table[, "multi_map"] <- mapping_metric_table[,"X._of_reads_mapped_to_multiple_loci"] + mapping_metric_table[,"X._of_reads_mapped_to_too_many_loci"]
 	# Reselect table
-	vars_STAR_mapping <- c("Uniquely_mapped_reads_.", "multi_map", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._other")
+	vars_STAR_mapping <- c("Uniquely_mapped_reads_.", "multi_map", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._too_many_mismatches", "X._of_reads_unmapped._other")
 	mapping_metric_table <- mapping_metric_table[, vars_STAR_mapping]
 	mapping_metric_table <- data.frame(metric_table["sample"], mapping_metric_table)
 
@@ -528,7 +529,6 @@ output:
 ```
 
 ```{r samples_clustering, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval = execute_clustering}
-# save.image("/home/bio267lab/proyectos/pmm2_belen/mRNAseq_2016/analysis/DEG_workflow/test.RData")
 invisible(lapply(names(targets),function(target_name){
 	# Take results
 	# Check and generate info
