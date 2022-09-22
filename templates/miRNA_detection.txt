@@ -62,7 +62,7 @@ miRNA_detection){
 	?
 	miRDeep2.pl dir_temp/miRDeep2_input_reads.fasta $ref/genome.fa mapping_sample)/mapping.arf $ref/ref_miRNA/miRNA_mature.fasta none $ref/ref_miRNA/miRNA_precursors.fasta -d -g -1 -a 1 &>miRDeep2.log	
 	if grep -q "ended" miRDeep2.log; then
-		# parse_miRDeep2.rb result*csv
+		parse_miRDeep2.rb result*csv
 		
 		# # ## FORMAT KNOWN MIRNA DATA
 		tail -n +2 known_miRDeep_miRNAs | cut -f 1,17 | tr ":" "\t"| sed -r 's/\.\./\t/' | awk 'BEGIN{IFS="\t";OFS="\t"}{print $2,$3,$4,$1,$2":"$3":"$4}' > known_miRNA.coord
