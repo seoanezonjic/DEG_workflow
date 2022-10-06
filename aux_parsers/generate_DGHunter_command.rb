@@ -126,6 +126,10 @@ def parse_string_command(cmd, mode)
                 options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]
             end
 
+			option.on("--WGCNA_corType string") do |item|
+                                options["WGCNA_corType"] = ["--WGCNA_corType", item]
+                        end
+
 			option.on("--multifactorial string") do |item|
 				options["multifactorial"] = ["--multifactorial", item]
 			end
