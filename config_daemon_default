@@ -61,6 +61,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
     export WGCNA_min_genes_cluster="30"     #-------#       Minimum number of genes to keep a cluster       
     export WGCNA_detectcutHeight="0.995"    #-------#       Cut height to split modules
    	export WGCNA_deepsplit="2"    #-------#		Split deep to define modules (values between 1 to 3)
+   	export WGCNA_corType=pearson    #-------#		Correlation function to build the coexpression network
    	export min_reads=''	#------#	Used in filtering. Reads (counts per million mapped reads) per gene per sample must be higher than this value to count towards the --minlibraries value. Default=2
 	export min_libraries=''	#------#	Used in filtering. Minimun libraries that have reads to keep a gene. Default=2
 	export filter_type='' #------#	Used in filtering. Genes filtering mode. Set 'global' to apply filter for all samples or 'separate' for check treats and controls . Default=separate
