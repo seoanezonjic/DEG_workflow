@@ -306,12 +306,13 @@ output:
 	vars_STAR_mapping <- c("Uniquely_mapped_reads_.", "X._of_reads_mapped_to_multiple_loci", "X._of_reads_mapped_to_too_many_loci", "X._of_reads_unmapped._too_short", "X._of_reads_unmapped._too_many_mismatches", "X._of_reads_unmapped._other")
 	execute_STAR_mapping <- all(vars_STAR_mapping %in% colnames(metric_table))
 	vars_STAR_feature_overlap <- c("Uniquely_mapped_reads_number", "aligned_to_feature")
-
-	############ Correcting_metrics for paired samples
-	metric_table[,vars_STAR_feature_overlap] <- metric_table[,vars_STAR_feature_overlap] * metric_table$pair_layout
-	###############
-	vars_STAR_feature_overlap <- c("final_total_sequences", vars_STAR_feature_overlap)
 	execute_STAR_feature_overlap <- all(vars_STAR_feature_overlap %in% colnames(metric_table))
+	############ Correcting_metrics for paired samples
+	if (execute_STAR_feature_overlap) {
+		metric_table[,vars_STAR_feature_overlap] <- metric_table[,vars_STAR_feature_overlap] * metric_table$pair_layout
+	} 
+	vars_STAR_feature_overlap <- c("final_total_sequences", vars_STAR_feature_overlap)
+	###############
 	vars_mirna_mapping <- c("bowtie1_mapped_per", "bowtie1_multimapping_per", "bowtie1_unmapped_per")
 	execute_mirna_mapping <- all(vars_mirna_mapping %in% colnames(metric_table))
 	vars_mirna_mapping_abs <- c("final_total_sequences", "bowtie1_filtered_reads", "bowtie1_mapped")
