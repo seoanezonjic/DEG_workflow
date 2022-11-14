@@ -12,7 +12,7 @@ export PATH=$CODE_PATH'/aux_sh:'$PATH
 export PATH=$CODE_PATH'/aux_parsers:'$PATH
 source $CONFIG_DAEMON
 	
-
+export TARGETS=1
 if [ $experiment_type != "miRNAseq_detection" ] ; then 
 
 	rm -r $TARGETS_FOLDER
