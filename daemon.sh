@@ -19,14 +19,14 @@ if [ $experiment_type != "miRNAseq_detection" ] ; then
 	mkdir $TARGETS_FOLDER
 	eval "$generate_targets"
 	export TARGETS=`ls $TARGETS_FOLDER/*_target.txt | rev | cut -f 1 -d "/" | rev | tr "\n" ","` ; TARGETS=${TARGETS%?}	#-------#	Target file location, including a short sample description	
-	n_target=`echo $TARGETS |tr "," "\n" | wc -l `
-	tasks=`echo $n_target"+1" | bc`
+	
 
 	if [ "$ADD_trimming_opt" != "" ]; then 
 		export ADD_trimming_opt=";"$ADD_trimming_opt
 	fi
 fi 
-
+n_target=`echo $TARGETS |tr "," "\n" | wc -l `
+tasks=`echo $n_target"+1" | bc`
 
 ## STAGE EXECUTION
 #######################################################################
