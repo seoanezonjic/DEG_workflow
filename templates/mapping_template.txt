@@ -40,12 +40,9 @@ clean_samples){
 align_rna_seq){ 
 	resources: -m '40gb' -c 16 -t '10:00:00' -n cal
 	#module load samtools/1.9 #not available on picasso now
-	module load samtools/1.3
-	module load python/2.7.18
-	module load qualimap/2.2.1
-	source ~soft_bio_267/initializes/init_R
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
 	if [ "$experiment_type" == "RNAseq_transcriptome" ]; then
+		module load samtools/1.3
 		module load bowtie/2.2.9
 		module load sam2counts
 		module load python/2.7.18
@@ -57,7 +54,6 @@ align_rna_seq){
 		sam2counts_all.py -o selected_counts -b sorted_mappings.bam
 		parse_bowtie_log.sh bowtie_log | awk '{print "$sample" "\t" $0}' >> ../metrics
 	elif [ "$experiment_type" == "RNAseq_genome" ]; then
-		module unload gcc
 		module load star/2.5.3a
 		if [ "$read_layout" == "paired" ]; then
 			STAR --runThreadN [cpu] --genomeDir $ref/STAR_index --readFilesIn clean_samples)/output_files/paired_1.fastq.gz clean_samples)/output_files/paired_2.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate
@@ -68,9 +64,11 @@ align_rna_seq){
 		#creating count table
 		select_counts.rb -i ReadsPerGene.out.tab -s $stranded > selected_counts
 		#metric extraction
+		source ~soft_bio_267/initializes/init_R
 		parse_STAR_log.R -d Log.final.out | awk '{print "$sample" "\t" $0}' >> ../metrics
 		awk 'NR>4 {sum+=$2} END {print sum}' selected_counts |  awk '{print "$sample" "\t" "aligned_to_feature" "\t" $0 }' >> ../metrics
 	fi			
+	module load qualimap/2.2.1
 	?
 	qualimap bamqc -nt [cpu] -bam sorted_mappings.bam -outdir results --java-mem-size=20G
 	if [ ! -s results/qualimapReport.html ]; then 
