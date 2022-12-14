@@ -115,15 +115,15 @@ def parse_string_command(cmd, mode)
 			end
 
   			option.on("--WGCNA_minCoreKME integer") do |item|
-                options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]
+                options["WGCNA_minCoreKME"] = ["--WGCNA_minCoreKME", item]
             end
 	
   			option.on("--WGCNA_minCoreKMESize integer") do |item|
-                options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]
+                options["WGCNA_minCoreKMESize"] = ["--WGCNA_minCoreKMESize", item]
             end
   			
 			option.on("--WGCNA_minKMEtoStay integer") do |item|
-                options["WGCNA_detectcutHeight"] = ["--WGCNA_detectcutHeight", item]
+                options["WGCNA_minKMEtoStay"] = ["--WGCNA_minKMEtoStay", item]
             end
 
 			option.on("--WGCNA_corType string") do |item|
