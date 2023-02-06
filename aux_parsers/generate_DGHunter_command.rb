@@ -177,7 +177,11 @@ def parse_string_command(cmd, mode)
 				options["qthreshold"] = ["-Q", item]
 			end
 
-			option.on("-c cores", "--cores") do |item|
+			option.on("--max_genes_plot") do |item|
+                                options["max_genes_plot"] = ["--max_genes_plot", item]
+                        end
+		
+		 	option.on("-c cores", "--cores") do |item|
 				options["cores"] = ["-c", item]
 			end
 
