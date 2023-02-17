@@ -61,7 +61,10 @@ output:
 		"X._of_reads_unmapped._other" = "Unmapped: Other %",
 		"Uniquely_mapped_reads_number" = "Unique Map",
 		"aligned_to_feature" = "Aligned to Genomic Feature",
-		"initial_weigthed_qual_per_sequence" = "Weighted Sequence Quality Before Trimming",
+		"initial_mean_qual_per_base" = "Average Base Quality",
+		"initial_min_qual_per_base_in_10th_decile" = "Min Qual per Base (Tenth Decile)",
+		"initial_min_qual_per_base_in_lower_quartile" = "Min Qual per Base (Lower Quartile)",
+		"initial_weigthed_qual_per_sequence" = "Weighted Sequence Quality",
 		"number_duplicatedreads.estimated." = "Estimated Duplicated Reads",
 		"final_mean_qual_per_base" = "Average Base Quality",
 		"final_min_qual_per_base_in_10th_decile" = "Min Qual per Base (Tenth Decile)",
@@ -299,6 +302,8 @@ output:
 	##############################
 	vars_trimming <- c("initial_total_sequences", "adapter_filter_passed", "no_contaminants_reads", "final_total_sequences")
 	execute_trimming <- all(vars_trimming %in% colnames(metric_table))
+	vars_qual_scores_init<- c("initial_min_qual_per_base_in_10th_decile", "initial_min_qual_per_base_in_lower_quartile", "initial_mean_qual_per_base", "initial_weigthed_qual_per_sequence")
+	execute_qual_scores_init <- all(vars_qual_scores_init %in% colnames(metric_table))
 	vars_qual_scores <- c("final_min_qual_per_base_in_10th_decile", "final_min_qual_per_base_in_lower_quartile", "final_mean_qual_per_base", "final_weigthed_qual_per_sequence")
 	execute_qual_scores <- all(vars_qual_scores %in% colnames(metric_table))
 	vars_aligned_v_qual <- c("aligned_to_feature", "initial_weigthed_qual_per_sequence")
@@ -364,6 +369,20 @@ output:
 		plot_in_div(pp, fig_width= width)
 	}
 ```
+
+
+```{r qual_scores_initial, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_qual_scores_init}
+	cat("\n\n### **Quality scores for samples - lowest scores (min/10th decile) and weighted average BEFORE trimming**\n\nThe weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base")
+	vars_qual_scores_legend_names_init <- metric_var_2_legend_name[match(vars_qual_scores_init, metric_var_2_legend_name$metric_var), "legend_name" ]
+	make_vert_line_plot_from_df(
+		df = metric_table, 
+		id = "sample", 
+		other_vars = vars_qual_scores,
+		legend_names = vars_qual_scores_legend_names_init
+	)
+```
+
+
 
 ```{r length_after_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_length_trimming}
 
