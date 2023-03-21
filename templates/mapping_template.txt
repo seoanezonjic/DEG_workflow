@@ -2,7 +2,7 @@
 ####################
 ### Trimming and mapping template. Parametres can be customized at config_deamon "Trimming and Mapping" section.
 
-clean_samples){
+%clean_samples){
  	resources: -u 1 -n cal -c 16 -t '7-00:00:00' -m '80gb'
 	module unload java
 	source ~soft_bio_267/initializes/init_stbb	
@@ -44,7 +44,7 @@ align_rna_seq){
 	if [ "$experiment_type" == "RNAseq_transcriptome" ]; then
 		module load samtools/1.3
 		module load bowtie/2.2.9
-		module load sam2counts
+#		module load sam2counts/20131126
 		module load python/2.7.18
 		if [ "$read_layout" == "paired" ] ; then
 			bowtie2 -q -x $ref'/bowtie_index_tr/reference' -1 clean_samples)/output_files/paired_1.fastq.gz -2 clean_samples)/output_files/paired_2.fastq.gz --no-discordant --no-mixed -p [cpu] 2>bowtie_log | samtools sort -o sorted_mappings.bam
@@ -68,6 +68,7 @@ align_rna_seq){
 		parse_STAR_log.R -d Log.final.out | awk '{print "$sample" "\t" $0}' >> ../metrics
 		awk 'NR>4 {sum+=$2} END {print sum}' selected_counts |  awk '{print "$sample" "\t" "aligned_to_feature" "\t" $0 }' >> ../metrics
 	fi			
+	module purge
 	module load qualimap/2.2.1
 	?
 	qualimap bamqc -nt [cpu] -bam sorted_mappings.bam -outdir results --java-mem-size=20G
