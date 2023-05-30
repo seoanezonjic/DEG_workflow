@@ -27,11 +27,11 @@ end
 
 def translate_ids(mature_to_coord, parsed_mirBase)
 	mirb_id_to_coor = []
-	mature_to_coord.each do |chr, start_c, end_c, mature_id, coord_n|
+	mature_to_coord.each do |chr, start_c, end_c, mature_id, coord_n, strand|
 		if parsed_mirBase[mature_id].nil?
 			p "#{mature_id} has not been translated"
 		else
-			mirb_id_to_coor << [chr, start_c, end_c, parsed_mirBase[mature_id], coord_n]
+			mirb_id_to_coor << [chr, start_c, end_c, parsed_mirBase[mature_id], coord_n, strand]
 		end
 	end
 	return mirb_id_to_coor
@@ -58,6 +58,7 @@ miRBase_translation = File.readlines(miRBase_tr).map {|line| line = line.chomp.s
 miRNA_mature_to_coor = File.readlines(miRNA_to_coor_file).map {|line| line = line.chomp.split("\t")}
 
 parsed_mirBase = parse_mirbase(miRBase_translation)
+
 
 translated_ids = translate_ids(miRNA_mature_to_coor, parsed_mirBase)
 

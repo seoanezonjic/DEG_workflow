@@ -9,7 +9,7 @@ def load_files(all_files) #takes a files array and return an array
 	all_info = []
 	all_files.each do |file_name|
 		File.readlines(file_name).each do |line| 
-			line = line.chomp.split("\t")[0..3]
+			line = line.chomp.split("\t")
 			line[1] = line[1].to_i
 			line[2] = line[2].to_i
 			all_info << line
@@ -54,7 +54,6 @@ def merge_coords(formatted_miRNAs, distance) #takes a hash of arrays and merge a
 			counter += 1
 			actual_entry = entries[counter]
 			if do_overlap(ref_entry[1..2], actual_entry[1..2], distance)
-				puts [ref_entry[2], actual_entry[2]].max if group == "hsa-let-7i-5p"
 				ref_entry[2] = [ref_entry[2], actual_entry[2]].max
 			else
 				merged_miRNAs[group] << ref_entry
@@ -110,18 +109,13 @@ end.parse!
 ### MAIN
 ########################################################
 
-#puts(options[:output_path])
-#exit
-#puts(options[:novel_mirnas])
 
-#exit
 if !options[:known_mirnas].nil?
 
 	known_mirnas = load_files(options[:known_mirnas])
 	known_mirnas = format_miRNA_coords(known_mirnas, 3)
 	known_mirnas = merge_coords(known_mirnas, options[:distance])
-	#known_mirnas.each {|group, mirnas| p mirnas if mirnas.length > 1}
-	#exit
+
 
 	File.open("#{options[:output_path]}/known_miRNA.coord", 'w') do |outfile|
 		known_mirnas.each do |miRNA, findings|
