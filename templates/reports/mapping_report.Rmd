@@ -377,7 +377,7 @@ output:
 	make_vert_line_plot_from_df(
 		df = metric_table, 
 		id = "sample", 
-		other_vars = vars_qual_scores,
+		other_vars = vars_qual_scores_init,
 		legend_names = vars_qual_scores_legend_names_init
 	)
 ```
