@@ -21,9 +21,6 @@ if [ $experiment_type != "miRNAseq_detection" ] ; then
 	export TARGETS=`ls $TARGETS_FOLDER/*_target.txt | rev | cut -f 1 -d "/" | rev | tr "\n" ","` ; TARGETS=${TARGETS%?}	#-------#	Target file location, including a short sample description	
 	
 
-	if [ "$ADD_trimming_opt" != "" ]; then 
-		export ADD_trimming_opt=";"$ADD_trimming_opt
-	fi
 fi 
 n_target=`echo $TARGETS |tr "," "\n" | wc -l `
 tasks=`echo $n_target"+1" | bc`

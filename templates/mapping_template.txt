@@ -8,7 +8,7 @@ clean_samples){
 	source ~soft_bio_267/initializes/init_stbb	
 	CPU=`echo "[cpu] - 2" | bc`
 	if [ "$ADD_trimming_opt" != "" ]; then
-                Add_trimming_opt=`echo ";$ADD_trimming_opt" | tr ':' ' '`
+                Add_trimming_opt=`echo ";$ADD_trimming_opt" | tr ':' ' ' | tr '!' ','`
         fi
 
 	if [ $link_path != "" ]; then
