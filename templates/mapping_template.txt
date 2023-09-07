@@ -69,7 +69,7 @@ align_rna_seq){
 		awk 'NR>4 {sum+=$2} END {print sum}' selected_counts |  awk '{print "$sample" "\t" "aligned_to_feature" "\t" $0 }' >> ../metrics
 	fi			
 	module purge
-	module load qualimap/2.2.1
+	. ~soft_bio_267/initializes/init_qualimap	
 	?
 	qualimap bamqc -nt [cpu] -bam sorted_mappings.bam -outdir results --java-mem-size=20G
 	if [ ! -s results/qualimapReport.html ]; then 
