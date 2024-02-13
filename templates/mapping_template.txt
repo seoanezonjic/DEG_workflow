@@ -72,7 +72,7 @@ align_rna_seq){
 	. ~soft_bio_267/initializes/init_qualimap	
 	?
 	qualimap bamqc -nt [cpu] -bam sorted_mappings.bam -outdir results --java-mem-size=20G
-	if [ ! -s results/qualimapReport.html ]; then 
+	if [ ! -s results/qualimapReport.html ] || [ ! -s selected_counts ]; then 
 		>&2 echo "Mapping step has failed"
 		exit 1
 	else
