@@ -63,6 +63,7 @@ align_rna_seq){
 		elif [ "$read_layout" == "single" ]; then
 			STAR --runThreadN [cpu] --genomeDir $ref/STAR_index --readFilesIn clean_samples)/output_files/sequences_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate --outReadsUnmapped Fastx
 		fi
+		rm Aligned.toTranscriptome.out.bam
 		parse_STAR_log.R -d Log.final.out | awk '{print "$sample" "\t" $0}' >> star_log 
 		mkdir mapping_logs 
 		mv Log* mapping_logs/
