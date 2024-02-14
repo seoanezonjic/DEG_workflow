@@ -28,6 +28,8 @@ while IFS= read sample; do
 	fi
 	if [[ $experiment_type == "RNAseq_genome" ]]; then
 		AF_VARS=$AF_VARS,`echo "
+		\\$MIN_TOO_SHORT=$min_too_short,
+		\\$UNPAMMED_RATIO=$unmapped_ratio,
 		\\$stranded=$stranded
 		" | tr -d [:space:]`
 	fi

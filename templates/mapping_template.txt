@@ -3,7 +3,7 @@
 ### Trimming and mapping template. Parametres can be customized at config_deamon "Trimming and Mapping" section.
 
 clean_samples){
- 	resources: -u 1 -n cal -c 16 -t '7-00:00:00' -m '80gb'
+ 	resources: -u 1 -n cal -c 16 -t '01:00:00' -m '80gb'
 	module unload java
 	source ~soft_bio_267/initializes/init_stbb	
 	CPU=`echo "[cpu] - 2" | bc`
@@ -38,7 +38,7 @@ clean_samples){
 }
 
 align_rna_seq){ 
-	resources: -m '40gb' -c 16 -t '10:00:00' -n cal
+	resources: -m '40gb' -c 16 -t '01:00:00' -n cal
 	#module load samtools/1.9 #not available on picasso now
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
 	if [ "$experiment_type" == "RNAseq_transcriptome" ]; then
@@ -55,18 +55,27 @@ align_rna_seq){
 		parse_bowtie_log.sh bowtie_log | awk '{print "$sample" "\t" $0}' >> ../metrics
 	elif [ "$experiment_type" == "RNAseq_genome" ]; then
 		module load star/2.5.3a
+		source ~soft_bio_267/initializes/init_R
 		if [ "$read_layout" == "paired" ]; then
-			STAR --runThreadN [cpu] --genomeDir $ref/STAR_index --readFilesIn clean_samples)/output_files/paired_1.fastq.gz clean_samples)/output_files/paired_2.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate
+			STAR --runThreadN [cpu] --genomeDir $ref/STAR_index --readFilesIn clean_samples)/output_files/paired_1.fastq.gz clean_samples)/output_files/paired_2.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate --outReadsUnmapped Fastx
+			cat Unmapped.out* > unmapped.fastq
+			rm Unmapped.out*
 		elif [ "$read_layout" == "single" ]; then
-			STAR --runThreadN [cpu] --genomeDir $ref/STAR_index --readFilesIn clean_samples)/output_files/sequences_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate
+			STAR --runThreadN [cpu] --genomeDir $ref/STAR_index --readFilesIn clean_samples)/output_files/sequences_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate --outReadsUnmapped Fastx
 		fi
+		parse_STAR_log.R -d Log.final.out | awk '{print "$sample" "\t" $0}' >> star_log 
+		mkdir mapping_logs 
+		mv Log* mapping_logs/
+		too_short_sample=`grep 'too_short' star_log | cut -f 3 | tr -d '%'`
+		if [ `echo "$too_short_sample > $MIN_TOO_SHORT"` ]; then 
+			map_too_short.sh unmapped.fastq $ref [cpu] $UNPAMMED_RATIO
+		else 
+			rm Unmapped.out*
+		fi  
 		mv Aligned.sortedByCoord.out.bam sorted_mappings.bam 
 		#creating count table
 		select_counts.rb -i ReadsPerGene.out.tab -s $stranded > selected_counts
 		#metric extraction
-		source ~soft_bio_267/initializes/init_R
-		parse_STAR_log.R -d Log.final.out | awk '{print "$sample" "\t" $0}' >> ../metrics
-		awk 'NR>4 {sum+=$2} END {print sum}' selected_counts |  awk '{print "$sample" "\t" "aligned_to_feature" "\t" $0 }' >> ../metrics
 	fi			
 	module purge
 	. ~soft_bio_267/initializes/init_qualimap	
@@ -76,9 +85,11 @@ align_rna_seq){
 		>&2 echo "Mapping step has failed"
 		exit 1
 	else
+		cat star_log >> ../metrics
+		awk 'NR>4 {sum+=$2} END {print sum}' selected_counts |  awk '{print "$sample" "\t" "aligned_to_feature" "\t" $0 }' >> ../metrics
 		sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
 		#Removing temporal files
-		rm ./*.bam
+		rm sorted_mappings.bam 
 	fi
 }
 

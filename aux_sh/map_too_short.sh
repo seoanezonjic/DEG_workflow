@@ -1,20 +1,18 @@
 #!/usr/bin/env bash
-#SBATCH --cpus-per-task=32
-#SBATCH --mem='40gb'
-#SBATCH --time='10:00:00'
-#SBATCH --constraint=cal
-#SBATCH --error=job.%J.err
-#SBATCH --output=job.%J.out
-
-hostname
+sample=$1
+reference=$2
+threads=$3
+unmapped_ratio=$4
 
 module load star/2.5.3a
+source ~soft_bio_267/initializes/init_python
 
-STAR --runThreadN 32 --genomeDir /mnt/home/users/pab_001_uma/pedro/references/hsGRc38/STAR_index --readFilesIn /mnt2/fscratch/users/bio_267_uma/elenarojano/NGS_projects/sarcoma/results/clean_and_map/CTL_2_cell/seqtrimbb_0000/output_files/paired_1.fastq.gz /mnt2/fscratch/users/bio_267_uma/elenarojano/NGS_projects/sarcoma/results/clean_and_map/CTL_2_cell/seqtrimbb_0000/output_files/paired_2.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate --outReadsUnmapped Fastx
-STAR --runThreadN 32 --genomeDir /mnt/home/users/pab_001_uma/pedro/references/hsGRc38/STAR_index --readFilesIn Unmapped.out.mate1 Unmapped.out.mate2 --outSAMtype BAM SortedByCoordinate --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0
 
-module unload star/2.5.3a
-module load samtools/1.3
+STAR --runThreadN $threads --genomeDir $reference/STAR_index --readFilesIn $sample --outSAMtype BAM SortedByCoordinate --outFilterScoreMinOverLread 0 --outFilterMatchNminOverLread 0
 
-samtools index Aligned.sortedByCoord.out.bam
+get_too_short.py Aligned.sortedByCoord.out.bam unaligned $unmapped_ratio
+
+module purge
+module load cdhit
+cd-hit-est -T $threads -M 0 -i unaligned.fasta -o unaligned_no_redundant.fasta -c 1
 
