@@ -94,41 +94,41 @@ align_rna_seq){
 	fi
 }
 
-%get_variants){
-        resources: -m '10gb' -c 16 -t '10:00:00'
-        module load picard/2.20.2
-        echo [cpu] &> /dev/null
-        picard AddOrReplaceReadGroups \
-               I=align_rna_seq)/sorted_mappings.bam \
-               SO=coordinate \
-                O=formated.bam \
-               RGID=4 \
-                RGLB=lib1 \
-               RGPL=ILLUMINA \
-                RGPU=unit1 \
-               RGSM=20
-        picard MarkDuplicates I=formated.bam o=formated_dep.bam CREATE_INDEX=true VALIDATION_STRINGENCY=SILENT M=output.metrics
-        rm -rf formated.bam
-        module unload picard
-        module load gatk/4.1.2.0
-        module unload java
-        module load java/jdk-8u121
-        ?
-        gatk --java-options "-Xmx10g" SplitNCigarReads -R $only_read_ref/genome.fa -I formated_dep.bam -O splitted.bam
-        gatk --java-options "-Xmx10g" HaplotypeCaller  \
-           -R $only_read_ref/genome.fa \
-           -I splitted.bam \
-           -O output.vcf #\
-           #-stand_call_conf 20 \
-           #-filterNoBases \
-           #--filter_reads_with_N_cigar
-        if [ ! -s output.vcf ]; then
-                >&2 echo "Variant calling step has failed"
-                exit 1
-        else
-                #Removing temporal files
-                rm ./*.bam
-                rm align_rna_seq)/*.bam
-        fi
-}
+# get_variants){
+#         resources: -m '10gb' -c 16 -t '10:00:00'
+#         module load picard/2.20.2
+#         echo [cpu] &> /dev/null
+#         picard AddOrReplaceReadGroups \
+#                I=align_rna_seq)/sorted_mappings.bam \
+#                SO=coordinate \
+#                 O=formated.bam \
+#                RGID=4 \
+#                 RGLB=lib1 \
+#                RGPL=ILLUMINA \
+#                 RGPU=unit1 \
+#                RGSM=20
+#         picard MarkDuplicates I=formated.bam o=formated_dep.bam CREATE_INDEX=true VALIDATION_STRINGENCY=SILENT M=output.metrics
+#         rm -rf formated.bam
+#         module unload picard
+#         module load gatk/4.1.2.0
+#         module unload java
+#         module load java/jdk-8u121
+#         ?
+#         gatk --java-options "-Xmx10g" SplitNCigarReads -R $only_read_ref/genome.fa -I formated_dep.bam -O splitted.bam
+#         gatk --java-options "-Xmx10g" HaplotypeCaller  \
+#            -R $only_read_ref/genome.fa \
+#            -I splitted.bam \
+#            -O output.vcf #\
+#            #-stand_call_conf 20 \
+#            #-filterNoBases \
+#            #--filter_reads_with_N_cigar
+#         if [ ! -s output.vcf ]; then
+#                 >&2 echo "Variant calling step has failed"
+#                 exit 1
+#         else
+#                 #Removing temporal files
+#                 rm ./*.bam
+#                 rm align_rna_seq)/*.bam
+#         fi
+# }
 
