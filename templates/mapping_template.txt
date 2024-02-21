@@ -58,7 +58,8 @@ align_rna_seq){
 		source ~soft_bio_267/initializes/init_R
 		if [ "$read_layout" == "paired" ]; then
 			STAR --runThreadN [cpu] --genomeDir $ref/STAR_index --readFilesIn clean_samples)/output_files/paired_1.fastq.gz clean_samples)/output_files/paired_2.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate --outReadsUnmapped Fastx
-			cat Unmapped.out* > unmapped.fastq
+			sed -r 's,\t([01][01]),_1\t\1,g' Unmapped.out.mate1 > unmapped.fastq
+			sed -r 's,\t([01][01]),_2\t\1,g' Unmapped.out.mate2 >> unmapped.fastq
 			rm Unmapped.out*
 		elif [ "$read_layout" == "single" ]; then
 			STAR --runThreadN [cpu] --genomeDir $ref/STAR_index --readFilesIn clean_samples)/output_files/sequences_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate --outReadsUnmapped Fastx
