@@ -1,0 +1,16 @@
+<h1> Short overlapping reads analysis report. </h1>
+
+<p>This report contains the information of the analysis done for each sample for the detection of reads whose top percentage of the sequence (80% or higher) does not match the reference genome.
+Fragments of reads that do not align against the reference (soft clip) are included in a FASTA file that is analyzed with BLAST to identify the provenance of those reads and to determine if they are contaminants that may alter the results of differential expression analysis.</p>
+
+<%
+def mod_data(data):
+	data.insert(0, ['Read', 'SubjectID', 'Tax'])
+%>
+
+
+<p> Table ${ plotter.add_table('tab:inputTable.txt') } includes BLAST matches with a identity percentage over 95 and a query coverage per subject over 95. Results are filtered out to get uniq records.</p>
+
+${ plotter.table(id='inputTable.txt', header=True, text=True, styled='dt', attrib =  {'class' : 'table'}, func=mod_data)}
+
+
