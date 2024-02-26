@@ -66,7 +66,7 @@ align_rna_seq){
 			mv Unmapped.out.mate1 unmapped.fastq
 		fi
 		rm Aligned.toTranscriptome.out.bam
-		parse_STAR_log.R -d Log.final.out | awk '{print "$sample" "\t" $0}' >> star_log 
+		parse_STAR_log.R -d Log.final.out | awk '{print "$sample" "\t" $0}' > star_log 
 		mkdir mapping_logs 
 		mv Log* mapping_logs/
 		mv Aligned.sortedByCoord.out.bam sorted_mappings.bam 
@@ -74,7 +74,7 @@ align_rna_seq){
 		select_counts.rb -i ReadsPerGene.out.tab -s $stranded > selected_counts
 		#metric extraction
 		too_short_sample=`grep 'too_short' star_log | cut -f 3 | tr -d '%'`
-		if (( $(echo "$too_short_sample > $MIN_TOO_SHORT" | bc -l) )); then 
+		if (( $(echo "$too_short_sample < $MIN_TOO_SHORT" | bc -l) )); then 
 			map_too_short.sh unmapped.fastq $ref [cpu] $UNPAMMED_RATIO
 		else 
 			rm Unmapped.out*
