@@ -69,7 +69,7 @@ align_rna_seq){
 		mkdir mapping_logs 
 		mv Log* mapping_logs/
 		too_short_sample=`grep 'too_short' star_log | cut -f 3 | tr -d '%'`
-		if [ `echo "$too_short_sample > $MIN_TOO_SHORT"` ]; then 
+		if (( $(echo "$too_short_sample > $MIN_TOO_SHORT" | bc -l) )); then 
 			map_too_short.sh unmapped.fastq $ref [cpu] $UNPAMMED_RATIO
 		else 
 			rm Unmapped.out*
