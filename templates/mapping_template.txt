@@ -74,7 +74,7 @@ align_rna_seq){
 		select_counts.rb -i ReadsPerGene.out.tab -s $stranded > selected_counts
 		#metric extraction
 		too_short_sample=`grep 'too_short' star_log | cut -f 3 | tr -d '%'`
-		if (( $(echo "$too_short_sample < $MIN_TOO_SHORT" | bc -l) )); then 
+		if (( $(echo "$too_short_sample > $MIN_TOO_SHORT" | bc -l) )); then 
 			map_too_short.sh unmapped.fastq $ref [cpu] $UNPAMMED_RATIO
 		else 
 			rm Unmapped.out*
