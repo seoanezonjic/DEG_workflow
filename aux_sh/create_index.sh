@@ -16,6 +16,15 @@ if [ $experiment_type == "RNAseq_genome" ] || [ $experiment_type == "miRNAseq_de
 		#fasta_editor.rb -i $mapping_ref/raw_genome.fa -r "CLEAN" -c a -o $mapping_ref/genome.fa
 		if [ `grep -c -e '^>' $mapping_ref/raw_genome.fa` ==  `grep -c -e '^>' $mapping_ref/genome.fa` ]; then
 			rm $mapping_ref/raw_genome.fa
+			
+			# This process removes all genome sequences without annotation
+			. ~soft_bio_267/initializes/init_python
+			mv $mapping_ref/genome.fa $mapping_ref/genome_orig.fa
+			grep -v '#' $mapping_ref/annotation.gtf | cut -f 1 | sort -u > $mapping_ref/annotated_seq_ids
+			lista2fasta.py $mapping_ref/annotated_seq_ids $mapping_ref/genome_orig.fa > $mapping_ref/genome.fa
+			if [ `wc -l $mapping_ref/annotated_seq_ids` ==  `grep -c -e '^>' $mapping_ref/genome.fa` ]; then
+				rm $mapping_ref/genome_orig.fa
+			fi
 		else
 			echo "IDs cleaning has failed"
 		fi
