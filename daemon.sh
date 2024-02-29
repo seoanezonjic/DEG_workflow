@@ -76,4 +76,8 @@ elif [ "$module" == "4b" ]; then
 	else
 		sbatch launch_fun_hun.sh $module
 	fi
+elif [ "$module" == "5" ]; then
+	echo "Creating ExpHunterSuite results pack"
+	create_hunter_pack.sh 
 fi
+

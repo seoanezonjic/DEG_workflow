@@ -1,4 +1,4 @@
-################################### 
+###################################  
 ## GLOBAL VARS ##
 ###################################   
 
@@ -48,6 +48,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	export MIN_READ_LENGTH=65 	#-------#	Minimum read length theshold in trimming step. Set 10 for miRNA detection or miRNA DEA analysis
 	export read_layout='paired'	#-------#	Read layout must be defined as 'paired' in case of paired-end samples or 'single' in case of single-end samples
 	export stranded='yes'	#-------#	This parametrer must be changed in case of not-stranded sequencing only (rare case)
+	export miRNA_det_path=""	#-------#	Path to miRNA detection execution folder. This folder is only inspected to create the final results pack
 
 
 	################## Differential expression analysis variables #####################
@@ -80,7 +81,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	######## Functional DEgenesHunter Analysis	#######
 	
 	export fun_pvalue=0.1 #-------#	Minimum P-value threshold
-	export fun_an_type="KgR"	#-------#	Ontologies or pathways analysis to perform (G = GO [topGO], K = KEGG, g = GO [clusterProfiler], R = Reactome [clusterProfiler])
+	export fun_an_type="KgR"	#-------#	Functional annotation database and enrichment method(s) to use (topGO: G = GO | clusterProfiler: K = KEGG, g = GO, R = Reactome). D = Disease Ontology (DO), d = DGN.
 	export fun_an_performance="o"	#-------#	Functional analysis type ("o" for Over Representation Analysis and "g" for Gene Set Enrichment Analysis)
 	export GO_modules="MBC"	#-------#	Gene subontology analysis to perform (M = Molecular Function, B = Biological Process, C = Celular Components)
 	export fun_remote_mode=''	#-------#	Remote mode. deamon.sh 4 is executed at login when remote mode is activated (Use (b) to launch biomaRt translation; (k) to use Kegg remote data base)
