@@ -8,7 +8,8 @@ CONFIG_DAEMON=$CODE_PATH'/config_daemon'
 if [ "$3" != "" ] ; then
 	CONFIG_DAEMON=$3
 fi
-export PATH=$CODE_PATH'/aux_sh:'$PATH
+export AUXSH_PATH=$CODE_PATH'/aux_sh'
+export PATH=$AUXSH_PATH:$PATH
 export PATH=$CODE_PATH'/aux_parsers:'$PATH
 source $CONFIG_DAEMON
 	
@@ -41,7 +42,7 @@ elif [ "$module" == "1b" ] ; then
 	if [ $launch_login == TRUE ]; then	
 		create_index.sh
 	else
-		sbatch create_index.sh
+		sbatch $AUXSH_PATH/create_index.sh
 	fi
 
 elif [ "$module" == "2a" ] ; then
@@ -58,7 +59,7 @@ elif [ "$module" == "3" ] ; then
 	if [ $launch_login == TRUE ]; then
 		compare_all_samples.sh 
 	else
-		sbatch --cpus-per-task="$tasks" compare_all_samples.sh  
+		sbatch --cpus-per-task="$tasks" $AUXSH_PATH/compare_all_samples.sh  
 	fi
 elif [ "$module" == "4a" ] ; then
 	#STAGE 4A : FUNCTIONAL ANALYSIS
@@ -66,7 +67,7 @@ elif [ "$module" == "4a" ] ; then
 	if [ `echo $fun_remote_mode | grep -q -G "[kb]"` ] || [ $launch_login == TRUE ]; then	
 		launch_fun_hun.sh $module
 	else
-		sbatch launch_fun_hun.sh $module	
+		sbatch $AUXSH_PATH/launch_fun_hun.sh $module	
 	fi
 elif [ "$module" == "4b" ]; then
 	#STAGE 4B : Creating Clusters specific report
@@ -74,6 +75,6 @@ elif [ "$module" == "4b" ]; then
 	if [ $launch_login == TRUE ]; then	
 		launch_fun_hun.sh $module
 	else
-		sbatch launch_fun_hun.sh $module
+		sbatch $AUXSH_PATH/launch_fun_hun.sh $module
 	fi
 fi
