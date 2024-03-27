@@ -26,6 +26,7 @@ if [[ $experiment_type != "miRNAseq_detection" ]]; then
 	all_samples=${all_samples%?}
 	headers=$headers",t"
 	merge_count_tables.rb -i $counts_tables -t $all_samples > $report_folder/all_counts
+	sed -ir '1s/^\t/gene_id\t/g' $report_folder/all_counts
 	all_report_files=$all_report_files,$report_folder/all_counts
 	if [ "$TARGETS" != "" ]; then
 		all_report_files=$all_report_files,$full_path_tagets
@@ -34,8 +35,9 @@ if [[ $experiment_type != "miRNAseq_detection" ]]; then
 		done
 	fi
 fi
-
-create_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.Rmd -o $report_folder/mapping_report.html -d $all_report_files -H $headers
+source ~josecordoba/software/initializes/init_htmlreportR
+html_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.txt -o $report_folder/mapping_report.html -d $all_report_files --title "Mapping Report" 
+#create_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.Rmd -o $report_folder/mapping_report.html -d $all_report_files -H $headers
 if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	. ~soft_bio_267/initializes/init_ruby
 	module load cdhit
