@@ -1,61 +1,9 @@
 
 
-<style>
-body {
-  width: 100%;
-  text-align: center;
-  font-family: Arial, sans-serif;  
-  justify-content: center;
-  align-items: center;
-  width: 90%; 
-}
-
-.content img {
-  height: auto; 
-  display: block;
-  margin: 0 auto;
-  align: center;
-  width: 80%; 
-  position: relative;
-}
-
-p {
-	text-align: left;
-}
-
-/* Style for h1 */
-h1 {
-  font-size: 2.5em; /* Adjust size as needed */
-  font-weight: bold;
-  color: #000; /* Black */
-  background-color: #f0f0f0; /* Clear grey background */
-  border-radius: 8px; /* Rounded corners */
-  margin-bottom: 0.5em; /* Adjust spacing as needed */
-}
-
-/* Style for h2 */
-h2 {
-  font-size: 2em; /* Adjust size as needed */
-  font-weight: bold;
-  color: #000; /* Black */
-  background-color: #f0f0f0; /* Clear grey background */
-  border-radius: 8px; /* Rounded corners */
-  margin-bottom: 0.5em; /* Adjust spacing as needed */
-}
-
-/* Style for h3 */
-h3 {
-  font-size: 1.5em; /* Adjust size as needed */
-  font-weight: bold;
-  color: #000; /* Black */
-  background-color: #f0f0f0; /* Clear grey background */
-  border-radius: 8px; /* Rounded corners */
-  margin-bottom: 0.5em; /* Adjust spacing as needed */
-}
 
 
 
-</style>
+
 <!--begin.rcode functions, results='asis', echo=FALSE, warning=FALSE, message=FALSE
 knitr::opts_chunk$set(fig.width = 10, 
 					  fig.height= 6)
@@ -372,14 +320,11 @@ end.rcode-->
 
 <h1> QC and Alignment Report </h1>
 
-<!--begin.rcode trimming_begin_before, eval=any(c(execute_length_trimming,execute_qual_scores_init,execute_trimming,execute_qual_scores)), results='asis', echo=FALSE, warning=FALSE, message=FALSE
-	cat("<div id='trimming'>")
-	plotter$add_menu_item("trimming", list(text = "Trimming"))
-end.rcode-->
 
 <!--begin.rcode  length_before_trimming, eval=execute_length_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE
-cat("<h2> Length distribution before trimming </h2> <br>
-<h3> Comprarison of samples length distribution before trimming </h3>\n")
+cat(plotter$create_title("Length distribution before trimming", "l_dist_b", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+cat(plotter$create_title("Comprarison of samples length distribution before trimming", "dist_b", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+
 
 	column_name <- "initial_sequence_length_distribution"
 	title <- "Length distributions before trimming"
@@ -391,7 +336,8 @@ end.rcode-->
 
 
 <!--begin.rcode  qual_scores_initial, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_qual_scores_init
-	cat("<h3> Quality scores for samples </h3> <br>
+cat(plotter$create_title("Quality scores for samples", "qual_b", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+	cat("<br>
 	<b> Lowest scores (min/10th decile) and weighted average BEFORE trimming.</b><br>
 		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
 	legend_names <- metric_var_2_legend_name[match(vars_qual_scores_init, metric_var_2_legend_name$metric_var), "legend_name" ]
@@ -403,8 +349,9 @@ end.rcode-->
 
 
 <!--begin.rcode  length_after_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_length_trimming
-	cat("<h2> Length distribution after trimming </h2> <br>
-	<h3> Comprarison of samples length distribution after trimming </h3><br>\n")
+cat(plotter$create_title("Length distribution after trimming", "l_dist_a", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+cat(plotter$create_title("Comprarison of samples length distribution after trimming", "dist_a", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+
 	
 	column_name <- "final_sequence_length_distribution"
  	title <- "Length distributions after trimming"
@@ -416,10 +363,9 @@ end.rcode-->
 end.rcode-->
 
 <!--begin.rcode  trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_trimming
-	
-	cat("<h2> QC of reads before alignment </h2><br>
-		<h3> Total num bers of reads before and after trimming </h3>\n")
-	
+	cat(plotter$create_title("QC of reads before alignment", "QC", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+cat(plotter$create_title("Total num bers of reads before and after trimming", "reads_cleaned", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+
 	# look up these vars in the legend table using match
 	legend_names <- metric_var_2_legend_name[match(vars_trimming, metric_var_2_legend_name$metric_var), "legend_name" ]
 	other_vars <- vars_trimming
@@ -431,8 +377,9 @@ end.rcode-->
 
 
 <!--begin.rcode  qual_scores, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_qual_scores
-	
-	cat("<h3> Quality scores for samples </h3> <br>
+	cat(plotter$create_title("Quality scores for samples", "qual_sc", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+
+	cat("<br>
 		<b> Lowest scores (min/10th decile) and weighted average.</b><br>
 		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
 	legend_names <- metric_var_2_legend_name[match(vars_qual_scores, metric_var_2_legend_name$metric_var), "legend_name" ]
@@ -442,22 +389,13 @@ end.rcode-->
 
 end.rcode-->
 
-
-<!--begin.rcode trimming_end_before, eval=any(c(execute_length_trimming,execute_qual_scores_init,execute_trimming,execute_qual_scores)), results='asis', echo=FALSE, warning=FALSE, message=FALSE
-	cat("</div>")
-end.rcode-->
-
-
-<!--begin.rcode mapping_begin, eval=any(c(execute_aligned_v_qual,execute_STAR_mapping,execute_bowtie2_mapping,execute_STAR_feature_overlap,execute_mirna_mapping,execute_mirna_mapping_abs,execute_clustering)), results='asis', echo=FALSE, warning=FALSE, message=FALSE
-	cat("<div id='mapping'>")
-	plotter$add_menu_item("mapping", list(text = "Mapping"))
-end.rcode-->
-
 <!--begin.rcode  aligned_v_qual, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_aligned_v_qual
 	##################################################
 	###	STAR PLOTS
 	##################################################
-	cat("\n\n<h3> Reads aligning to genes vs sequence quality scores </h3> <br>
+	cat(plotter$create_title("Reads aligning to genes vs sequence quality scores", "align_vs_qual", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+
+	cat("<br>
 		Here we plot the number of reads aligning to genomic features against the sequence quality scores.<br>\n")
 	vars_aligned_v_qual_legend_names <- metric_var_2_legend_name[match(vars_aligned_v_qual, metric_var_2_legend_name$metric_var), "legend_name"]
 
@@ -472,8 +410,10 @@ end.rcode-->
 
 
 <!--begin.rcode  STAR_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_STAR_mapping
-	cat("\n\n<h2> Alignment Details </h2><br>
-		<h3> Trimmed reads mapping to the genome uniquely, non-uniquely, and not at all </h3><br>
+	cat(plotter$create_title("Alignment Details", "align_det", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+	cat(plotter$create_title("Trimmed reads mapping to the genome uniquely, non-uniquely, and not at all", "mapping_sum", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+
+	cat("<br>
 		STAR mapper used for this execution. All reads that maps more than once were rejected.<br>\n")
 
 	vars_STAR_mapping <- c(vars_STAR_mapping, "multi_map")
@@ -490,8 +430,10 @@ end.rcode-->
 	##################################################
 	###	BOWTIE2 PLOTS
 	##################################################
-	cat("\n<h2> Alignment Details </h2> <br>
-		<h3> Trimmed reads mapping to the genome uniquely, non-uniquely, and not at all </h3><br>
+	cat(plotter$create_title("Alignment Details", "align_det", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+	cat(plotter$create_title("Trimmed reads mapping to the genome uniquely, non-uniquely, and not at all", "mapping_sum", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+
+	cat("<br>
 		Bowtie 2 mapper used for this execution. For reads that map more than once, only best alignment is selected.<br>\n")	
 
     vars_bowtie2_mapping_legend_names <- metric_var_2_legend_name[match(vars_bowtie2_mapping, metric_var_2_legend_name$metric_var), "legend_name" ]
@@ -502,7 +444,9 @@ end.rcode-->
 end.rcode-->
 
 <!--begin.rcode  STAR_feature_overlap, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_STAR_feature_overlap
-	cat("\n<h3> Overlap of the mapped reads with genomic features </h3> <br>
+	cat(plotter$create_title("Overlap of the mapped reads with genomic features", "overlap", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+
+	cat("<br>
 		STAR mapper used for this execution. Reads were aligned to whole genome so mapped reads can not map to genomic features.<br>\n")	
 	
 
@@ -514,9 +458,10 @@ end.rcode-->
     cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, plotting_function =make_stacked_barchart_from_df_dodge,text = TRUE))
 end.rcode-->
 
-<!--begin.rcode  bowtie2_feature_overlap, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval = FALSE
- #eval=execute_bowtie2_feature_overlap}
-	cat("<h3> Overlap of the mapped reads with genomic features </h3> <br>
+<!--begin.rcode  bowtie2_feature_overlap, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_bowtie2_feature_overlap
+	cat(plotter$create_title("Overlap of the mapped reads with genomic features", "overlap", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+
+	cat("<br>
 		Bowtie 2 mapper used for this execution. Reads were aligned to transcriptome or custom fasta so mapped reads always overlap with genomic features.<br>\n")	
 	vars_bowtie2_feature_overlap_legend_names <- metric_var_2_legend_name[match(vars_bowtie2_feature_overlap, metric_var_2_legend_name$metric_var), "legend_name" ]
 
@@ -532,7 +477,9 @@ end.rcode-->
 	##################################################
 	###	miRNASEQ PLOTS
 	##################################################
-	cat("\n\n<h2> Alignment Details </h2> <br>
+	cat(plotter$create_title("Alignment Details", "align_det", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+
+	cat("<br>
 	 <b> Trimmed reads mapping to the genome almost once, reads mapping suppresed by multimapping threshold, and not mapped at all </b><br>
 	 Bowtie 1 mapper was used. Reads that mapped more than 7 times onto genome were rejected.<br>\n")
 
@@ -545,7 +492,9 @@ end.rcode-->
 end.rcode-->
 
 <!--begin.rcode  mirna_mapping_abs, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_mirna_mapping_abs
-	cat("<h3> Raw reads count mapping summary </h3><br>
+	cat(plotter$create_title("Raw reads count mapping summary", "miRNA_mapping", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+
+	cat("<br>
 		Summary: smallRNAseq reads mapped onto genome using Bowtie1. A filtering step was performed before mapping, and reads smaller than 18 bp.\n")
 	vars_mirna_mapping_abs_legend_names <- metric_var_2_legend_name[match(vars_mirna_mapping_abs, metric_var_2_legend_name$metric_var), "legend_name" ]
 
@@ -556,7 +505,8 @@ end.rcode-->
 end.rcode-->
 
 <!--begin.rcode  top_n_expression, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_clustering
-	cat("<h2> Percentages of reads per sample mapping to the most highly expressed genes </h2><br>\n")
+	cat(plotter$create_title("Percentages of reads per sample mapping to the most highly expressed genes", "most_expressed", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+
 	#save(make_top_n_expression_table, plotter, file = "/mnt/home/users/bio_267_uma/josecordoba/proyectos/LaforaRNAseq/analysis/RNA_seq/DEG_workflow_last/test.Rdata")
 	n <- 5
 	cat(plotter$table("all_counts", header = TRUE, row_names = TRUE, text = FALSE,table_rownames = TRUE,styled = "dt", func = make_top_n_expression_table))
@@ -564,9 +514,6 @@ end.rcode-->
 end.rcode-->
 
 
-<!--begin.rcode mapping_end, eval=any(c(execute_aligned_v_qual,execute_STAR_mapping,execute_bowtie2_mapping,execute_STAR_feature_overlap,execute_mirna_mapping,execute_mirna_mapping_abs,execute_clustering)), results='asis', echo=FALSE, warning=FALSE, message=FALSE
-	cat("</div>")
-end.rcode-->
 
 <!--begin.rcode  samples_clustering, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval = FALSE
  #eval = execute_clustering}
