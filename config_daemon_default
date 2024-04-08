@@ -46,6 +46,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	export HUNTER_RESULTS_FOLDER=$project_folder'/DEGenesHunter_results'	#-------#	Secondary execution path
 	export TEMPLATE=$CODE_PATH"/templates/mapping_template.txt"	#-------#	AutoFlow mapping template. Modifying this variable is not advised
 	export MIN_READ_LENGTH=65 	#-------#	Minimum read length theshold in trimming step. Set 10 for miRNA detection or miRNA DEA analysis
+	export min_qual=20	#-------#	Minimum quality threshold to be applied (Phred quality score). Integer
 	export read_layout='paired'	#-------#	Read layout must be defined as 'paired' in case of paired-end samples or 'single' in case of single-end samples
 	export stranded='yes'	#-------#	This parametrer must be changed in case of not-stranded sequencing only (rare case)
 	export miRNA_det_path=""	#-------#	Path to miRNA detection execution folder. This folder is only inspected to create the final results pack

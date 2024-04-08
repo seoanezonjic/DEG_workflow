@@ -19,7 +19,8 @@ while IFS= read sample; do
 		AF_VARS=$AF_VARS,`echo "
 		\\$min_read_length=$MIN_READ_LENGTH,
 		\\$read_layout=$read_layout,
-		\\$experiment_type=$experiment_type
+		\\$experiment_type=$experiment_type,
+		\\$MIN_QUAL=$min_qual
 		" | tr -d [:space:]`
 	else 
 		AF_VARS=$AF_VARS,`echo "

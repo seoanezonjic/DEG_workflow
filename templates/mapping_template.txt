@@ -17,9 +17,9 @@ clean_samples){
 	else
 		if [ "$read_layout" == "paired" ]; then
 	? 
-			seqtrimbb -t $trim_template -Q $read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz' -P "minlength=$min_read_length`echo $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
+			seqtrimbb -t $trim_template -Q $read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz' -P "quality_threshold=$MIN_QUAL;minlength=$min_read_length`echo $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
 		elif [ "$read_layout" == "single" ] ; then
-			/usr/bin/time -o process_data -v seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -P "minlength=$min_read_length`echo -e $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
+			/usr/bin/time -o process_data -v seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -P "quality_threshold=$MIN_QUAL;minlength=$min_read_length`echo -e $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
 		fi	
 	fi
 
