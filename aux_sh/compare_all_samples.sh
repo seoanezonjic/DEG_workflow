@@ -26,7 +26,7 @@ if [[ $experiment_type != "miRNAseq_detection" ]]; then
 	all_samples=${all_samples%?}
 	headers=$headers",t"
 	merge_count_tables.rb -i $counts_tables -t $all_samples > $report_folder/all_counts
-	sed -ir '1s/^\t/gene_id\t/g' $report_folder/all_counts
+	sed -i '1s/^\t/gene_id\t/g' $report_folder/all_counts
 	all_report_files=$all_report_files,$report_folder/all_counts
 	if [ "$TARGETS" != "" ]; then
 		all_report_files=$all_report_files,$full_path_tagets
