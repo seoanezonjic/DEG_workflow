@@ -1,5 +1,14 @@
+<style>
+	body {
+		margin: 0 auto; /* Centers the body horizontally */
+		max-width: 90%; /* Sets maximum width to 90% of the viewport */
+	}
 
-
+	body * {
+	    max-width: 100%;
+	    box-sizing: border-box; /* Ensure padding and border are included in the width */
+	}
+</style>
 
 
 
