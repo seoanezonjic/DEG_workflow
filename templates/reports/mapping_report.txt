@@ -126,8 +126,7 @@ knitr::opts_chunk$set(fig.width = 10,
 	
 
 		if(length(unique(ggplot_obj$data$metric)) == 1){
-			cat(paste(c("\n\n All reads of all samples has", unique(data_f$metric), "nt of length\n\n"), sep = ""))
-			return(NULL)
+			return(paste(c("\n\n All reads of all samples has", unique(ggplot_obj$data$metric), "nt of length\n\n"), sep = ""))
 		}
 		plot <- ggplot_obj + ggplot2::aes(y = metric_num, weight = count, x = pair_name, fill = sample_name) + 
 			ggplot2::geom_violin(scale = "width", adjust = 1/15) +
@@ -516,7 +515,6 @@ end.rcode-->
 <!--begin.rcode  top_n_expression, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_clustering
 	cat(plotter$create_title("Percentages of reads per sample mapping to the most highly expressed genes", "most_expressed", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
-	#save(make_top_n_expression_table, plotter, file = "/mnt/home/users/bio_267_uma/josecordoba/proyectos/LaforaRNAseq/analysis/RNA_seq/DEG_workflow_last/test.Rdata")
 	n <- 5
 	cat(plotter$table("all_counts", header = TRUE, row_names = TRUE, text = FALSE,table_rownames = TRUE,styled = "dt", func = make_top_n_expression_table))
 
