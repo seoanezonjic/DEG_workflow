@@ -35,9 +35,8 @@ if [[ $experiment_type != "miRNAseq_detection" ]]; then
 		done
 	fi
 fi
-source ~josecordoba/software/initializes/init_htmlreportR
+source ~soft_bio_267/initializes/init_htmlreportR
 html_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.txt -o $report_folder/mapping_report.html -d $all_report_files --title "Mapping Report" 
-#create_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.Rmd -o $report_folder/mapping_report.html -d $all_report_files -H $headers
 if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	. ~soft_bio_267/initializes/init_ruby
 	module load cdhit
