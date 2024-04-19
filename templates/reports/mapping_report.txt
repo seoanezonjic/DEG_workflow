@@ -61,11 +61,12 @@ knitr::opts_chunk$set(fig.width = 10,
 	}
 
 	parse_STAR_vars <- function(df) {
+
+	    df[, "multi_map"] <- as.numeric(gsub("%", "", df[,"%_of_reads_mapped_to_multiple_loci"])) + as.numeric(gsub("%", "",df[,"%_of_reads_mapped_to_too_many_loci"]))
 		mapping_metric_table <- df[, colnames(df) %in% vars_STAR_mapping]
 		mapping_metric_table <- as.data.frame(lapply(mapping_metric_table, function(x) as.numeric(gsub("\\%", "", x))), check.names = FALSE)
 		mapping_metric_table$sample <- df$sample
 		# Sum multimapping
-		mapping_metric_table[, "multi_map"] <- mapping_metric_table[,"%_of_reads_mapped_to_multiple_loci"] + mapping_metric_table[,"%_of_reads_mapped_to_too_many_loci"]
 		# Reselect table
 		mapping_metric_table <- mapping_metric_table[, c("sample", vars_STAR_mapping)]
 		melt_df <- filter_and_melt(mapping_metric_table)
@@ -255,7 +256,7 @@ end.rcode-->
 		"%_of_reads_mapped_to_multiple_loci" = "Multi Map %",
 		"%_of_reads_mapped_to_too_many_loci" = "Multi Map-too many %",
 		"%_of_reads_unmapped:_too_short" = "Unmapped: Too Short %",
-		"%_of_reads_unmapped:_too_many_mismatches" = "Unmapped: To many mismatches %", 
+		"%_of_reads_unmapped:_too_many_mismatches" = "Unmapped: Too many mismatches %", 
 		"%_of_reads_unmapped:_other" = "Unmapped: Other %",
 		"Uniquely_mapped_reads_number" = "Unique Map",
 		"aligned_to_feature" = "Aligned to Genomic Feature",
@@ -300,7 +301,7 @@ end.rcode-->
 	execute_qual_scores <- all(vars_qual_scores %in% all_vars)
 	vars_aligned_v_qual <- c("aligned_to_feature", "initial_weigthed_qual_per_sequence")
 	execute_aligned_v_qual <- all(vars_aligned_v_qual %in% all_vars)
-	 vars_STAR_mapping <- c("Uniquely_mapped_reads_%", "%_of_reads_mapped_to_multiple_loci", "%_of_reads_mapped_to_too_many_loci", "%_of_reads_unmapped:_too_short", "%_of_reads_unmapped:_too_many_mismatches", "%_of_reads_unmapped:_other")
+	vars_STAR_mapping <- c("Uniquely_mapped_reads_%", "%_of_reads_unmapped:_too_short", "%_of_reads_unmapped:_too_many_mismatches", "%_of_reads_unmapped:_other")
 	execute_STAR_mapping <- all(vars_STAR_mapping %in% all_vars)
 	vars_STAR_feature_overlap <- c("Uniquely_mapped_reads_number", "aligned_to_feature")
 	execute_STAR_feature_overlap <- all(vars_STAR_feature_overlap %in% all_vars)
@@ -320,7 +321,7 @@ end.rcode-->
 	execute_bowtie2_feature_overlap <- all(c(vars_bowtie2_feature_overlap, "bowtie2_uniq_mapped_per")  %in% all_vars)
 	vars_length_trimming <- c("initial_sequence_length_distribution", "final_sequence_length_distribution")
 	execute_length_trimming <- all(vars_length_trimming %in% all_vars)
-	vars_clustering <- c("initial_total_sequences", "final_total_sequences", "Uniquely_mapped_reads_.", "multi_map", "X._of_reads_mapped_to_multiple_loci","X._of_reads_mapped_to_too_many_loci","X._of_reads_unmapped._too_short","X._of_reads_unmapped._other","Uniquely_mapped_reads_number","aligned_to_feature","initial_weigthed_qual_per_sequence","number_duplicatedreads.estimated.","final_mean_qual_per_base","final_min_qual_per_base_in_10th_decile","final_min_qual_per_base_in_lower_quartile","final_weigthed_qual_per_sequence","bowtie1_mapped_per","bowtie1_unmapped_per","bowtie1_multimapping_per","bowtie1_mapped","bowtie1_filtered_reads","bowtie2_unmapped_per","bowtie2_multimapping_per","bowtie2_uniq_mapped_per")
+	vars_clustering <- c("initial_total_sequences", "final_total_sequences", "Uniquely_mapped_reads_.", "multi_map", "%_of_reads_mapped_to_multiple_loci","%_of_reads_mapped_to_too_many_loci","%_of_reads_unmapped._too_short","%_of_reads_unmapped._other","Uniquely_mapped_reads_number","aligned_to_feature","initial_weigthed_qual_per_sequence","number_duplicatedreads.estimated.","final_mean_qual_per_base","final_min_qual_per_base_in_10th_decile","final_min_qual_per_base_in_lower_quartile","final_weigthed_qual_per_sequence","bowtie1_mapped_per","bowtie1_unmapped_per","bowtie1_multimapping_per","bowtie1_mapped","bowtie1_filtered_reads","bowtie2_unmapped_per","bowtie2_multimapping_per","bowtie2_uniq_mapped_per")
 	vars_clustering <- vars_clustering[vars_clustering %in% all_vars]	
 end.rcode-->
 
@@ -372,7 +373,7 @@ end.rcode-->
 
 <!--begin.rcode  trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_trimming
 	cat(plotter$create_title("QC of reads before alignment", "QC", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
-cat(plotter$create_title("Total num bers of reads before and after trimming", "reads_cleaned", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+cat(plotter$create_title("Total numbers of reads before and after trimming", "reads_cleaned", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 	# look up these vars in the legend table using match
 	legend_names <- metric_var_2_legend_name[match(vars_trimming, metric_var_2_legend_name$metric_var), "legend_name" ]
@@ -423,7 +424,6 @@ end.rcode-->
 
 	cat("<br>
 		STAR mapper used for this execution. All reads that maps more than once were rejected.<br>\n")
-
 	vars_STAR_mapping <- c(vars_STAR_mapping, "multi_map")
     vars_STAR_mapping_legend_names <- metric_var_2_legend_name[match(vars_STAR_mapping, metric_var_2_legend_name$metric_var), "legend_name" ]
 	
