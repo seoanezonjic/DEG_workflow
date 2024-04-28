@@ -11,33 +11,25 @@ mkdir -p $mapping_ref
 if [ "$only_read_ref" != "" ]; then
 	ln -s `ls -d $only_read_ref/* |tr "\n" " "` $mapping_ref/
 	exit
-	# ln -s $only_read_ref/* $mapping_ref/
 fi
 
 if [ $experiment_type == "miRNAseq_detection" ] ; then 
-	. ~josecordoba/proyectos/initializes/init_mirdeep2
+	source  ~soft_bio_267/initializes/init_python
+	
 	ref_miRNA=$mapping_ref/ref_miRNA
 	mkdir -p $ref_miRNA
 	echo "Downloading miRBASE for $organism"
-	#wget "ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz" -O $ref_miRNA/hairpin.fa.gz 
-	wget "https://www.mirbase.org/download/CURRENT/hairpin.fa" -O $ref_miRNA/hairpin.fa
-	#gunzip -f $ref_miRNA/hairpin.fa.gz 
-	extract_miRNAs.pl $ref_miRNA/hairpin.fa $MIRBASE_ORGANISM > $ref_miRNA/miRNA_precursors.fasta
-	rm $ref_miRNA/hairpin.fa
-	#wget "ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz" -O $ref_miRNA/mature.fa.gz
-	wget "https://www.mirbase.org/download/CURRENT/mature.fa" -O $ref_miRNA/mature.fa
+	wget "https://www.mirbase.org/download/CURRENT/hairpin.fa" -O $ref_miRNA/prev_hairpin.fa
+	wget "https://www.mirbase.org/download/CURRENT/mature.fa" -O $ref_miRNA/prev_mature.fa
+	sed 's/<br>/\n/g' $ref_miRNA/prev_mature.fa | sed -r 's/(<p>)|(<\/p>)|(^\s$)//g' | sed 's/&gt;/>/g' |  sed '/^$/d' |  sed -n "/"$MIRBASE_ORGANISM"/{N;p}" > $ref_miRNA/mature.fa
+	sed 's/<br>/\n/g' $ref_miRNA/prev_hairpin.fa | sed -r 's/(<p>)|(<\/p>)|(^\s$)//g' | sed 's/&gt;/>/g' |  sed '/^$/d' |  sed -n "/"$MIRBASE_ORGANISM"/{N;p}" > $ref_miRNA/hairpin.fa
 
-	#gunzip -f $ref_miRNA/mature.fa.gz
-	extract_miRNAs.pl $ref_miRNA/mature.fa $MIRBASE_ORGANISM > $ref_miRNA/miRNA_mature.fasta
-	rm $ref_miRNA/mature.fa
+	cut -f 1 -d " " $ref_miRNA/hairpin.fa > $ref_miRNA/miRNA_precursors.fasta
+	cut -f 1 -d " " $ref_miRNA/mature.fa > $ref_miRNA/miRNA_mature.fasta
 
-	#wget ftp://mirbase.org/pub/mirbase/CURRENT/aliases.txt.gz -O $ref_miRNA/aliases.txt.gz
-	#wget "https://www.mirbase.org/ftp/CURRENT/aliases.txt.gz" -O $ref_miRNA/aliases.txt.gz # THIS NOT EXISTS. MERGED WITH FASTAS?
-	#gunzip -f $ref_miRNA/aliases.txt.gz
-#elif [  $experiment_type == "miRNAseq_detection" ]; then
-	# wget "http://carolina.imis.athena-innovation.gr/diana_tools/downloads/e2de248e81009d5a5s33ebe9906fa32c/TarBase_v8_download.tar.gz" -O miRNA_targets.txt.gz
-	# gunzip -f miRDB_v6.0_prediction_result.txt.gz
-	# grep $MIRBASE_ORGANISM miRDB_v6.0_prediction_result.txt > targets.txt
+	cat $ref_miRNA/mature.fa $ref_miRNA/hairpin.fa  | grep "^>" | tr -d ">"| cut -f 1,2 -d " "| tr " " "\t" > $ref_miRNA/prev_aliases.txt
+	aggregate_column_data -i $ref_miRNA/prev_aliases.txt -x 2 -s ";" -a 1 > $ref_miRNA/aliases.txt
+	rm $ref_miRNA/*hairpin.fa $ref_miRNA/*mature.fa $ref_miRNA/prev_aliases.txt
 fi
 
 if [[ $experiment_type == "RNAseq_genome" || $experiment_type == "miRNAseq_detection" ]];then
