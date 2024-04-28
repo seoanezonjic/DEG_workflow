@@ -22,7 +22,7 @@ if [ $experiment_type == "RNAseq_genome" ] || [ $experiment_type == "miRNAseq_de
 			mv $mapping_ref/genome.fa $mapping_ref/genome_orig.fa
 			grep -v '#' $mapping_ref/annotation.gtf | cut -f 1 | sort -u > $mapping_ref/annotated_seq_ids
 			lista2fasta.py $mapping_ref/annotated_seq_ids $mapping_ref/genome_orig.fa > $mapping_ref/genome.fa
-			if [ `wc -l $mapping_ref/annotated_seq_ids` ==  `grep -c -e '^>' $mapping_ref/genome.fa` ]; then
+			if [ `wc -l $mapping_ref/annotated_seq_ids |cut -f 1 -d " "` == `grep -c -e '^>' $mapping_ref/genome.fa` ]; then
 				rm $mapping_ref/genome_orig.fa
 			fi
 		else
@@ -51,8 +51,8 @@ elif [ $experiment_type == "RNAseq_transcriptome" ]; then
 elif [ $experiment_type == "miRNAseq_detection" ]; then
 	out=$mapping_ref'/bowtie_index_mirna'
 	if ! [[ -d $out || -L $out ]]; then
-		module load samtools/1.9
-		. ~josecordoba/proyectos/initializes/init_mirdeep2
+		module load samtools/1.16
+		. ~soft_bio_267/initializes/init_mirdeep2
 		mkdir -p $out
 		bowtie-build $mapping_ref'/genome.fa' $out'/genome'
 		samtools faidx $mapping_ref'/genome.fa'
