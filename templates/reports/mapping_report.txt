@@ -509,7 +509,7 @@ end.rcode-->
     ident <- "sample" 
     other_vars <- vars_mirna_mapping_abs
     legend_names <- vars_mirna_mapping_abs_legend_names
-    cat(plotter$static_ggplot_main("metrics", text = FALSE, plotting_function = make_stacked_barchart_from_df_dodge))
+    cat(plotter$static_ggplot_main("metrics", text = "dynamic", func = filter_and_melt, plotting_function = make_stacked_barchart_from_df_dodge))
 end.rcode-->
 
 <!--begin.rcode  top_n_expression, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_clustering
