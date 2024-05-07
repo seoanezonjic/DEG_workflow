@@ -7,14 +7,14 @@
 ## Lift over of g38 data over g37 genome
 ### ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/_README_GRCh37_mapping.txt
 ## wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_30/GRCh37_mapping/gencode.v30lift37.annotation.gtf.gz' -O  $1'/gencode.v30lift37.annotation.gtf.gz'
-mkdir -p $mapping_ref
+mkdir -p $mapping_ref/Y_PAR_MASKED
 if [ "$only_read_ref" != "" ]; then
 	ln -s `ls -d $only_read_ref/* |tr "\n" " "` $mapping_ref/
 	exit
 fi
 
+source  ~soft_bio_267/initializes/init_python
 if [ $experiment_type == "miRNAseq_detection" ] ; then 
-	source  ~soft_bio_267/initializes/init_python
 	
 	ref_miRNA=$mapping_ref/ref_miRNA
 	mkdir -p $ref_miRNA
@@ -48,4 +48,5 @@ if [[ $experiment_type == "RNAseq_genome" || $experiment_type == "miRNAseq_detec
 	else 
 		echo "$organism genome and annotations has been downloaded"
 	fi 
+	maskFasta.py $MASK_YPAR_BEDS/$organism.bed $mapping_ref/genome.fa > $mapping_ref/Y_PAR_MASKED/genome_Ymask.fa
 fi 
