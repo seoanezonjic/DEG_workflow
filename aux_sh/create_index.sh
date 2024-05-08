@@ -40,13 +40,15 @@ if [ $experiment_type == "RNAseq_genome" ]; then
 	else
 		echo "Reference seems to be indexed. If not, remove "$mapping_ref'/STAR_index'" folder"
 	fi
-	out=$mapping_ref'/Y_PAR_MASKED/STAR_index'
-	if ! [[ -d $out || -L $out ]]; then
-		module load star/2.5.3a
-		mkdir -p $out
-		STAR --runThreadN 2 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/Y_PAR_MASKED/genome.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
-	else
-		echo "Reference seems to be indexed. If not, remove "$mapping_ref'/STAR_index'" folder"
+	if [[ $organism == 'human' ]]; then # only human has PAR regions well defined
+		out=$mapping_ref'/Y_PAR_MASKED/STAR_index'
+		if ! [[ -d $out || -L $out ]]; then
+			module load star/2.5.3a
+			mkdir -p $out
+			STAR --runThreadN 2 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/Y_PAR_MASKED/genome_Ymask.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
+		else
+			echo "Reference seems to be indexed. If not, remove "$mapping_ref'/Y_PAR_MASKED/STAR_index'" folder"
+		fi
 	fi
 
 elif [ $experiment_type == "RNAseq_transcriptome" ]; then
