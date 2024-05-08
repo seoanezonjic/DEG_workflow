@@ -10,6 +10,7 @@ while IFS= read sample; do
 	\\$trim_template=$TRIM_TEMPLATE,
 	\\$sample=$sample,
 	\\$ref=$mapping_ref,
+	\\$organism=$organism,
 	\\$ADD_trimming_opt=$ADD_trimming_opt,
 	\\$link_path=\"$link_path\"
 	" | tr -d [:space:]`
