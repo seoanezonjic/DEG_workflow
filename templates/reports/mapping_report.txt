@@ -57,7 +57,9 @@ knitr::opts_chunk$set(fig.width = 10,
 	####################################################
 
 	parse_bowtie2_metrics <- function(df) {
-		data.frame(df["sample"], df[, vars_bowtie2_mapping])
+		mapping_metric_table <-data.frame(df["sample"], df[, vars_bowtie2_mapping])
+		filter_and_melt(mapping_metric_table)
+
 	}
 
 	parse_STAR_vars <- function(df) {
@@ -448,7 +450,7 @@ end.rcode-->
     ident <- "sample"
     other_vars <- vars_bowtie2_mapping
 	legend_names <- vars_bowtie2_mapping_legend_names
-    cat(plotter$static_ggplot_main("metrics", text = TRUE,func = parse_bowtie2_metrics, plotting_function =make_stacked_barchart_from_df))
+    cat(plotter$static_ggplot_main("metrics", text = "dynamic", func = parse_bowtie2_metrics, plotting_function = make_stacked_barchart_from_df))
 end.rcode-->
 
 <!--begin.rcode  STAR_feature_overlap, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_STAR_feature_overlap
@@ -473,12 +475,13 @@ end.rcode-->
 		Bowtie 2 mapper used for this execution. Reads were aligned to transcriptome or custom fasta so mapped reads always overlap with genomic features.<br>\n")	
 	vars_bowtie2_feature_overlap_legend_names <- metric_var_2_legend_name[match(vars_bowtie2_feature_overlap, metric_var_2_legend_name$metric_var), "legend_name" ]
 
-    make_stacked_barchart_from_df_dodge(
-		df = metric_table, 
-        id = "sample", 
-        other_vars = vars_bowtie2_feature_overlap,
-        legend_names = vars_bowtie2_feature_overlap_legend_names
-    )
+ 
+    other_vars <- vars_bowtie2_feature_overlap
+    legend_names <- vars_bowtie2_feature_overlap_legend_names
+    
+    ident <- "sample" 
+    cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, plotting_function =make_stacked_barchart_from_df_dodge,text = TRUE))
+
 end.rcode-->
 
 <!--begin.rcode  mirna_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_mirna_mapping
