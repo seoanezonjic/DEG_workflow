@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 output_folder=$CODE_PATH/DEG_workflow_results
-miRNA_det_path=$3
+miRNA_det_path=$1
 
 mkdir -p $output_folder
 cp $report_folder/mapping_report.html $output_folder

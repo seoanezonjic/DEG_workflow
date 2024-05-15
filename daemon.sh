@@ -93,7 +93,7 @@ if [ "$module" == "4b" ]; then
 fi
 if [ "$module" == "5" ]; then
 	echo "Creating ExpHunterSuite results pack"
-	create_hunter_pack.sh 
+	create_hunter_pack.sh $ADD_OPTIONS
 	exit
 fi
 
