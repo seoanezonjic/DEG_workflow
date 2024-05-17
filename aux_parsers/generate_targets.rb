@@ -54,81 +54,89 @@ def load_table(input_file, blacklist = nil, whitelist = nil, filter = nil)
 end
 
 
-def parse_targets(targets_string)
-	parsed_targets = {}
-	feature_names = []
-	targets_string.split(";").each do |target|
-		target = target.split(">")
-		target_name = target.shift
-		features = target.shift.split(":")
-		feature_name = features.shift
-		feature_names << feature_name
-		features = features.shift.split(",")
+#target_name>
+# 		feature_name:
+#			feature_ctrl, feature_tr1/feature_tr2
+		;
+#		feature_nameN:
+#			feature_ctrl, featue_trn 
+def parse_target(target_string)
+	parsed_target = {}
+	target_string = target_string.split(">")
+	target_name = target_string.shift
+	all_features = target_string.shift.split(";")
+	all_features.each do |factor|
+		
+		feature_name, features = factor.split(":")
+		features = features.split(",")
 		features = features.map{|feature| feature = feature.split("/")}
-		parsed_targets[target_name.to_sym] = {feature_name.to_sym => features}
+		parsed_target[feature_name.to_sym] = features
 	end
-
-	return parsed_targets, feature_names
+	return target_name, parsed_target
 end
 
 
-def build_targets(table, targets)
-	new_targets = {}
-	targets.each do |target_name, all_features|
+def build_target(table, target)
 		new_target = {"Ctrl" => [], "Treat" => []}
-		all_features.each do |feature_name, features|
-			new_target["Ctrl"] = find_features(feature_name, features[CTRL], table)
-			new_target["Treat"] = find_features(feature_name, features[TREAT], table)
-		end
-		new_targets[target_name] = new_target
-	end	
-	return new_targets
+		ctrl_features = filter_features(target, CTRL)
+		new_target["Ctrl"] = find_features(ctrl_features, table)
+		treat_features = filter_features(target, TREAT)
+		new_target["Treat"] = find_features(treat_features, table)
+	return new_target
 
 end
 
-def find_features(feature_name, features, table)
+def filter_features(features, factor)
+	filtered_ft = features.each_with_object({}) do |(ft_name, feature), result| 
+		result[ft_name]= feature[factor] 
+	end
+	return filtered_ft
+end
+
+def find_features(features, table)
 	samples_list = []
 	table.each do |sample, all_features|
-		if features.include?(all_features[feature_name.to_sym])  
-			samples_list << sample 
+		include_sample = true
+		features.each do |feature_name, ft_values|
+			if !ft_values.include?(all_features[feature_name.to_sym])  
+				include_sample = false
+				break
+			end
 		end
+		samples_list << sample if include_sample
 	end
 	return samples_list
 end
 
-def save_targets(targets, output_path, experiment_design, additional_columns)
-	targets.each do |target_name, treats|
-		File.open("#{output_path}/#{target_name.to_s}_target.txt",'w') do |out_file|
-			header = "sample\ttreat"
-			header = "sample\ttreat\t#{additional_columns.join("\t")}" if additional_columns.length > 0
+def save_target(target_name, treats, output_path, experiment_design, additional_columns)
+	File.open("#{output_path}/#{target_name.to_s}_target.txt",'w') do |out_file|
+		header = "sample\ttreat"
+		header = "sample\ttreat\t#{additional_columns.join("\t")}" if additional_columns.length > 0
 
-			out_file.puts header
+		out_file.puts header
 
-			treats.each do |treat, samples|
-				samples.each do |sample|
-					if additional_columns.length > 0
-						features_by_sample = []
-						additional_columns.each do |additional_feature|
-							features_by_sample << experiment_design[sample][additional_feature]
-						end
-						out_file.puts "#{sample}\t#{treat}\t#{features_by_sample.join("\t")}" if !sample.nil?
-					else
-						out_file.puts "#{sample}\t#{treat}" if !sample.nil?
+		treats.each do |treat, samples|
+			samples.each do |sample|
+				if additional_columns.length > 0
+					features_by_sample = []
+					additional_columns.each do |additional_feature|
+						features_by_sample << experiment_design[sample][additional_feature]
 					end
-
+					out_file.puts "#{sample}\t#{treat}\t#{features_by_sample.join("\t")}" if !sample.nil?
+				else
+					out_file.puts "#{sample}\t#{treat}" if !sample.nil?
 				end
+
 			end
 		end
 	end
 end
 
-def save_aux_options(targets, output_path, aux_options)
+def save_aux_options(target_name, output_path, aux_options)
 	FileUtils.mkdir_p output_path
-	targets.each do |target_name, treats|
-		aux_file = "#{output_path}/#{target_name}_target.aux"
-		File.open(aux_file, 'w') do |out|
-			out.puts aux_options
-		end
+	aux_file = "#{output_path}/#{target_name}_target.aux"
+	File.open(aux_file, 'w') do |out|
+		out.puts aux_options
 	end
 end
 
@@ -155,13 +163,13 @@ OptionParser.new do |opts|
 		options[:filter] = string
 	end
 
-	options[:targets] = nil
-	opts.on("-t STRING", "--targets STRING", "String which describes targets. EXAMPLE: 'TARGET_A>COLUMN_A:FEAT_CTL1,FEAT_TRT1;TARGET_B>COLUMN_B:FEAT_CTL1/FEAT_CTL2,FEAT_TRT1/FEAT_TRT2'") do |string|
-		options[:targets] = string
+	options[:target] = nil
+	opts.on("-t STRING", "--target STRING", "String which describes target. EXAMPLE: 'TARGET_A>COLUMN_A:FEAT_CTL1,FEAT_TRT1;TARGET_B>COLUMN_B:FEAT_CTL1/FEAT_CTL2,FEAT_TRT1/FEAT_TRT2'") do |string|
+		options[:target] = string
 	end
 
 	options[:additional_features] = []
-	opts.on("--additional_features STRING", "String with extra factors separated by commas to be added to targets.") do |string|
+	opts.on("--additional_features STRING", "String with extra factors separated by commas to be added to target.") do |string|
 		options[:additional_features] = string.split(",")
 	end
 
@@ -171,12 +179,12 @@ OptionParser.new do |opts|
 	end
 
 	options[:blacklist] = nil
-	opts.on("-b FILE/STRING", "--blacklist FILE/STRING", "List with samples name to exclude from targets. File or comma separated string") do |file|
+	opts.on("-b FILE/STRING", "--blacklist FILE/STRING", "List with samples name to exclude from target. File or comma separated string") do |file|
 		options[:blacklist] = file
 	end
 
 	options[:whitelist] = nil
-	opts.on("-w FILE/STRING", "--whitelist FILE/STRING", "List with samples name to acept from targets. File or comma separated string") do |file|
+	opts.on("-w FILE/STRING", "--whitelist FILE/STRING", "List with samples name to acept from target. File or comma separated string") do |file|
 		options[:whitelist] = file
 	end
 
@@ -195,7 +203,8 @@ whitelist = load_list(options[:whitelist]) if !options[:whitelist].nil?
 
 filter = parse_filter(options[:filter]) if !options[:filter].nil?
 experiment_design = load_table(options[:table], blacklist, whitelist, filter)
-targets, features = parse_targets(options[:targets])
-targets = build_targets(experiment_design, targets) # meter aqui lo de guardar columnas y quitar la columna replicate
-save_targets(targets, options[:output_path], experiment_design, options[:additional_features].map!{|feature| feature.to_sym})
-save_aux_options(targets, options[:output_path], options[:aux_options]) if !options[:aux_options].empty?
+target_name, target = parse_target(options[:target])
+target = build_target(experiment_design, target) # meter aqui lo de guardar columnas y quitar la columna replicate
+
+save_target(target_name, target, options[:output_path], experiment_design, options[:additional_features].map!{|feature| feature.to_sym})
+save_aux_options(target_name, options[:output_path], options[:aux_options]) if !options[:aux_options].empty?

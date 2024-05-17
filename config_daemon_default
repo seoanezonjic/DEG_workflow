@@ -72,7 +72,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	export string_features=''	#------#	Columns in the target file to be used as categorical factors in correlation analysis. Multiple columns should be separated by commas
 	export numeric_features=''
 	export generate_targets="
-		generate_targets.rb -o $TARGETS_FOLDER -e experiment_design -t 'target_name>factor:control_feature,treatment_feature_1/treatment_feature_2' -o $TARGETS_FOLDER
+		generate_targets.rb -o $TARGETS_FOLDER -e experiment_design -t 'target_name>factorA:control_feature,treatment_feature_1/treatment_feature_2;factorB:control_Featrue,treatment_feature' -o $TARGETS_FOLDER
 	"	#------#	Commands to generate target files. Whole string will be interpreted by BASH.
 	# If you need extra fields for multifactorial DEGENESHUNTER or additional features, or define auxiliar options for DEGENSHUNTER correlations, use the following:
 	# These auxiliar options have preference over config daemon variables and command line additional options
