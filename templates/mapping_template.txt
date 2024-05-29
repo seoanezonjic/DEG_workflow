@@ -57,17 +57,17 @@ align_rna_seq){
 		module load star/2.5.3a
 		source ~soft_bio_267/initializes/init_R
 		if [[ $organism == 'human' ]]; then # only human has PAR regions well defined
-			ref_type=Y_PAR_MASKED/STAR_index
+			REF_type=Y_PAR_MASKED/STAR_index
 		else
-			ref_type=STAR_index
+			REF_type=STAR_index
 		fi
 		if [ "$read_layout" == "paired" ]; then
-			STAR --runThreadN [cpu] --genomeDir $ref/$ref_type --readFilesIn clean_samples)/output_files/paired_1.fastq.gz clean_samples)/output_files/paired_2.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate --outReadsUnmapped Fastx
+			STAR --runThreadN [cpu] --genomeDir $ref/$REF_type --readFilesIn clean_samples)/output_files/paired_1.fastq.gz clean_samples)/output_files/paired_2.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate --outReadsUnmapped Fastx
 			sed -r 's,\t([01][01]),_1\t\1,g' Unmapped.out.mate1 > unmapped.fastq
 			sed -r 's,\t([01][01]),_2\t\1,g' Unmapped.out.mate2 >> unmapped.fastq
 			rm Unmapped.out*
 		elif [ "$read_layout" == "single" ]; then
-			STAR --runThreadN [cpu] --genomeDir $ref/$ref_type --readFilesIn clean_samples)/output_files/sequences_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate --outReadsUnmapped Fastx
+			STAR --runThreadN [cpu] --genomeDir $ref/$REF_type --readFilesIn clean_samples)/output_files/sequences_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate --outReadsUnmapped Fastx
 			mv Unmapped.out.mate1 unmapped.fastq
 		fi
 		rm Aligned.toTranscriptome.out.bam
