@@ -90,4 +90,5 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	export custom_nomenclature=''	#-------#	File with custom nomenclature in GMT format
 	export fun_organism='Human'	#-------#	Organism to perform functional analysis on
 	export annotation_list=''	#-------#	Functional annotation of transcripts based on an model organism for functional analysis. First column must be ENSEMBL gene ID and second column transcript name
+	export clean_parentals=TRUE
 fi

@@ -169,6 +169,9 @@ def parse_string_command(cmd, mode)
 				options["fun_remote_mode"] = ["-r", item]
 			end
 
+		    	option.on("--clean_parentals VALUE") do |item|
+                               	options["clean_parentals"] = ["--clean_parentals", item]
+                        end
 			option.on("-P THRESHOLD", "--pthreshold") do |item|
 				options["pthreshold"] = ["-P", item]
 			end
@@ -208,9 +211,13 @@ def generate_command(variables)
 	command = ''
 	variables.each do |variable, attributes|
 		flag, value = attributes
-		next if (value.nil? || value.empty?) && attributes.length > 1
-		option = "#{flag} #{value} "
-		option = "#{flag} " if value == "BOOLEAN"
+		next if (value.nil? || value.empty? || value == "FALSE") && attributes.length > 1
+		
+		if "TRUE" == value
+			option = "#{flag} " 
+		else
+			option = "#{flag} #{value} "
+		end
 		command << option
 	end
 	return command
@@ -256,7 +263,8 @@ fun_variables = {
 	"fun_pvalue" => ["-P"],
 	"fun_organism" => ["-m"],
 	"annotation_list" => ["-a"],
-	"universe" => ["-u"]
+	"universe" => ["-u"],
+	"clean_parentals" => ["--clean_parentals"]
 }
 
 if options[:mode] == 'degenes_Hunter'
