@@ -23,5 +23,7 @@ do
     cp -r $comparison_path/Common_results $out_comparison
     cp -r $comparison_path/functional_enrichment $out_comparison
     cp -r $comparison_path/Results_WGCNA $out_comparison
+    cp -r $comparison_path/Results_default $out_comparison
+    cp -r $comparison_path/PCA_results $out_comparison
     rm -rf $out_comparison/Results_WGCNA/*.RData
 done
