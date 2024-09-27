@@ -1,5 +1,6 @@
 #! /usr/bin/env bash
 
+source ~soft_bio_267/initializes/init_degenes_hunter
 output_folder=$CODE_PATH/DEG_workflow_results
 miRNA_det_path=$1
 
