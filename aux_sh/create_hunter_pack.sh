@@ -17,13 +17,23 @@ do
     out_comparison="$output_folder/$(basename "$comparison_path")"
     mkdir -p $out_comparison
     cp $comparison_path/DEG_report.html $out_comparison
-    cp $comparison_path/filtered_count_data.txt $out_comparison
-    cp $comparison_path/final_counts.txt $out_comparison
     cp $comparison_path/control_treatment.txt $out_comparison
-    cp -r $comparison_path/Common_results $out_comparison
+
+    miRNA=`grep -c 'MIMAT' $comparison_path/Common_results/hunter_results_table.txt`
+    if [ "$miRNA" -gt 0 ]; then
+        add_annotation.R -i $comparison_path/filtered_count_data.txt -o $out_comparison/filtered_count_data.txt -m
+        add_annotation.R -i $comparison_path/final_counts.txt -o $out_comparison/final_counts.txt -m
+        add_annotation.R -i $comparison_path/Common_results/hunter_results_table.txt -o $out_comparison/hunter_results_table.txt -m -c rownames
+        add_annotation.R -i $comparison_path/Results_default/Normalized_counts_default.txt -o $out_comparison/Normalized_counts_default.txt -m
+    else
+        cp $comparison_path/filtered_count_data.txt $out_comparison
+        cp $comparison_path/final_counts.txt $out_comparison
+        cp $comparison_path/Common_results/hunter_results_table.txt $out_comparison
+        cp $comparison_path/Results_default/Normalized_counts_default.txt $out_comparison
+    fi
+  
     cp -r $comparison_path/functional_enrichment $out_comparison
     cp -r $comparison_path/Results_WGCNA $out_comparison
-    cp -r $comparison_path/Results_default $out_comparison
     cp -r $comparison_path/PCA_results $out_comparison
     rm -rf $out_comparison/Results_WGCNA/*.RData
 done
