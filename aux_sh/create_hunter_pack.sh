@@ -27,10 +27,14 @@ do
         add_annotation.R -i $comparison_path/Common_results/hunter_results_table.txt -o $out_comparison/hunter_results_table.txt -m -c rownames
         add_annotation.R -i $comparison_path/Results_default/Normalized_counts_default.txt -o $out_comparison/Normalized_counts_default.txt -m
     else
-        cp $comparison_path/filtered_count_data.txt $out_comparison
-        cp $comparison_path/final_counts.txt $out_comparison
-        cp $comparison_path/Common_results/hunter_results_table.txt $out_comparison
-        cp $comparison_path/Results_default/Normalized_counts_default.txt $out_comparison
+        #cp $comparison_path/filtered_count_data.txt $out_comparison
+        #cp $comparison_path/final_counts.txt $out_comparison
+        #cp $comparison_path/Common_results/hunter_results_table.txt $out_comparison
+        #cp $comparison_path/Results_default/Normalized_counts_default.txt $out_comparison
+        add_annotation.R -i $comparison_path/filtered_count_data.txt -o $out_comparison/filtered_count_data.txt
+        add_annotation.R -i $comparison_path/final_counts.txt -o $out_comparison/final_counts.txt
+        add_annotation.R -i $comparison_path/Common_results/hunter_results_table.txt -o $out_comparison/hunter_results_table.txt -c rownames
+        add_annotation.R -i $comparison_path/Results_default/Normalized_counts_default.txt -o $out_comparison/Normalized_counts_default.txt
     fi
   
     cp -r $comparison_path/functional_enrichment $out_comparison
