@@ -14,7 +14,7 @@ mkdir -p $symlinks_fastq_folder
 
 if [ "$keep_bam" == TRUE ]; then 
     bam_subfolder="/qualimap_0000"
-    symlinks_bam_folder=$output_folder"/symLinks/bam_files"
+    symlinks_bam_folder=$output_folder"/bam_files"
     rm -rf $symlinks_bam_folder
     mkdir -p $symlinks_bam_folder
 fi
