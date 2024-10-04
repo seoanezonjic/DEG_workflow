@@ -6,16 +6,15 @@
 main_folder=$MAPPING_RESULTS_FOLDER
 output_folder="$CODE_PATH/symLinks"
 
+rm -rf $output_folder
+
 fastq_subfolder="/seqtrimbb_0000/output_files"
 symlinks_fastq_folder=$output_folder"/fastq_files"
-rm -rf $symlinks_fastq_folder
 mkdir -p $symlinks_fastq_folder
-
 
 if [ "$keep_bam" == TRUE ]; then 
     bam_subfolder="/qualimap_0000"
     symlinks_bam_folder=$output_folder"/bam_files"
-    rm -rf $symlinks_bam_folder
     mkdir -p $symlinks_bam_folder
 fi
 
