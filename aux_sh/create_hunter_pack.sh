@@ -4,7 +4,9 @@ source ~soft_bio_267/initializes/init_degenes_hunter
 output_folder=$CODE_PATH/DEG_workflow_results
 miRNA_det_path=$1
 
+rm -rf $output_folder
 mkdir -p $output_folder
+
 cp $report_folder/mapping_report.html $output_folder
 if [ ! -z "$miRNA_det_path" ]; then
     echo 'A'

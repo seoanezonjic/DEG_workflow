@@ -13,7 +13,6 @@ export MASK_YPAR_BEDS=$CODE_PATH'/bed_YPAR'
 export PATH=$AUXSH_PATH:$PATH
 export PATH=$CODE_PATH'/aux_parsers:'$PATH
 source $CONFIG_DAEMON
-	
 
 ## STAGE EXECUTION
 #######################################################################
@@ -94,6 +93,10 @@ fi
 if [ "$module" == "5" ]; then
 	echo "Creating ExpHunterSuite results pack"
 	create_hunter_pack.sh $ADD_OPTIONS
+	create_symlinks.sh $ADD_OPTIONS
+	if [ "$keep_bam" == TRUE ]; then
+		create_symlinks.sh $keep_bam $ADD_OPTIONS
+	fi
 	exit
 fi
 
