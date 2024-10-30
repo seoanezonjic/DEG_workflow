@@ -97,7 +97,7 @@ align_rna_seq){
 		awk 'NR>4 {sum+=$2} END {print sum}' selected_counts |  awk '{print "$sample" "\t" "aligned_to_feature" "\t" $0 }' >> ../metrics
 		sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
 		#Removing temporal files
-		if [ $keep_bam == FALSE ]; then
+		if [ "$keep_bam" == FALSE ]; then
 			rm sorted_mappings.bam 
 		fi
 	fi
