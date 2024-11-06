@@ -10,7 +10,7 @@ source ~soft_bio_267/initializes/init_python
 mkdir $report_folder
 ## Collection information and mapping report generation
 cat $MAPPING_RESULTS_FOLDER/*/metrics | sed "s/'//g" | awk 'BEGIN {IFS="\t";OFS="\t"}{if($3 != "" )print $0}' > $report_folder'/all_metrics'
-echo create_metric_table $report_folder'/all_metrics' sample $report_folder'/metric_table' -c $report_folder'/corrupted_samples'
+create_metric_table $report_folder'/all_metrics' sample $report_folder'/metric_table' -c $report_folder'/corrupted_samples'
 
 full_path_tagets=`ls $TARGETS_FOLDER/*_target.txt | tr "\n" ","` 
 full_path_tagets=${full_path_tagets%?}
