@@ -18,6 +18,7 @@ export TARGETS_FOLDER=$CODE_PATH'/TARGETS'	#-------#	Set the folder that stores 
 export link_path=''	#-------#	Folder with cleaned samples following the AutoFlow results folder structure. Folder must contain {sample_name}/seqtrimbb_0000/output_files. output_files folder will be linked
 export ADD_trimming_opt=""	#-------#	Additional triming options. Semicolon (:) equals to spaces ( ), and exclamation marks (!) to commas (,). Please consider this to replace
 export keep_bam=FALSE #-------#	Keep bam files after aligning. Set this variable to 'TRUE' to keep these files in the output folder.
+export bam_coords="" #-------# Path to bed file with genome coordinates to keep in BAM files. Leave empty ("") to disable.
 export launch_login=FALSE 	#-------#	Login execution mode. Set this variable to 'TRUE' to execute all modules in login.
 
 ######	SAMPLES VARIABLES	#######
