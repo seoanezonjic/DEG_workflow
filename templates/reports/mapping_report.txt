@@ -519,7 +519,7 @@ end.rcode-->
 	cat(plotter$create_title("Percentages of reads per sample mapping to the most highly expressed genes", "most_expressed", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 	n <- 5
-	cat(plotter$table("all_counts", header = TRUE, row_names = TRUE, text = FALSE,table_rownames = TRUE,styled = "dt", func = make_top_n_expression_table))
+	cat(plotter$table(list(id = "all_counts", header = TRUE, row_names = TRUE, text = FALSE,table_rownames = TRUE,styled = "dt", func = make_top_n_expression_table)))
 
 end.rcode-->
 
