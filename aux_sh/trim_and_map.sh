@@ -13,7 +13,9 @@ while IFS= read sample; do
 	\\$organism=$organism,
 	\\$ADD_trimming_opt=$ADD_trimming_opt,
 	\\$link_path=\"$link_path\",
-	\\$bam_coords=$bam_coords
+	\\$bam_coords=$bam_coords,
+	\\$var_intervals=$var_intervals,
+	\\$only_read_ref=$only_read_ref
 	" | tr -d [:space:]`
 
 	if `echo $experiment_type | grep -q "^RNAseq"`; then
