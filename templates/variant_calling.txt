@@ -1,0 +1,28 @@
+
+get_interval_variants){
+	module load picard/2.20.2
+    module load samtools/1.16
+    split_intervals=`printf '%s\n' "$var_intervals" | sed 's/;/ -L /g'`
+    picard AddOrReplaceReadGroups I=align_rna_seq)/sorted_mappings.bam \
+						          SO=coordinate O=RG.bam RGID=4 RGLB=lib1 \
+						          RGPL=ILLUMINA RGPU=unit1 RGSM=$sample
+    samtools index RG.bam
+    module unload picard
+    module load gatk
+	?
+    gatk HaplotypeCaller --java-options '-Xmx10G' -I RG.bam \
+	                     -R $only_read_ref/genome.fa -L $split_intervals \
+	                     --dont-use-soft-clipped-bases --sequence-dictionary $only_read_ref/genome.dict \
+	                     -stand-call-conf 20.0 --disable-read-filter MappingQualityAvailableReadFilter \
+	                     --output-mode EMIT_ALL_CONFIDENT_SITES \
+	                     -O variants.vcf.gz
+    tabix -f -p vcf variants.vcf.gz
+    filteredVariants=`gatk CountVariants -V variants.vcf.gz | tail -n 1`
+    if [[ -z $filteredVariants ]]; then
+        echo ERROR: missing output vcf.
+        exit 1
+    else
+        echo -e $sample"\tinterval_variants\t"$filteredVariants >> ../metrics
+        # rm RG.bam*
+    fi
+}

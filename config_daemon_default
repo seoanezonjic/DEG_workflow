@@ -18,7 +18,6 @@ export TARGETS_FOLDER=$CODE_PATH'/TARGETS'	#-------#	Set the folder that stores 
 export link_path=''	#-------#	Folder with cleaned samples following the AutoFlow results folder structure. Folder must contain {sample_name}/seqtrimbb_0000/output_files. output_files folder will be linked
 export ADD_trimming_opt=""	#-------#	Additional triming options. Semicolon (:) equals to spaces ( ), and exclamation marks (!) to commas (,). Please consider this to replace
 export keep_bam=FALSE #-------#	Keep bam files after aligning. Set this variable to 'TRUE' to keep these files in the output folder.
-export bam_coords="" #-------# Path to bed file with genome coordinates to keep in BAM files. Leave empty ("") to disable.
 export launch_login=FALSE 	#-------#	Login execution mode. Set this variable to 'TRUE' to execute all modules in login.
 
 ######	SAMPLES VARIABLES	#######
@@ -52,7 +51,11 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	export read_layout='paired'	#-------#	Read layout must be defined as 'paired' in case of paired-end samples or 'single' in case of single-end samples
 	export stranded='yes'	#-------#	This parametrer must be changed in case of not-stranded sequencing only (rare case)
 	export miRNA_det_path=""	#-------#	Path to miRNA detection execution folder. This folder is only inspected to create the final results pack
-
+	export bam_coords="" #-------# Path to bed file with genome coordinates to keep in BAM files. Leave empty ("") to disable.
+	export var_intervals="chr1:1-100&chr2:2-200" #-------# Genomic intervals to variant call (low confidence). If empty, variant calling will not be performed. If high-confidence variant calling is required, please use https://github.com/AEstebanMar/alignment_vc_pipeline. Specify more than one interval by separating them with "&".
+	if [[ $var_intervals != "" ]]; then
+		export TEMPLATE=$TEMPLATE","$CODE_PATH"/templates/variant_calling.txt"
+	fi
 
 	################## Differential expression analysis variables #####################
 	##### IMPORTANT: To delete a variable, you just have to define it as an empty string
