@@ -52,7 +52,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	export stranded='yes'	#-------#	This parametrer must be changed in case of not-stranded sequencing only (rare case)
 	export miRNA_det_path=""	#-------#	Path to miRNA detection execution folder. This folder is only inspected to create the final results pack
 	export bam_coords="" #-------# Path to bed file with genome coordinates to keep in BAM files. Leave empty ("") to disable.
-	export var_intervals="chr1:1-100&chr2:2-200" #-------# Genomic intervals to variant call (low confidence). If empty, variant calling will not be performed. If high-confidence variant calling is required, please use https://github.com/AEstebanMar/alignment_vc_pipeline. Specify more than one interval by separating them with "&".
+	export var_intervals="chr1:1-100;chr2:2-200" #-------# Genomic intervals to variant call (low confidence). If empty, variant calling will not be performed. If high-confidence variant calling is required, please use https://github.com/AEstebanMar/alignment_vc_pipeline. Specify more than one interval by separating them with "&".
 	if [[ $var_intervals != "" ]]; then
 		export TEMPLATE=$TEMPLATE","$CODE_PATH"/templates/variant_calling.txt"
 	fi
