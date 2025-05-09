@@ -2,27 +2,59 @@
 get_interval_variants){
 	module load picard/2.20.2
     module load samtools/1.16
-    split_intervals=`printf '%s\n' "$var_intervals" | sed 's/;/ -L /g'`
-    picard AddOrReplaceReadGroups I=align_rna_seq)/sorted_mappings.bam \
+    split_intervals=`printf '%s\n' "$var_intervals" | sed 's/;/\n/g'`
+    rm interval_list.bed
+    echo -e 
+    for interval in $split_intervals; do
+        chr=`echo $interval | cut -f 1 -d :`
+        start=`echo $interval | cut -f 2 -d : | cut -f 1 -d -`
+        end=`echo $interval | cut -f 2 -d : | cut -f 2 -d -`
+        echo -e $chr"\t"$start"\t"$end >> interval_list.bed
+    done
+    ln -s align_rna_seq)/sorted_mappings.bam sorted_mappings.bam
+    samtools index sorted_mappings.bam
+    samtools view -b sorted_mappings.bam -L interval_list.bed > region.bam
+    samtools index region.bam
+    picard AddOrReplaceReadGroups I=region.bam \
 						          SO=coordinate O=RG.bam RGID=4 RGLB=lib1 \
 						          RGPL=ILLUMINA RGPU=unit1 RGSM=$sample
     samtools index RG.bam
     module unload picard
     module load gatk
+    gatk MarkDuplicates --INPUT RG.bam --OUTPUT formatted_dep.bam  \
+                        --CREATE_INDEX true --VALIDATION_STRINGENCY SILENT \
+                        --METRICS_FILE output.metrics
+    module load bcftools/1.16
+    module load samtools/1.16
+    gatk ReorderSam --INPUT formatted_dep.bam \
+                    --OUTPUT formatted_reorder.bam \
+                    --SEQUENCE_DICTIONARY $only_read_ref/genome.dict \
+                    --CREATE_INDEX true
+    gatk SplitNCigarReads -R $only_read_ref/genome.fa -I formatted_reorder.bam -O formatted_split.bam
+    samtools index formatted_split.bam
 	?
-    gatk HaplotypeCaller --java-options '-Xmx10G' -I RG.bam \
-	                     -R $only_read_ref/genome.fa -L $split_intervals \
+    gatk HaplotypeCaller --java-options '-Xmx10G' -I formatted_split.bam \
+	                     -R $only_read_ref/genome.fa -L interval_list.bed \
 	                     --dont-use-soft-clipped-bases --sequence-dictionary $only_read_ref/genome.dict \
-	                     -stand-call-conf 20.0 --disable-read-filter MappingQualityAvailableReadFilter \
+	                     -stand-call-conf 20.0 \
 	                     --output-mode EMIT_ALL_CONFIDENT_SITES \
 	                     -O variants.vcf.gz
-    tabix -f -p vcf variants.vcf.gz
-    filteredVariants=`gatk CountVariants -V variants.vcf.gz | tail -n 1`
+    gatk VariantFiltration -R $only_read_ref/genome.fa -V variants.vcf.gz \
+                           --filter-expression "DP < 5.0" \
+                           --filter-name DP \
+                           --filter-expression "QD < 2.0" \
+                           --filter-name QD \
+                           -O filtered.vcf.gz
+    tabix -f -p vcf filtered.vcf.gz
+    filteredVariants=`gatk CountVariants -V filtered.vcf.gz | tail -n 1`
     if [[ -z $filteredVariants ]]; then
         echo ERROR: missing output vcf.
         exit 1
     else
         echo -e $sample"\tinterval_variants\t"$filteredVariants >> ../metrics
-        # rm RG.bam*
+        rm RG.bam* region.bam*
+        if [[ "$keep_bam" == FALSE ]]; then
+            rm formatted*.bam*
+        fi
     fi
 }
