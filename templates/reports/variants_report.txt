@@ -1,0 +1,4 @@
+
+<!--begin.rcode multiVCF_table, results='asis', echo=FALSE
+	cat(plotter$table(list(id = "all_variants.txt", header = TRUE, row_names = FALSE, table_rownames = FALSE, styled = "dt", text = "dynamic")))
+end.rcode-->
