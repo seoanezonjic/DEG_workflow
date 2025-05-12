@@ -47,6 +47,23 @@ if [ "$module" == "2b" ] ; then
 	exit
 fi
 
+if [ "$module" == "2c" ] ; then
+	echo "Preparing multiVCF"
+	mkdir -p $VARIANT_RESULTS_FOLDER
+	module load bcftools/1.21
+	source ~soft_bio_267/initializes/init_htmlreportR
+	vcf=`find $MAPPING_RESULTS_FOLDER/*/gatk_0000/filtered.vcf.gz`
+	bcftools merge $vcf --output-type z --output $VARIANT_RESULTS_FOLDER/"combined.vcf.gz"
+	header=`bcftools view -h $VARIANT_RESULTS_FOLDER/"combined.vcf.gz" | tail -n 1`
+	bcftools view -H $VARIANT_RESULTS_FOLDER/"combined.vcf.gz" -o $VARIANT_RESULTS_FOLDER/"all_variants.txt"
+	sed -i "1i $header" $VARIANT_RESULTS_FOLDER/"all_variants.txt"
+	sed -i "s/#//g" $VARIANT_RESULTS_FOLDER/"all_variants.txt"
+	echo Command called: html_report.R -t $REPORT_TEMPLATES_FOLDER/variants_report.txt -o $report_folder/variants_report.html -d "$VARIANT_RESULTS_FOLDER/all_variants.txt" --title "Variant analysis report"
+	html_report.R -t $REPORT_TEMPLATES_FOLDER/variants_report.txt -o $report_folder/variants_report.html -d "$VARIANT_RESULTS_FOLDER/all_variants.txt" --title "Variant analysis report"
+	echo "Report built in "$report_folder"/variants_report.html"
+	exit
+fi
+
 export TARGETS=1
 if [ $experiment_type != "miRNAseq_detection" ] ; then 
 
@@ -54,7 +71,6 @@ if [ $experiment_type != "miRNAseq_detection" ] ; then
 	mkdir $TARGETS_FOLDER
 	eval "$generate_targets"
 	export TARGETS=`ls $TARGETS_FOLDER/*_target.txt | rev | cut -f 1 -d "/" | rev | tr "\n" ","` ; TARGETS=${TARGETS%?}	#-------#	Target file location, including a short sample description	
-	
 
 fi 
 n_target=`echo $TARGETS |tr "," "\n" | wc -l `
@@ -90,6 +106,7 @@ if [ "$module" == "4b" ]; then
 		sbatch $AUXSH_PATH/launch_fun_hun.sh $module
 	fi
 fi
+
 if [ "$module" == "5" ]; then
 	echo "Creating ExpHunterSuite results pack"
 	create_hunter_pack.sh $ADD_OPTIONS
