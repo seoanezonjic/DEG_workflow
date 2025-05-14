@@ -57,6 +57,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	if [[ $var_intervals != "" ]]; then
 		export TEMPLATE=$TEMPLATE","$CODE_PATH"/templates/variant_calling.txt"
 	fi
+	export query_genes="ENSG00000100417;ENSG00000140650" #-------# Genes to explore in expression analysis. Use ENS symbol, and separate them with semicolons (";").
 
 	################## Differential expression analysis variables #####################
 	##### IMPORTANT: To delete a variable, you just have to define it as an empty string
