@@ -16,7 +16,7 @@ source $CONFIG_DAEMON
 
 ## STAGE EXECUTION
 #######################################################################
-mkdir -p  $MAPPING_RESULTS_FOLDER
+mkdir -p $MAPPING_RESULTS_FOLDER
 
 
 if [ "$module" == "1a" ] ; then
