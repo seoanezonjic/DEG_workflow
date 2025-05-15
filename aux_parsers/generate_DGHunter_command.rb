@@ -133,6 +133,10 @@ def parse_string_command(cmd, mode)
 			option.on("--multifactorial string") do |item|
 				options["multifactorial"] = ["--multifactorial", item]
 			end
+
+			option.on("-q string", "--query_genes string") do |item|
+				options["query_genes"] = ["--query_genes", item]
+			end
 		end
 
 	elsif mode == 'functional_Hunter'
