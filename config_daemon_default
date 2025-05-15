@@ -14,7 +14,7 @@ export transcriptome=''	#-------#	Path to transcriptome must be specified when u
 export RESOURCES="-c 2 -t 10:00:00 -m 10"	#-------#	AutoFlow resources setting 
 export project_folder=`pwd`'/project_execution'	#-------#	Global execution folder 
 export MAPPING_RESULTS_FOLDER=$project_folder'/clean_and_map'	#-------#	Secondary execution path
-export VARIANT_RESULTS_FOLDER=$project_folder'/variants' #-------# Path for variant analysis results
+export VARIANT_RESULTS_FOLDER=$project_folder'/variant_analysis' #-------# Path for variant analysis results
 export TARGETS_FOLDER=$CODE_PATH'/TARGETS'	#-------#	Set the folder that stores all target files. DEFAULT: TARGETS_FOLDER=$CODE_PATH'/TARGETS'
 export link_path=''	#-------#	Folder with cleaned samples following the AutoFlow results folder structure. Folder must contain {sample_name}/seqtrimbb_0000/output_files. output_files folder will be linked
 export ADD_trimming_opt=""	#-------#	Additional triming options. Semicolon (:) equals to spaces ( ), and exclamation marks (!) to commas (,). Please consider this to replace
