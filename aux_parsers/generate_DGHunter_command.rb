@@ -255,7 +255,8 @@ de_variables = {
 	"min_libraries" => ["-l"],
 	"string_features" => ["-S"],
 	"numeric_features" => ["-N"],
-	"target_path" => ["-t"]
+	"target_path" => ["-t"],
+	"query_genes" => ["-q"]
 }
 
 fun_variables = {
