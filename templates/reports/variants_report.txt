@@ -1,4 +1,27 @@
 
+<!--begin.rcode format_variants
+	variants <- plotter$hash_vars$all_variants.txt
+	colnames(variants) <- variants[1, ]
+	variants <- variants[-1, ]
+	variants$GENE <- "?"
+	variants$MUT <- "?"
+	plotter$hash_vars$all_variants <- variants
+end.rcode-->
+
+<!--begin.rcode add_effects, eval = nrow(plotter$hash_vars$all_variant_effects.txt) > 0
+	effects <- plotter$hash_vars$all_variant_effects.txt
+	colnames(effects) <- c("CHROM", "POS", "REF", "ALT", "GENE", "MUT")
+	variants <- plotter$hash_vars$all_variants
+	for(pos in unique(effects$POS)) {
+		matched_variants <- variants[variants$POS == pos, ]
+		matched_variants$GENE <- effects[unique(effects$POS) == pos, ]$GENE
+		matched_effects <- match(matched_variants$ALT, effects$ALT)
+		matched_variants$MUT <- effects[matched_effects, , drop = FALSE]$MUT
+		variants[variants$POS == pos, ] <- matched_variants
+	}
+	plotter$hash_vars$all_variants <- variants
+end.rcode-->
+
 <!--begin.rcode multiVCF_table, results='asis', echo=FALSE
-	cat(plotter$table(list(id = "all_variants.txt", header = TRUE, row_names = FALSE, table_rownames = FALSE, styled = "dt", text = "dynamic")))
+	cat(plotter$table(list(id = "all_variants", header = NULL, row_names = FALSE, table_rownames = FALSE, styled = "dt", text = "dynamic")))
 end.rcode-->

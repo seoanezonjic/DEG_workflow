@@ -2,9 +2,9 @@
 get_interval_variants){
 	module load picard/2.20.2
     module load samtools/1.16
+    source ~soft_bio_267/initializes/init_pets
     split_intervals=`printf '%s\n' "$var_intervals" | sed 's/;/\n/g'`
     rm interval_list.bed
-    echo -e 
     for interval in $split_intervals; do
         chr=`echo $interval | cut -f 1 -d :`
         start=`echo $interval | cut -f 2 -d : | cut -f 1 -d -`
@@ -45,8 +45,17 @@ get_interval_variants){
                            --filter-name QD \
                            -O filtered.vcf.gz
     tabix -f -p vcf filtered.vcf.gz
-    filteredVariants=`gatk CountVariants -V filtered.vcf.gz | tail -n 1`
-    if [[ -z $filteredVariants ]]; then
+    gunzip -c filtered.vcf.gz | sed 's/^chr//g' > tmp.vcf
+    vcf2effects -i tmp.vcf -o var_effects.txt -g 'GRCh38'
+    retVal=$?
+    if [ $retVal -ne 0 ]; then
+        echo ERROR: Cellranger exited with code $retVal
+        exit $retVal
+    else
+        rm -r ./$experiment_name/SC_MULTI_CS ./$experiment_name/_* ./$experiment_name/$experiment_name.mri.tgz
+    fi
+    cleanVariants=`gatk CountVariants -V variants.vcf | tail -n 1`
+    if [[ -z $cleanVariants ]]; then
         echo ERROR: missing output vcf.
         exit 1
     else
