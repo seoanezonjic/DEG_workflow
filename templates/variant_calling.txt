@@ -39,10 +39,10 @@ get_interval_variants){
 	                     -stand-call-conf 20.0 --output-mode EMIT_VARIANTS_ONLY \
 	                     -O variants.vcf.gz
     gatk VariantFiltration -R $only_read_ref/genome.fa -V variants.vcf.gz \
-                           --filter-expression "DP < 10.0" \
-                           --filter-name DP \
-                           --filter-expression "QD < 2.0" \
-                           --filter-name QD \
+                           --genotype-filter-expression "DP < 10.0" \
+                           --genotype-filter-name DP \
+                           --genotype-filter-expression "QD < 2.0" \
+                           --genotype-filter-name QD \
                            -O filtered.vcf.gz
     tabix -f -p vcf filtered.vcf.gz
     gunzip -c filtered.vcf.gz | sed 's/^chr//g' > tmp.vcf
