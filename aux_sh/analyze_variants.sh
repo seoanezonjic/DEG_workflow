@@ -7,7 +7,7 @@ hostname
 echo "Preparing multiVCF"
 mkdir -p $VARIANT_RESULTS_FOLDER
 module load bcftools/1.21
-source ~soft_bio_267/initializes/init_htmlreportR
+source ~soft_bio_267/initializes/init_R
 vcf=`find $MAPPING_RESULTS_FOLDER/*/gatk_0000/filtered.vcf.gz`
 bcftools merge $vcf --output-type z --output $VARIANT_RESULTS_FOLDER/"combined.vcf.gz"
 header=`bcftools view -h $VARIANT_RESULTS_FOLDER/"combined.vcf.gz" | tail -n 1`
