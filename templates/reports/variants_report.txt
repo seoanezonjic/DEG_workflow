@@ -14,7 +14,7 @@ end.rcode-->
 	variants <- plotter$hash_vars$all_variants
 	for(pos in unique(effects$POS)) {
 		matched_variants <- variants[variants$POS == pos, ]
-		matched_variants$GENE <- effects[unique(effects$POS) == pos, ]$GENE
+		matched_variants$GENE <- unique(effects[effects$POS == pos, ]$GENE)
 		matched_effects <- match(matched_variants$ALT, effects$ALT)
 		matched_variants$MUT <- effects[matched_effects, , drop = FALSE]$MUT
 		variants[variants$POS == pos, ] <- matched_variants
