@@ -38,6 +38,7 @@ get_interval_variants){
         exit $retVal
     else
         rm formatted_reorder.ba* formatted_dep.ba* region.ba*
+    fi
 	?
     gatk HaplotypeCaller --java-options '-Xmx10G' -I formatted_split.bam \
 	                     -R $only_read_ref/genome.fa -L interval_list.bed \
