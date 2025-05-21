@@ -14,15 +14,25 @@ end.rcode-->
 	variants <- plotter$hash_vars$all_variants
 	for(pos in unique(effects$POS)) {
 		matched_vars <- variants[variants$POS == pos, ]
-		effects_subset <- effects[effects$POS == pos, ]
-		matched_vars$GENE <- unique(effects_subset$GENE)
-		matched_effects <- match(matched_vars$ALT, effects_subset$ALT)
-		matched_vars$MUT <- effects_subset[matched_effects, , drop = FALSE]$MUT
-		variants[variants$POS == pos, ] <- matched_vars
+		if(nrow(matched_vars) > 0) {
+			effects_subset <- effects[effects$POS == pos, ]
+			matched_vars$GENE <- unique(effects_subset$GENE)
+			matched_effects <- match(matched_vars$ALT, effects_subset$ALT)
+			matched_vars$MUT <- effects_subset[matched_effects, , drop = FALSE]$MUT
+			variants[variants$POS == pos, ] <- matched_vars
+		}
 	}
 	plotter$hash_vars$all_variants <- variants
 end.rcode-->
 
 <!--begin.rcode multiVCF_table, results='asis', echo=FALSE
+	cat("<p>Brief explanation of VCF format:</p>")
+	info <- list(CHROM = "Contig on which the variant occurs", POS = "Genomic coordinates", ID = "Variant identifier (optional)", REF = "Reference allele",
+				 ALT = "Observed alternative allele(s)", QUAL = "Phred-scaled probability that a REF/ALT polymorphism exists given sequencing data",
+				 FILTER = "Name of filters variant fails to pass, or PASS if all filters were passed. In this report, only PASS variants are shown.",
+				 INFO = "Site-levels annotations. Contains potentially uninformative reads.", FORMAT = "Site-levels annotations WITHOUT potentially uninformative reads.")
+	cat(make_html_list(list_content = info))
+	cat("<p>Summary of genotyping information</p>")
+
 	cat(plotter$table(list(id = "all_variants", header = NULL, row_names = FALSE, table_rownames = FALSE, styled = "dt", text = "dynamic")))
 end.rcode-->
