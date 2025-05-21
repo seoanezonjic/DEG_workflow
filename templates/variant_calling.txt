@@ -32,6 +32,12 @@ get_interval_variants){
                     --CREATE_INDEX true
     gatk SplitNCigarReads -R $only_read_ref/genome.fa -I formatted_reorder.bam -O formatted_split.bam
     samtools index formatted_split.bam
+    retVal=$?
+    if [ $retVal -ne 0 ]; then
+        echo ERROR: Something went wrong when subsetting the BAM file.
+        exit $retVal
+    else
+        rm formatted_reorder.ba* formatted_dep.ba* region.ba*
 	?
     gatk HaplotypeCaller --java-options '-Xmx10G' -I formatted_split.bam \
 	                     -R $only_read_ref/genome.fa -L interval_list.bed \
@@ -40,29 +46,30 @@ get_interval_variants){
 	                     -O variants.vcf.gz
     gatk VariantFiltration -R $only_read_ref/genome.fa -V variants.vcf.gz \
                            --genotype-filter-expression "DP < 10.0" \
-                           --genotype-filter-name DP \
+                           --genotype-filter-name DP_OUT \
                            --genotype-filter-expression "QD < 2.0" \
-                           --genotype-filter-name QD \
-                           -O filtered.vcf.gz
+                           --genotype-filter-name QD_OUT \
+                           -O tagged.vcf.gz
+    bcftools view tagged.vcf.gz | grep -v DP_OUT | grep -v QD_OUT | bgzip > filtered.vcf.gz
     tabix -f -p vcf filtered.vcf.gz
     gunzip -c filtered.vcf.gz | sed 's/^chr//g' > tmp.vcf
     vcf2effects -i tmp.vcf -o var_effects.txt -g 'GRCh38'
     retVal=$?
     if [ $retVal -ne 0 ]; then
-        echo ERROR: Cellranger exited with code $retVal
+        echo ERROR: vcf2effects has failed.
         exit $retVal
-    else
-        rm -r ./$experiment_name/SC_MULTI_CS ./$experiment_name/_* ./$experiment_name/$experiment_name.mri.tgz
     fi
-    cleanVariants=`gatk CountVariants -V variants.vcf | tail -n 1`
+    cleanVariants=`gatk CountVariants -V variants.vcf.gz | tail -n 1`
     if [[ -z $cleanVariants ]]; then
         echo ERROR: missing output vcf.
         exit 1
     else
+        rm tmp.vcf
+        rm tagged_vcf.gz
         echo -e $sample"\tinterval_variants\t"$filteredVariants >> ../metrics
         rm RG.bam* region.bam*
         if [[ "$keep_bam" == FALSE ]]; then
-            rm formatted*.bam*
+            rm formatted_split.bam
         fi
     fi
 }
