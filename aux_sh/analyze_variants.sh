@@ -21,6 +21,10 @@ rm $VARIANT_RESULTS_FOLDER/"all_variant_effects.txt"
 for effect in $effects; do
 	cat $effect >> $VARIANT_RESULTS_FOLDER/"all_variant_effects.txt"
 done
+if [ ! -s $VARIANT_RESULTS_FOLDER/"all_variant_effects.txt" ]; then
+	echo No known variants have been identified. No variant effects predicted.
+	echo -e No_variants_detected > $VARIANT_RESULTS_FOLDER/"all_variant_effects.txt"
+fi
 echo "Command called: html_report.R -t $REPORT_TEMPLATES_FOLDER'/variants_report.txt' -o $VARIANT_RESULTS_FOLDER'/variants_report.html' -d $VARIANT_RESULTS_FOLDER'/all_variants.txt',$VARIANT_RESULTS_FOLDER'/all_variant_effects.txt' --title 'Variant analysis report'"
 html_report.R -t $REPORT_TEMPLATES_FOLDER'/variants_report.txt' -o $VARIANT_RESULTS_FOLDER'/variants_report.html' -d $VARIANT_RESULTS_FOLDER'/all_variants.txt',$VARIANT_RESULTS_FOLDER'/all_variant_effects.txt' --title 'Variant analysis report'
 echo "Report built in "$VARIANT_RESULTS_FOLDER"/variants_report.html"
