@@ -1,3 +1,11 @@
+<!--begin.rcode setup
+	sort_info <- function(info) {
+		split_info <- strsplit(info, ";")
+		sorted_info <- lapply(split_info, sort)
+		res <- lapply(sorted_info, paste, collapse = ";")
+		return(res)
+	}
+end.rcode-->
 
 <!--begin.rcode format_variants
 	variants <- plotter$hash_vars$all_variants.txt
@@ -5,6 +13,7 @@
 	variants <- variants[-1, ]
 	variants$GENE <- "?"
 	variants$MUT <- "?"
+	variants$INFO <- sort_info(variants$INFO)
 	plotter$hash_vars$all_variants <- variants
 end.rcode-->
 
@@ -36,7 +45,13 @@ end.rcode-->
 			  "FILTER: Name of filters variant fails to pass, or PASS if all filters were passed. In this report, only PASS variants are shown.",
 			  "INFO: Site-levels annotations. Contains potentially uninformative reads.", "FORMAT: Site-levels annotations WITHOUT potentially uninformative reads.")
 	cat(make_html_list(list_content = info))
+	var_info <- c("GT: the genotype of this sample at this site. 0 for REF allele, 1 for 1st ALT allele, 2 for 2nd, and so on.",
+				  "AD, DP: allele (unfiltered) depth and filtered depth of coverage.",
+				  "PL: normalized phred-scaled likelihood of each possible genotype (for diploid biallelic sites: 0/0 vs 0/1 vs 1/1).",
+				  "GQ: pred-scaled quality of assigned genotype.")
 	cat("<p>Summary of genotyping information</p>")
-
+	cat(make_html_list(list_content = var_info))
+	cat("<p> For predicted variants, ? means no information was available in variant effect predictor. NA means that an unknown variant
+		was detected in that genomic position. </p>")
 	cat(plotter$table(list(id = "all_variants", header = NULL, row_names = FALSE, table_rownames = FALSE, styled = "dt", text = "dynamic")))
 end.rcode-->
