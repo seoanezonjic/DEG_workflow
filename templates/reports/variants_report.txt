@@ -9,15 +9,16 @@
 end.rcode-->
 
 <!--begin.rcode add_effects, eval = nrow(plotter$hash_vars$all_variant_effects.txt) > 0
-	effects <- plotter$hash_vars$all_variant_effects.txt
+	effects <- unique(plotter$hash_vars$all_variant_effects.txt)
 	colnames(effects) <- c("CHROM", "POS", "REF", "ALT", "GENE", "MUT")
 	variants <- plotter$hash_vars$all_variants
 	for(pos in unique(effects$POS)) {
-		matched_variants <- variants[variants$POS == pos, ]
-		matched_variants$GENE <- unique(effects[effects$POS == pos, ]$GENE)
-		matched_effects <- match(matched_variants$ALT, effects$ALT)
-		matched_variants$MUT <- effects[matched_effects, , drop = FALSE]$MUT
-		variants[variants$POS == pos, ] <- matched_variants
+		matched_vars <- variants[variants$POS == pos, ]
+		effects_subset <- effects[effects$POS == pos, ]
+		matched_vars$GENE <- unique(effects_subset$GENE)
+		matched_effects <- match(matched_vars$ALT, effects_subset$ALT)
+		matched_vars$MUT <- effects_subset[matched_effects, , drop = FALSE]$MUT
+		variants[variants$POS == pos, ] <- matched_vars
 	}
 	plotter$hash_vars$all_variants <- variants
 end.rcode-->
