@@ -54,7 +54,12 @@ get_interval_variants){
     bcftools view tagged.vcf.gz | grep -v DP_OUT | grep -v QD_OUT | bgzip > filtered.vcf.gz
     tabix -f -p vcf filtered.vcf.gz
     gunzip -c filtered.vcf.gz | sed 's/^chr//g' > tmp.vcf
-    vcf2effects -i tmp.vcf -o var_effects.txt -g 'GRCh38'
+    if [ "$organism" == "human" ]; then
+        genome="GRCh38"
+    elif [ "$organism" == "mouse" ]; then
+        genome="GRCm39"
+    fi
+    vcf2effects -i tmp.vcf -o var_effects.txt -g $genome
     retVal=$?
     if [ $retVal -ne 0 ]; then
         echo ERROR: vcf2effects has failed.
