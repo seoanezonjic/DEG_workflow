@@ -57,7 +57,7 @@ get_interval_variants){
     if [ "$organism" == "human" ]; then
         genome="GRCh38"
     elif [ "$organism" == "mouse" ]; then
-        genome="GRCm39"
+        genome="GRCm38"
     fi
     vcf2effects -i tmp.vcf -o var_effects.txt -g $genome
     retVal=$?
