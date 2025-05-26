@@ -43,8 +43,7 @@ get_interval_variants){
     gatk HaplotypeCaller --java-options '-Xmx10G' -I formatted_split.bam \
 	                     -R $only_read_ref/genome.fa -L interval_list.bed \
 	                     --dont-use-soft-clipped-bases --sequence-dictionary $only_read_ref/genome.dict \
-	                     -stand-call-conf 20.0 --output-mode EMIT_VARIANTS_ONLY \
-	                     -O variants.vcf.gz
+	                     -stand-call-conf 20.0 -O variants.vcf.gz
     gatk VariantFiltration -R $only_read_ref/genome.fa -V variants.vcf.gz \
                            --genotype-filter-expression "DP < 10.0" \
                            --genotype-filter-name DP_OUT \
