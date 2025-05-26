@@ -7,7 +7,7 @@
 	}
 end.rcode-->
 
-<!--begin.rcode format_variants
+<!--begin.rcode format_variants, eval = nrow(plotter$hash_vars$all_variants.txt) > 1
 	variants <- plotter$hash_vars$all_variants.txt
 	colnames(variants) <- variants[1, ]
 	variants <- variants[-1, ]
@@ -67,5 +67,9 @@ end.rcode-->
 				"or <a href = https://docs.varsome.com/en/vcf-attributes-explained> this unofficial resource </a>.<p>"))
 	cat("<p> For predicted variants, ? means no information was available in variant effect predictor. NA means that an unknown variant
 		was detected in that genomic position. </p>")
-	cat(plotter$table(list(id = "all_variants", header = NULL, row_names = FALSE, table_rownames = FALSE, styled = "dt", text = "dynamic")))
+	if(!is.null(plotter$hash_vars[["all_variants"]])) {
+		cat(plotter$table(list(id = "all_variants", header = NULL, row_names = FALSE, table_rownames = FALSE, styled = "dt", text = "dynamic")))
+	} else {
+		cat("<p>No variants have been identified</p>")
+	}
 end.rcode-->
