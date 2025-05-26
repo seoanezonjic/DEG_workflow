@@ -9,7 +9,8 @@ mkdir -p $VARIANT_RESULTS_FOLDER
 module load bcftools/1.21
 source ~soft_bio_267/initializes/init_R
 vcf=`find $MAPPING_RESULTS_FOLDER/*/gatk_0000/filtered.vcf.gz`
-bcftools merge $vcf --output-type z --output $VARIANT_RESULTS_FOLDER/"combined.vcf.gz"
+bcftools merge $vcf --output-type z --output $VARIANT_RESULTS_FOLDER/"tmp.vcf.gz"
+bcftools norm -m- $VARIANT_RESULTS_FOLDER/"tmp.vcf.gz" -o $VARIANT_RESULTS_FOLDER/"combined.vcf.gz"
 header=`bcftools view -h $VARIANT_RESULTS_FOLDER/"combined.vcf.gz" | tail -n 1`
 bcftools view -H $VARIANT_RESULTS_FOLDER/"combined.vcf.gz" -o $VARIANT_RESULTS_FOLDER/"tmp_variants.txt"
 grep PASS $VARIANT_RESULTS_FOLDER/"tmp_variants.txt" > $VARIANT_RESULTS_FOLDER/"all_variants.txt"
