@@ -18,7 +18,7 @@ end.rcode-->
 end.rcode-->
 
 <!--begin.rcode add_effects, eval = ncol(plotter$hash_vars$all_variant_effects.txt) > 0 & !is.null(plotter$hash_vars[["all_variants"]])
-	if(plotter$hash_vars$all_variant_effects.txt[[1]][1] == "No_variants_detected") {
+	if(plotter$hash_vars$all_variant_effects.txt[[1]][1] == "No_known_variants_detected") {
 		cat("<p>No known variants identified, effects could not be predicted.</p>")
 	} else {
 		effects <- unique(plotter$hash_vars$all_variant_effects.txt)
