@@ -41,15 +41,14 @@ get_interval_variants){
     fi
 	?
     gatk HaplotypeCaller --java-options '-Xmx10G' -I formatted_split.bam \
-	                     -R $only_read_ref/genome.fa -L interval_list.bed \
+	                     -R $only_read_ref/genome.fa -L interval_list.bed --output-mode EMIT_VARIANTS_ONLY \
 	                     --dont-use-soft-clipped-bases --sequence-dictionary $only_read_ref/genome.dict \
-	                     -stand-call-conf 20.0 -O variants.vcf.gz
+	                     -stand-call-conf 20.0 -O variants.vcf.gz --linked-de-bruijn-graph true
     gatk VariantFiltration -R $only_read_ref/genome.fa -V variants.vcf.gz \
                            --genotype-filter-expression "DP < 10.0" \
                            --genotype-filter-name DP_OUT \
                            --genotype-filter-expression "QD < 2.0" \
-                           --genotype-filter-name QD_OUT \
-                           -O tagged.vcf.gz
+                           --genotype-filter-name QD_OUT -O tagged.vcf.gz
     bcftools view tagged.vcf.gz | grep -v DP_OUT | grep -v QD_OUT | bgzip > filtered.vcf.gz
     tabix -f -p vcf filtered.vcf.gz
     gunzip -c filtered.vcf.gz | sed 's/^chr//g' > tmp.vcf
