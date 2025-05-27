@@ -14,7 +14,7 @@ bcftools norm -m- $VARIANT_RESULTS_FOLDER/"tmp.vcf.gz" -o $VARIANT_RESULTS_FOLDE
 header=`bcftools view -h $VARIANT_RESULTS_FOLDER/"combined.vcf.gz" | tail -n 1`
 bcftools view -H $VARIANT_RESULTS_FOLDER/"combined.vcf.gz" -o $VARIANT_RESULTS_FOLDER/"tmp_variants.txt"
 grep PASS $VARIANT_RESULTS_FOLDER/"tmp_variants.txt" > $VARIANT_RESULTS_FOLDER/"all_variants.txt"
-rm $VARIANT_RESULTS_FOLDER/"tmp_variants.txt"
+rm $VARIANT_RESULTS_FOLDER/"tmp_variants.txt" $VARIANT_RESULTS_FOLDER/"tmp.vcf.gz"
 sed -i "1i $header" $VARIANT_RESULTS_FOLDER/"all_variants.txt"
 sed -i "s/#//g" $VARIANT_RESULTS_FOLDER/"all_variants.txt"
 effects=`find $MAPPING_RESULTS_FOLDER/*/gatk_0000/var_effects.txt`
