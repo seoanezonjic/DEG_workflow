@@ -68,7 +68,10 @@ end.rcode-->
 	cat("<p> For predicted variants, ? means no information was available in variant effect predictor. NA means that an unknown variant
 		was detected in that genomic position. </p>")
 	if(!is.null(plotter$hash_vars[["all_variants"]])) {
-		cat(plotter$table(list(id = "all_variants", header = NULL, row_names = FALSE, table_rownames = FALSE, styled = "dt", text = "dynamic")))
+		mut_col <- ncol(plotter$hash_vars$all_variants)
+		gene_col <- mut_col - 1
+		reordered_vector <- c(1:5, gene_col, mut_col, 9, 10:(gene_col-1), 6, 8)
+		cat(plotter$table(list(id = "all_variants", header = NULL, fields = reordered_vector, row_names = FALSE, table_rownames = FALSE, styled = "dt", text = "dynamic")))
 	} else {
 		cat("<p>No variants have been identified</p>")
 	}
