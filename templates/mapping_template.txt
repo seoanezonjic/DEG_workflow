@@ -2,7 +2,7 @@
 ####################
 ### Trimming and mapping template. Parametres can be customized at config_deamon "Trimming and Mapping" section.
 
-clean_samples){
+%clean_samples){
  	resources: -u 1 -n cal -c 16 -t '7-00:00:00' -m '80gb'
 	module unload java
 	source ~soft_bio_267/initializes/init_stbb	
@@ -55,7 +55,6 @@ align_rna_seq){
 		parse_bowtie_log.sh bowtie_log | awk '{print "$sample" "\t" $0}' >> ../metrics
 	elif [ "$experiment_type" == "RNAseq_genome" ]; then
 		module load star/2.5.3a
-		source ~soft_bio_267/initializes/init_R
 		if [[ $organism == 'human' ]]; then # only human has PAR regions well defined
 			REF_type=Y_PAR_MASKED/STAR_index
 		else
@@ -70,6 +69,8 @@ align_rna_seq){
 			STAR --runThreadN [cpu] --genomeDir $ref/$REF_type --readFilesIn clean_samples)/output_files/sequences_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate --outReadsUnmapped Fastx
 			mv Unmapped.out.mate1 unmapped.fastq
 		fi
+		module purge
+		source ~soft_bio_267/initializes/init_R
 		rm Aligned.toTranscriptome.out.bam
 		parse_STAR_log.R -d Log.final.out | awk '{print "$sample" "\t" $0}' > star_log 
 		mkdir mapping_logs 
@@ -98,6 +99,7 @@ align_rna_seq){
 		sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
 		# Keep specific genomic regions
 		if [ "$bam_coords" != "" ]; then
+				module purge
 				module load bedtools/2.28.0
 				bedtools intersect -a sorted_mappings.bam -b $bam_coords > filtered_region.bam
 		fi
