@@ -1,0 +1,64 @@
+
+####################
+### Trimming and mapping template. Parametres can be customized at config_deamon "Trimming and Mapping" section.
+
+clean_samples){
+ 	resources: -u 1 -n cal -c 16 -t '7-00:00:00' -m '80gb'
+	module unload java
+	source ~soft_bio_267/initializes/init_stbb	
+	CPU=`echo "[cpu] - 2" | bc`
+	if [ "$ADD_trimming_opt" != "" ]; then
+                Add_trimming_opt=`echo ";$ADD_trimming_opt" | tr ':' ' '`
+        fi
+
+	if [ $link_path != "" ]; then
+		rm -rf output_files*
+		ln -s $link_path/$sample/seqtrimbb_0000/output_files ./	
+	else
+		if [ "$read_layout" == "paired" ]; then
+	? 
+			seqtrimbb -t $trim_template -Q $read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz' -P "minlength=$min_read_length`echo $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
+		elif [ "$read_layout" == "single" ] ; then
+			/usr/bin/time -o process_data -v seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -P "minlength=$min_read_length`echo -e $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
+		fi	
+	fi
+
+	if { [ ! -s output_files/paired_1.fastq.gz ] || [ ! -s output_files/paired_2.fastq.gz ]; } && [ ! -s output_files/sequences_.fastq.gz ]; then
+		>&2 echo "Trimming has failed"
+		exit 1
+	else 
+		module purge
+		. ~soft_bio_267/initializes/init_ruby
+		get_fastqc_data.rb -i 'output_files/initial_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tinitial_" $0 }' >> ../metrics
+		seqtrim_results_parser.rb -i "output_files/plugins_logs/*" | awk '{print "$sample" "\t" $0 }' >> ../metrics
+		echo -e "$sample\tpair_layout\t`ls output_files/*fastq.gz | wc -l`" >> ../metrics
+		get_fastqc_data.rb -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
+		mv output_files/report_files/* ./
+	fi
+}
+
+pseudo_align_rna_seq){ 
+	resources: -m '40gb' -c 16 -t '10:00:00' -n cal
+	#module load samtools/1.9 #not available on picasso now
+	source ~soft_bio_267/initializes/init_salmon
+	module load samtools/1.3	
+	module load qualimap/2.2.1
+    threads_opt=`echo "[cpu] / 2" |bc`
+	if [ "$read_layout" == "paired" ] ; then
+		salmon quant -i $ref/salmon_index -z --writeQualities -l A -1 clean_samples)/output_files/paired_1.fastq.gz -2 clean_samples)/output_files/paired_2.fastq.gz -p $threads_opt -o transcripts_quant | samtools sort --threads $threads_opt > sorted_mappings.bam
+
+	elif [ "$read_layout" == "single" ]; then
+		salmon quant -i $ref/salmon_index -z --writeQualities -l A -r clean_samples)/output_files/sequences_.fastq.gz -p $threads_opt -o transcripts_quant | samtools sort --threads $threads_opt > sorted_mappings.bam
+	fi
+
+	?
+	qualimap bamqc -nt [cpu] -bam sorted_mappings.bam -outdir results --java-mem-size=20G
+	if [ ! -s results/qualimapReport.html ]; then 
+		>&2 echo "Mapping step has failed"
+		exit 1
+	else
+		sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
+		#Removing temporal files
+		rm ./*.bam
+	fi
+}
