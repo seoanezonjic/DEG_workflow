@@ -42,7 +42,12 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	## RNA-seq variables
 	##################################
 	####### Mapping	#######
-
+	export mapping_type="general"
+	 if [[ $mapping_type == "pseudo" ]]; then
+                export TEMPLATE=$CODE_PATH"/templates/pseudo_mapping_template.txt"      #-------#       AutoFlow mapping template. It is advisable not to modify this variable
+        else
+                export TEMPLATE=$CODE_PATH"/templates/mapping_template.txt"     #-------#       AutoFlow mapping template. It is advisable not to modify this variable
+        fi
 	export min_too_short=1	#-------#	Minimun percentage of Unmapped: too short reads to run the protocol to inspect them
 	export unmapped_ratio=0.8	#-------#	Ratio of unmapped nucleotids on a read to be reported as "too short" mapping
 	export HUNTER_RESULTS_FOLDER=$project_folder'/DEGenesHunter_results'	#-------#	Secondary execution path
