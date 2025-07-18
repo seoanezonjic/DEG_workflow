@@ -137,6 +137,9 @@ def parse_string_command(cmd, mode)
 			option.on("-q string", "--query_genes string") do |item|
 				options["query_genes"] = ["--query_genes", item]
 			end
+			option.on("--seed integer") do |item|
+				options["seed"] = ["--seed", item]
+			end
 		end
 
 	elsif mode == 'functional_Hunter'
@@ -256,7 +259,8 @@ de_variables = {
 	"string_features" => ["-S"],
 	"numeric_features" => ["-N"],
 	"target_path" => ["-t"],
-	"query_genes" => ["-q"]
+	"query_genes" => ["-q"],
+	"seed" => ["--seed"]
 }
 
 fun_variables = {
