@@ -82,7 +82,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
    	export min_reads=''	#------#	Used in filtering. Reads (counts per million mapped reads) per gene per sample threshold to count as expressed for --minlibraries value. Default=2
 	export min_libraries=''	#------#	Used in filtering. Minimum libraries needed to consider a gene as expressed. Default=2
 	export filter_type='' #------#	Used in filtering. Genes filtering mode. Set to 'global' to apply filter on all samples, or set to 'separate' to apply to each group independently. Default=separate
-	export string_features=''	#------#	Columns in the target file to be used as categorical factors in correlation analysis. Multiple columns should be separated by commas
+	export string_features=''	#------#	Columns in the target file to be used as categorical factors in correlation analysis. Multiple columns should be separated by commas. "treat" always used as string_feature, do not specify it.
 	export numeric_features=''
 	export generate_targets="
 		generate_targets.rb -o $TARGETS_FOLDER -e experiment_design -t 'target_name>factorA:control_feature,treatment_feature_1/treatment_feature_2;factorB:control_Featrue,treatment_feature' -o $TARGETS_FOLDER
