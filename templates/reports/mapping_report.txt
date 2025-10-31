@@ -62,14 +62,8 @@ knitr::opts_chunk$set(fig.width = 10,
 
 	}
 
-	parse_alt_GFP_metrics <- function(df) {
-		mapping_metric_table <-data.frame(df["sample"], df[, vars_alt_GFP_mapping])
-		filter_and_melt(mapping_metric_table)
-
-	}
-
-	parse_alt_PMM2_metrics <- function(df) {
-		mapping_metric_table <-data.frame(df["sample"], df[, vars_alt_PMM2_mapping])
+	parse_alt_GFP_PMM2_metrics <- function(df) {
+		mapping_metric_table <-data.frame(df["sample"], df[, vars_alt_GFP_PMM2_mapping])
 		filter_and_melt(mapping_metric_table)
 
 	}
@@ -296,7 +290,10 @@ end.rcode-->
 		"aligned_to_inj_pmm2_per" = "Aligned to injected PMM2 %",
 		"unaligned_to_inj_pmm2_per" = "Not aligned to injected PMM2 %",
 		"initial_sequence_length_distribution" = "Read length distribution before trimming",
-		"final_sequence_length_distribution" = "Read length distribution after trimming"
+		"final_sequence_length_distribution" = "Read length distribution after trimming",
+		"EGFP_unmapped_pct" = "Aligned to GFP (%)",
+		"injected_PMM2_unmapped_pct" = "Aligned to injected PMM2 (%)",
+		"unmapped_reads_unaligned_pct" = "Unaligned (%)"
 		)
 
 
@@ -341,10 +338,8 @@ end.rcode-->
 	execute_length_trimming <- all(vars_length_trimming %in% all_vars)
 	vars_clustering <- c("initial_total_sequences", "final_total_sequences", "Uniquely_mapped_reads_.", "multi_map", "%_of_reads_mapped_to_multiple_loci","%_of_reads_mapped_to_too_many_loci","%_of_reads_unmapped._too_short","%_of_reads_unmapped._other","Uniquely_mapped_reads_number","aligned_to_feature","initial_weigthed_qual_per_sequence","number_duplicatedreads.estimated.","final_mean_qual_per_base","final_min_qual_per_base_in_10th_decile","final_min_qual_per_base_in_lower_quartile","final_weigthed_qual_per_sequence","bowtie1_mapped_per","bowtie1_unmapped_per","bowtie1_multimapping_per","bowtie1_mapped","bowtie1_filtered_reads","bowtie2_unmapped_per","bowtie2_multimapping_per","bowtie2_uniq_mapped_per")
 	vars_clustering <- vars_clustering[vars_clustering %in% all_vars]	
-	vars_alt_GFP_mapping <- c("aligned_to_gfp_per", "unaligned_to_gfp_per")
-	execute_alt_GFP_mapping <- all(vars_alt_GFP_mapping %in% all_vars)
-	vars_alt_PMM2_mapping <- c("aligned_to_inj_pmm2_per", "unaligned_to_inj_pmm2_per")
-	execute_alt_PMM2_mapping <- all(vars_alt_PMM2_mapping %in% all_vars)	
+	vars_alt_GFP_PMM2_mapping <- c("EGFP_unmapped_pct", "injected_PMM2_unmapped_pct","unmapped_reads_unaligned_pct")
+	execute_alt_GFP_PMM2_mapping <- all(vars_alt_GFP_PMM2_mapping %in% all_vars)
 end.rcode-->
 
 
@@ -456,38 +451,23 @@ end.rcode-->
     
 end.rcode-->
 
-<!--begin.rcode  alt_GFP_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_alt_GFP_mapping
+<!--begin.rcode  alt_GFP_PMM2_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_alt_GFP_PMM2_mapping
 	##################################################
 	###	BOWTIE2 PLOTS
 	##################################################
 	cat(plotter$create_title("Unmapped Reads Alignment Details (Bowtie2)", "align_det_bowtie", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
-	cat(plotter$create_title("STAR unmapped reads that did and did not align to GFP", "mapping_sum", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+	cat(plotter$create_title("STAR unmapped reads that did and did not align to GFP and injected PMM2", "mapping_sum", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 	cat("<br>
-		Unmapped reads from the STAR mapping were mapped to the GFP sequence.<br>\n")	
+		Unmapped reads from the STAR mapping were mapped to the GFP and injected PMM2 sequence.<br>\n")	
 
-    vars_alt_GFP_mapping_legend_names <- metric_var_2_legend_name[match(vars_alt_GFP_mapping, metric_var_2_legend_name$metric_var), "legend_name" ]
+    vars_alt_GFP_PMM2_mapping_legend_names <- metric_var_2_legend_name[match(vars_alt_GFP_PMM2_mapping, metric_var_2_legend_name$metric_var), "legend_name" ]
     ident <- "sample"
-    other_vars <- vars_alt_GFP_mapping
-	legend_names <- vars_alt_GFP_mapping_legend_names
-    cat(plotter$static_ggplot_main("metrics", text = "dynamic", func = parse_alt_GFP_metrics, plotting_function = make_stacked_barchart_from_df))
+    other_vars <- vars_alt_GFP_PMM2_mapping
+	legend_names <- vars_alt_GFP_PMM2_mapping_legend_names
+    cat(plotter$static_ggplot_main("metrics", text = "dynamic", func = parse_alt_GFP_PMM2_metrics, plotting_function = make_stacked_barchart_from_df))
 end.rcode-->
 
-<!--begin.rcode  alt_PMM2_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_alt_PMM2_mapping
-	##################################################
-	###	BOWTIE2 PLOTS
-	##################################################
-	cat(plotter$create_title("STAR unmapped reads that did and did not align to PMM2", "mapping_sum", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
-
-	cat("<br>
-		Unmapped reads from the STAR mapping were mapped to the injected PMM2 sequence provided by the research group.<br>\n")	
-
-    vars_alt_PMM2_mapping_legend_names <- metric_var_2_legend_name[match(vars_alt_PMM2_mapping, metric_var_2_legend_name$metric_var), "legend_name" ]
-    ident <- "sample"
-    other_vars <- vars_alt_PMM2_mapping
-	legend_names <- vars_alt_PMM2_mapping_legend_names
-    cat(plotter$static_ggplot_main("metrics", text = "dynamic", func = parse_alt_PMM2_metrics, plotting_function = make_stacked_barchart_from_df))
-end.rcode-->
 
 <!--begin.rcode  STAR_feature_overlap, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_STAR_feature_overlap
 	cat(plotter$create_title("Overlap of the mapped reads with genomic features", "overlap", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
