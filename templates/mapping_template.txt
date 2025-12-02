@@ -45,7 +45,7 @@ align_rna_seq){
 		module load samtools/1.21
 		module load bowtie/2.2.9
 #		module load sam2counts/20131126
-		module load python/2.7.18
+		source ~soft_bio_267/initializes/init_python27
 		if [ "$read_layout" == "paired" ] ; then
 			bowtie2 -q -x $ref'/bowtie_index_tr/reference' -1 clean_samples)/output_files/paired_1.fastq.gz -2 clean_samples)/output_files/paired_2.fastq.gz --no-discordant --no-mixed -p [cpu] 2>bowtie_log | samtools sort -o sorted_mappings.bam
 		elif [ "$read_layout" == "single" ]; then
