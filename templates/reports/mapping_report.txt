@@ -108,6 +108,13 @@ knitr::opts_chunk$set(fig.width = 10,
 		melt_df <- reshape2::melt(reduced_df, id.vars = ident)
 		return(melt_df)
 	}
+
+
+	filter_for_barplot <- function(df){
+		res <- df[,c(ident, other_vars)]
+		return(res)
+	}
+
 	# this is a little like a barplot, but the absolute values are shown, with a line connecting them.
 	make_vert_line_plot_from_df <- function(ggplot_obj){
 
@@ -334,7 +341,7 @@ end.rcode-->
 
 <!--begin.rcode  length_before_trimming, eval=execute_length_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE
 cat(plotter$create_title("Length distribution before trimming", "l_dist_b", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
-cat(plotter$create_title("Comprarison of samples length distribution before trimming", "dist_b", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+cat(plotter$create_title("Comparison of samples length distribution before trimming", "dist_b", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 
 	column_name <- "initial_sequence_length_distribution"
@@ -361,7 +368,7 @@ end.rcode-->
 
 <!--begin.rcode  length_after_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_length_trimming
 cat(plotter$create_title("Length distribution after trimming", "l_dist_a", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
-cat(plotter$create_title("Comprarison of samples length distribution after trimming", "dist_a", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+cat(plotter$create_title("Comparison of samples length distribution after trimming", "dist_a", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 	
 	column_name <- "final_sequence_length_distribution"
@@ -375,14 +382,15 @@ end.rcode-->
 
 <!--begin.rcode  trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_trimming
 	cat(plotter$create_title("QC of reads before alignment", "QC", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
-cat(plotter$create_title("Total numbers of reads before and after trimming", "reads_cleaned", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+	cat(plotter$create_title("Total numbers of reads before and after trimming", "reads_cleaned", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 	# look up these vars in the legend table using match
 	legend_names <- metric_var_2_legend_name[match(vars_trimming, metric_var_2_legend_name$metric_var), "legend_name" ]
 	other_vars <- vars_trimming
 	ident <- "sample"
 
-	cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, plotting_function = make_stacked_barchart_from_df_dodge, text = TRUE))
+	cat(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE, func = filter_for_barplot,
+							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Values'))))
 	
 end.rcode-->
 
