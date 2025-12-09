@@ -115,6 +115,7 @@ knitr::opts_chunk$set(fig.width = 10,
 		return(res)
 	}
 
+
 	# this is a little like a barplot, but the absolute values are shown, with a line connecting them.
 	make_vert_line_plot_from_df <- function(ggplot_obj){
 
@@ -361,7 +362,7 @@ cat(plotter$create_title("Quality scores for samples", "qual_b", hlevel = 3, ind
 	lineplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_qual_scores_init))
 	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
                                                config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
-                                               fields = lineplot_fields))), preset = 'magic')
+                                               fields = lineplot_fields)), preset = 'magic'))
 
 end.rcode-->
 
@@ -400,7 +401,7 @@ end.rcode-->
 	lineplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_qual_scores))
 	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
                                                config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
-                                               fields = lineplot_fields))), preset = 'magic')
+                                               fields = lineplot_fields)), preset = 'magic'))
 
 end.rcode-->
 
@@ -412,13 +413,10 @@ end.rcode-->
 
 	cat("<br>
 		Here we plot the number of reads aligning to genomic features against the sequence quality scores.<br>\n")
-	vars_aligned_v_qual_legend_names <- metric_var_2_legend_name[match(vars_aligned_v_qual, metric_var_2_legend_name$metric_var), "legend_name"]
-
-	var1 <- vars_aligned_v_qual[1]
-	var2 <- vars_aligned_v_qual[2]
-	axis_lab_name1 <- vars_aligned_v_qual_legend_names[1]
-	axis_lab_name2 <- vars_aligned_v_qual_legend_names[2] 
-    cat(plotter$static_ggplot_main("metrics", plotting_function = make_scatterplot_from_df, text = TRUE))
+	plotter$hash_vars$scatter_data <- plotter$hash_vars$metrics[vars_aligned_v_qual]
+    cat(plotter$prettify_div(plotter$scatter2D(list(id = "scatter_data", title = "", row_names = FALSE, header = NULL,
+                               x_label = "Aligned to Genomic Feature", y_label = "Weighted Sequence Quality", alpha = 0.8, theme = "tableau",
+                               text = FALSE, config = list('setMinY' = 0))), preset = "magic"))
 end.rcode-->
 
 
@@ -432,7 +430,6 @@ end.rcode-->
 		STAR mapper used for this execution. All reads that maps more than once were rejected.<br>\n")
 	vars_STAR_mapping <- c(vars_STAR_mapping, "multi_map")
     vars_STAR_mapping_legend_names <- metric_var_2_legend_name[match(vars_STAR_mapping, metric_var_2_legend_name$metric_var), "legend_name" ]
-	
     ident <- "sample" 
     other_vars <- vars_STAR_mapping
     legend_names <- vars_STAR_mapping_legend_names	
