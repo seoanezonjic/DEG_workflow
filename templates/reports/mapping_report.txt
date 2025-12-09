@@ -111,7 +111,7 @@ knitr::opts_chunk$set(fig.width = 10,
 
 
 	filter_for_barplot <- function(df){
-		res <- df[,c(ident, other_vars)]
+		res <- df[c(ident, other_vars), ]
 		return(res)
 	}
 
@@ -358,10 +358,10 @@ cat(plotter$create_title("Quality scores for samples", "qual_b", hlevel = 3, ind
 	cat("<br>
 	<b> Lowest scores (min/10th decile) and weighted average BEFORE trimming.</b><br>
 		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
-	legend_names <- metric_var_2_legend_name[match(vars_qual_scores_init, metric_var_2_legend_name$metric_var), "legend_name" ]
-	other_vars <- vars_qual_scores_init
-	ident <- "sample"
-	cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, plotting_function = make_vert_line_plot_from_df, text = TRUE))
+	lineplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_qual_scores_init))
+	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
+                                               config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
+                                               fields = lineplot_fields))), preset = 'magic')
 
 end.rcode-->
 
@@ -384,13 +384,9 @@ end.rcode-->
 	cat(plotter$create_title("QC of reads before alignment", "QC", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
 	cat(plotter$create_title("Total numbers of reads before and after trimming", "reads_cleaned", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
-	# look up these vars in the legend table using match
-	legend_names <- metric_var_2_legend_name[match(vars_trimming, metric_var_2_legend_name$metric_var), "legend_name" ]
-	other_vars <- vars_trimming
-	ident <- "sample"
-
-	cat(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE, func = filter_for_barplot,
-							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Values'))))
+	barplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_trimming))
+	cat(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE,
+							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Values'), fields = barplot_fields)))
 	
 end.rcode-->
 
@@ -401,10 +397,10 @@ end.rcode-->
 	cat("<br>
 		<b> Lowest scores (min/10th decile) and weighted average.</b><br>
 		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
-	legend_names <- metric_var_2_legend_name[match(vars_qual_scores, metric_var_2_legend_name$metric_var), "legend_name" ]
-	other_vars <- vars_qual_scores
-	ident <- "sample"
-	cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, plotting_function = make_vert_line_plot_from_df, text = TRUE))
+	lineplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_qual_scores))
+	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
+                                               config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
+                                               fields = lineplot_fields))), preset = 'magic')
 
 end.rcode-->
 
