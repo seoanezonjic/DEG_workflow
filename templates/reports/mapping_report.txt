@@ -377,7 +377,7 @@ cat(plotter$create_title("Comparison of samples length distribution after trimmi
  	x_lab <- ""
  	y_lab <- "Length"
 						 	
-	cat(plotter$static_ggplot_main("metrics", func = parse_ditributions_to_df, plotting_function = make_violin_plot, text = TRUE))	
+	cat(plotter$static_ggplot_main("metrics", func = parse_ditributions_to_df, plotting_function = make_violin_plot, text = TRUE))
  	
 end.rcode-->
 
@@ -411,8 +411,8 @@ end.rcode-->
 	##################################################
 	cat(plotter$create_title("Reads aligning to genes vs sequence quality scores", "align_vs_qual", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
-	cat("<br>
-		Here we plot the number of reads aligning to genomic features against the sequence quality scores.<br>\n")
+	cat("<br>Here we plot the number of reads aligning to genomic features against the sequence quality scores.<br>\n")
+	
 	plotter$hash_vars$scatter_data <- plotter$hash_vars$metrics[vars_aligned_v_qual]
     cat(plotter$prettify_div(plotter$scatter2D(list(id = "scatter_data", title = "", row_names = FALSE, header = NULL,
                                x_label = "Aligned to Genomic Feature", y_label = "Weighted Sequence Quality", alpha = 0.8, theme = "tableau",
@@ -459,14 +459,12 @@ end.rcode-->
 
 	cat("<br>
 		STAR mapper used for this execution. Reads were aligned to whole genome so mapped reads can not map to genomic features.<br>\n")	
-	
 
-	vars_STAR_feature_overlap_legend_names <- metric_var_2_legend_name[match(vars_STAR_feature_overlap, metric_var_2_legend_name$metric_var), "legend_name" ]
+	barplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_STAR_feature_overlap))
+	cat(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE,
+							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Value', 'percentAspectRatioPlotArea' = 0.5), 
+							 fields = barplot_fields)))
 
-    ident <- "sample" 
-    other_vars <- vars_STAR_feature_overlap
-    legend_names <- vars_STAR_feature_overlap_legend_names
-    cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, plotting_function =make_stacked_barchart_from_df_dodge,text = TRUE))
 end.rcode-->
 
 <!--begin.rcode  bowtie2_feature_overlap, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_bowtie2_feature_overlap
@@ -474,14 +472,11 @@ end.rcode-->
 
 	cat("<br>
 		Bowtie 2 mapper used for this execution. Reads were aligned to transcriptome or custom fasta so mapped reads always overlap with genomic features.<br>\n")	
-	vars_bowtie2_feature_overlap_legend_names <- metric_var_2_legend_name[match(vars_bowtie2_feature_overlap, metric_var_2_legend_name$metric_var), "legend_name" ]
 
- 
-    other_vars <- vars_bowtie2_feature_overlap
-    legend_names <- vars_bowtie2_feature_overlap_legend_names
-    
-    ident <- "sample" 
-    cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, plotting_function =make_stacked_barchart_from_df_dodge,text = TRUE))
+    barplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_bowtie2_feature_overlap))
+	cat(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE,
+							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Value', 'percentAspectRatioPlotArea' = 0.5), 
+							 fields = barplot_fields)))
 
 end.rcode-->
 
@@ -517,7 +512,8 @@ end.rcode-->
 end.rcode-->
 
 <!--begin.rcode  top_n_expression, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_clustering
-	cat(plotter$create_title("Percentages of reads per sample mapping to the most highly expressed genes", "most_expressed", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+	cat(plotter$prettify_div(plotter$create_title("Percentages of reads per sample mapping to the most highly expressed genes", "most_expressed", 
+		hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL), preset = "magic"))
 
 	n <- 5
 	cat(plotter$table(list(id = "all_counts", header = TRUE, row_names = TRUE, text = FALSE,table_rownames = TRUE,styled = "dt", func = make_top_n_expression_table)))
