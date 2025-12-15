@@ -14,7 +14,7 @@ export transcriptome=''	#-------#	Path to transcriptome must be specified when u
 export RESOURCES="-c 2 -t 10:00:00 -m 10"	#-------#	AutoFlow resources setting 
 export project_folder=`pwd`'/project_execution'	#-------#	Global execution folder 
 export MAPPING_RESULTS_FOLDER=$project_folder'/clean_and_map'	#-------#	Secondary execution path
-export VARIANT_RESULTS_FOLDER=$project_folder'/variants' #-------# Path for variant analysis results
+export VARIANT_RESULTS_FOLDER=$project_folder'/variant_analysis' #-------# Path for variant analysis results
 export TARGETS_FOLDER=$CODE_PATH'/TARGETS'	#-------#	Set the folder that stores all target files. DEFAULT: TARGETS_FOLDER=$CODE_PATH'/TARGETS'
 export link_path=''	#-------#	Folder with cleaned samples following the AutoFlow results folder structure. Folder must contain {sample_name}/seqtrimbb_0000/output_files. output_files folder will be linked
 export ADD_trimming_opt=""	#-------#	Additional triming options. Semicolon (:) equals to spaces ( ), and exclamation marks (!) to commas (,). Please consider this to replace
@@ -42,7 +42,12 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	## RNA-seq variables
 	##################################
 	####### Mapping	#######
-
+	export mapping_type="general"
+	 if [[ $mapping_type == "pseudo" ]]; then
+                export TEMPLATE=$CODE_PATH"/templates/pseudo_mapping_template.txt"      #-------#       AutoFlow mapping template. It is advisable not to modify this variable
+        else
+                export TEMPLATE=$CODE_PATH"/templates/mapping_template.txt"     #-------#       AutoFlow mapping template. It is advisable not to modify this variable
+        fi
 	export min_too_short=1	#-------#	Minimun percentage of Unmapped: too short reads to run the protocol to inspect them
 	export unmapped_ratio=0.8	#-------#	Ratio of unmapped nucleotids on a read to be reported as "too short" mapping
 	export HUNTER_RESULTS_FOLDER=$project_folder'/DEGenesHunter_results'	#-------#	Secondary execution path
@@ -53,29 +58,32 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	export stranded='yes'	#-------#	This parametrer must be changed in case of not-stranded sequencing only (rare case)
 	export miRNA_det_path=""	#-------#	Path to miRNA detection execution folder. This folder is only inspected to create the final results pack
 	export bam_coords="" #-------# Path to bed file with genome coordinates to keep in BAM files. Leave empty ("") to disable.
-	export var_intervals="chr1:1-100;chr2:2-200" #-------# Genomic intervals to variant call (low confidence). If empty, variant calling will not be performed. If high-confidence variant calling is required, please use https://github.com/AEstebanMar/alignment_vc_pipeline. Specify more than one interval by separating them with "&".
+	export var_intervals="" #-------# Genomic intervals to variant call (low confidence). If empty, variant calling will not be performed. If high-confidence variant calling is required, please use https://github.com/AEstebanMar/alignment_vc_pipeline. Specify more than one interval by separating them with "&". Example: "chr1:1-100;chr2:2-200"
 	if [[ $var_intervals != "" ]]; then
 		export TEMPLATE=$TEMPLATE","$CODE_PATH"/templates/variant_calling.txt"
 	fi
+	export query_genes="" #-------# Genes to explore in expression analysis. Use ENS symbol, and separate them with semicolons (";"). Example: "ENSG00000100417;ENSG00000140650"
+	export alt_seq="" #-------# File with alternative sequence reference to do an alignment with the unmapped sequences from general mapping
 
 	################## Differential expression analysis variables #####################
 	##### IMPORTANT: To delete a variable, you just have to define it as an empty string
 
 	######	DEgenesHunter comparisons	######
 
+	export seed="" #-------#  Seed to define in degenes_Hunter.R script. Will affect PCA results. Leave empty ("") to use a random seed, else provide an integer.
 	export de_pvalue="0.05"	#-------#	Minimum P-value threshold 
 	export de_packages="WDELN"	#-------#	Gene expresion analysis algorithms to use (D = DESeq2, E = edgeR, L = limma, N= NOISeq, W = WGCNA)
 	export de_min_pack="4"	#-------#	Number of minimum packages to consider a gene as a 'PREVALENT' DEG
 	export de_logfc="1"	#-------#	Log2FC threshold
 	export WGCNA_mergecutHeight="0.25"      #-------#       Value to merge two similar modules: Maximum dissimilarity (i.e., 1-correlation) 
-    export WGCNA_min_genes_cluster="30"     #-------#       Minimum number of genes to keep a cluster       
-    export WGCNA_detectcutHeight="0.995"    #-------#       Cut height to split modules
+    	export WGCNA_min_genes_cluster="30"     #-------#       Minimum number of genes to keep a cluster       
+    	export WGCNA_detectcutHeight="0.995"    #-------#       Cut height to split modules
    	export WGCNA_deepsplit="2"    #-------#		Split depth to define modules (values between 1 to 3)
    	export WGCNA_corType=pearson    #-------#		Correlation function to build the coexpression network
    	export min_reads=''	#------#	Used in filtering. Reads (counts per million mapped reads) per gene per sample threshold to count as expressed for --minlibraries value. Default=2
 	export min_libraries=''	#------#	Used in filtering. Minimum libraries needed to consider a gene as expressed. Default=2
 	export filter_type='' #------#	Used in filtering. Genes filtering mode. Set to 'global' to apply filter on all samples, or set to 'separate' to apply to each group independently. Default=separate
-	export string_features=''	#------#	Columns in the target file to be used as categorical factors in correlation analysis. Multiple columns should be separated by commas
+	export string_features=''	#------#	Columns in the target file to be used as categorical factors in correlation analysis. Multiple columns should be separated by commas. "treat" always used as string_feature, do not specify it.
 	export numeric_features=''
 	export generate_targets="
 		generate_targets.rb -o $TARGETS_FOLDER -e experiment_design -t 'target_name>factorA:control_feature,treatment_feature_1/treatment_feature_2;factorB:control_Featrue,treatment_feature' -o $TARGETS_FOLDER

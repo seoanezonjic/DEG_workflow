@@ -1,4 +1,80 @@
+<!--begin.rcode setup
+	sort_info <- function(info) {
+		split_info <- strsplit(info, ";")
+		sorted_info <- lapply(split_info, sort)
+		res <- lapply(sorted_info, paste, collapse = ";")
+		return(res)
+	}
+end.rcode-->
+
+<!--begin.rcode format_variants, eval = nrow(plotter$hash_vars$all_variants.txt) > 1
+	variants <- plotter$hash_vars$all_variants.txt
+	colnames(variants) <- variants[1, ]
+	variants <- variants[-1, ]
+	variants$GENE <- "?"
+	variants$MUT <- "?"
+	variants$INFO <- sort_info(variants$INFO)
+	variants <- data.frame(lapply(variants, function(vector) gsub("0/0", "-", vector)))
+	plotter$hash_vars$all_variants <- variants
+end.rcode-->
+
+<!--begin.rcode add_effects, eval = ncol(plotter$hash_vars$all_variant_effects.txt) > 0 & !is.null(plotter$hash_vars[["all_variants"]])
+	if(plotter$hash_vars$all_variant_effects.txt[[1]][1] == "No_known_variants_detected") {
+		cat("<p>No known variants identified, effects could not be predicted.</p>")
+	} else {
+		effects <- unique(plotter$hash_vars$all_variant_effects.txt)
+		colnames(effects) <- c("CHROM", "POS", "REF", "ALT", "GENE", "MUT")
+		variants <- plotter$hash_vars$all_variants
+		for(pos in unique(effects$POS)) {
+			matched_vars <- variants[variants$POS == pos, ]
+			if(nrow(matched_vars) > 0) {
+				effects_subset <- effects[effects$POS == pos, ]
+				matched_vars$GENE <- unique(effects_subset$GENE)
+				matched_effects <- match(matched_vars$ALT, effects_subset$ALT)
+				matched_vars$MUT <- effects_subset[matched_effects, , drop = FALSE]$MUT
+				variants[variants$POS == pos, ] <- matched_vars
+			}
+		}
+		plotter$hash_vars$all_variants <- variants
+	}
+end.rcode-->
 
 <!--begin.rcode multiVCF_table, results='asis', echo=FALSE
-	cat(plotter$table(list(id = "all_variants.txt", header = TRUE, row_names = FALSE, table_rownames = FALSE, styled = "dt", text = "dynamic")))
+	cat("<p> Brief explanation of VCF format: </p>")
+	details <- c("<strong>CHROM</strong>: Contig where the variant occurs", "<strong>POS</strong>: Genomic coordinates", "<strong>ID</strong>: Variant identifier (optional)", "<strong>REF</strong>: Reference allele",
+			  "<strong>ALT</strong>: Observed alternative allele(s)", "<strong>QUA</strong>: Phred-scaled probability that a REF/ALT polymorphism exists given sequencing data",
+			  "<strong>FILTER</strong>: Name of filters variant fails to pass, or PASS if all filters were passed. In this report, only PASS variants are shown.",
+			  "<strong>INFO</strong>: Site-levels annotations. Contains potentially uninformative reads.", "<strong>FORMAT</strong>: Site-levels annotations WITHOUT potentially uninformative reads.")
+	var_details <- c("<strong>GT</strong>: the genotype of this sample at this site. 0 for REF allele, 1 for 1st ALT allele, 2 for 2nd, and so on.",
+				  "<strong>AD</strong>, <strong>DP</strong>: allele (unfiltered) depth and filtered depth of coverage.",
+				  "<strong>PL</strong>: normalized phred-scaled likelihood of each possible genotype (for diploid biallelic sites: 0/0 vs 0/1 vs 1/1).",
+				  "<strong>GQ</strong>: pred-scaled quality of assigned genotype.")
+	cat(make_html_list(list_content = details))
+	cat("<p> Summary of genotyping information </p>")
+	cat(make_html_list(list_content = var_details))
+	cat("<p> Explanation of possible values in INFO field: <p>")
+	info_details <- c("<strong>AC</strong>: Allele Count in genotypes.", "<strong>AF</strong>: Allelic Frequency.", "<strong>AN</strong>: total number of alleles.",
+					  "<strong>BaseQRankSum</strong>: Rank Sum Test of REF versus ALT base quality scores.",
+					  "<strong>ExcessHet</strong>: phred-scaled p-value for exact test of excess heterozygosity.",
+					  "<strong>FS</strong>: Fisher's exact test to detect Strand bias (the higher this is, the more likely there is bias).",
+					  "<strong>MLEAC</strong>: Maximum Likelihood Expectation of AC.", "<strong>MLEAF</strong>: Maximum Likelihood Expectation of AF",
+					  "<strong>MQ</strong>: Mapping quality", paste0("<strong>MQRankSum</strong>: this is the u-based z-approximation from the Rank Sum Test for mapping qualities.",
+					  "It compares the mapping qualities of the reads supporting the reference allele and the alternate allele"), "<strong>QD</strong>: QUAL normalized by read depth.",
+					  "<strong>ReadPosRankSum</strong>: this metric compares whether the positions of the REF and ALT alleles are different within the reads",
+					  "<strong>SOR</strong>: StrandOddsRatio. Reads at the ends of exons tend to only be covered by reads in one direction and FS gives those variants a bad score. This metric does not have this bias.")
+	cat(make_html_list(list_content = info_details))
+	cat(paste0("<p> For additional information regarding the VCF format, please see",
+				"<a href=https://samtools.github.io/hts-specs/VCFv4.1.pdf> the VCF manual page </a>",
+				"or <a href = https://docs.varsome.com/en/vcf-attributes-explained> this unofficial resource </a>.<p>"))
+	cat("<p> For predicted variants, ? means no information was available in variant effect predictor. NA means that an unknown variant
+		was detected in that genomic position. </p>")
+	cat("<p> - means that a 0/0 site was generated by splitting a multiallelic site in two rows, and removed by our parser.")
+	if(!is.null(plotter$hash_vars[["all_variants"]])) {
+		mut_col <- ncol(plotter$hash_vars$all_variants)
+		gene_col <- mut_col - 1
+		reordered_vector <- c(1:5, gene_col, mut_col, 9, 10:(gene_col-1), 6, 8)
+		cat(plotter$table(list(id = "all_variants", header = NULL, fields = reordered_vector, row_names = FALSE, table_rownames = FALSE, styled = "dt", text = "dynamic")))
+	} else {
+		cat("<p>No variants have been identified</p>")
+	}
 end.rcode-->

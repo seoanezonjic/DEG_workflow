@@ -16,7 +16,7 @@ source $CONFIG_DAEMON
 
 ## STAGE EXECUTION
 #######################################################################
-mkdir -p  $MAPPING_RESULTS_FOLDER
+mkdir -p $MAPPING_RESULTS_FOLDER
 
 
 if [ "$module" == "1a" ] ; then
@@ -48,19 +48,11 @@ if [ "$module" == "2b" ] ; then
 fi
 
 if [ "$module" == "2c" ] ; then
-	echo "Preparing multiVCF"
-	mkdir -p $VARIANT_RESULTS_FOLDER
-	module load bcftools/1.21
-	source ~soft_bio_267/initializes/init_htmlreportR
-	vcf=`find $MAPPING_RESULTS_FOLDER/*/gatk_0000/filtered.vcf.gz`
-	bcftools merge $vcf --output-type z --output $VARIANT_RESULTS_FOLDER/"combined.vcf.gz"
-	header=`bcftools view -h $VARIANT_RESULTS_FOLDER/"combined.vcf.gz" | tail -n 1`
-	bcftools view -H $VARIANT_RESULTS_FOLDER/"combined.vcf.gz" -o $VARIANT_RESULTS_FOLDER/"all_variants.txt"
-	sed -i "1i $header" $VARIANT_RESULTS_FOLDER/"all_variants.txt"
-	sed -i "s/#//g" $VARIANT_RESULTS_FOLDER/"all_variants.txt"
-	echo Command called: html_report.R -t $REPORT_TEMPLATES_FOLDER/variants_report.txt -o $report_folder/variants_report.html -d "$VARIANT_RESULTS_FOLDER/all_variants.txt" --title "Variant analysis report"
-	html_report.R -t $REPORT_TEMPLATES_FOLDER/variants_report.txt -o $report_folder/variants_report.html -d "$VARIANT_RESULTS_FOLDER/all_variants.txt" --title "Variant analysis report"
-	echo "Report built in "$report_folder"/variants_report.html"
+	if [ $launch_login == TRUE ]; then
+		analyze_variants.sh
+	else
+		sbatch $AUXSH_PATH/analyze_variants.sh
+	fi
 	exit
 fi
 

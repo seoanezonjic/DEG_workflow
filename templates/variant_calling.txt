@@ -2,9 +2,9 @@
 get_interval_variants){
 	module load picard/2.20.2
     module load samtools/1.16
+    source ~soft_bio_267/initializes/init_pets
     split_intervals=`printf '%s\n' "$var_intervals" | sed 's/;/\n/g'`
     rm interval_list.bed
-    echo -e 
     for interval in $split_intervals; do
         chr=`echo $interval | cut -f 1 -d :`
         start=`echo $interval | cut -f 2 -d : | cut -f 1 -d -`
@@ -32,29 +32,48 @@ get_interval_variants){
                     --CREATE_INDEX true
     gatk SplitNCigarReads -R $only_read_ref/genome.fa -I formatted_reorder.bam -O formatted_split.bam
     samtools index formatted_split.bam
+    retVal=$?
+    if [ $retVal -ne 0 ]; then
+        echo ERROR: Something went wrong when subsetting the BAM file.
+        exit $retVal
+    else
+        rm formatted_reorder.ba* formatted_dep.ba* region.ba*
+    fi
 	?
     gatk HaplotypeCaller --java-options '-Xmx10G' -I formatted_split.bam \
-	                     -R $only_read_ref/genome.fa -L interval_list.bed \
+	                     -R $only_read_ref/genome.fa -L interval_list.bed --output-mode EMIT_VARIANTS_ONLY \
 	                     --dont-use-soft-clipped-bases --sequence-dictionary $only_read_ref/genome.dict \
-	                     -stand-call-conf 20.0 \
-	                     --output-mode EMIT_ALL_CONFIDENT_SITES \
-	                     -O variants.vcf.gz
+	                     -stand-call-conf 20.0 -O variants.vcf.gz --linked-de-bruijn-graph true
     gatk VariantFiltration -R $only_read_ref/genome.fa -V variants.vcf.gz \
-                           --filter-expression "DP < 5.0" \
-                           --filter-name DP \
-                           --filter-expression "QD < 2.0" \
-                           --filter-name QD \
-                           -O filtered.vcf.gz
+                           --genotype-filter-expression "DP < 10.0" \
+                           --genotype-filter-name DP_OUT \
+                           --genotype-filter-expression "QD < 2.0" \
+                           --genotype-filter-name QD_OUT -O tagged.vcf.gz
+    bcftools view tagged.vcf.gz | grep -v DP_OUT | grep -v QD_OUT | bgzip > filtered.vcf.gz
     tabix -f -p vcf filtered.vcf.gz
-    filteredVariants=`gatk CountVariants -V filtered.vcf.gz | tail -n 1`
-    if [[ -z $filteredVariants ]]; then
+    gunzip -c filtered.vcf.gz | sed 's/^chr//g' > tmp.vcf
+    if [ "$organism" == "human" ]; then
+        genome="GRCh38"
+    elif [ "$organism" == "mouse" ]; then
+        genome="GRCm38"
+    fi
+    vcf2effects -i tmp.vcf -o var_effects.txt -g $genome
+    retVal=$?
+    if [ $retVal -ne 0 ]; then
+        echo ERROR: vcf2effects has failed.
+        exit $retVal
+    fi
+    cleanVariants=`gatk CountVariants -V variants.vcf.gz | tail -n 1`
+    if [[ -z $cleanVariants ]]; then
         echo ERROR: missing output vcf.
         exit 1
     else
+        rm tmp.vcf
+        rm tagged_vcf.gz
         echo -e $sample"\tinterval_variants\t"$filteredVariants >> ../metrics
         rm RG.bam* region.bam*
         if [[ "$keep_bam" == FALSE ]]; then
-            rm formatted*.bam*
+            rm formatted_split.bam
         fi
     fi
 }
