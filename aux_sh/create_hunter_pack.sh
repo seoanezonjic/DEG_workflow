@@ -35,6 +35,7 @@ do
     add_annotation.R -i $comparison_path/final_counts.txt -o $out_comparison/final_counts.txt $mode_annot $gene_id -O $fun_organism
     add_annotation.R -i $comparison_path/Common_results/hunter_results_table.txt -o $out_comparison/hunter_results_table.txt $mode_annot -c rownames $gene_id -O $fun_organism
     add_annotation.R -i $comparison_path/Results_default/Normalized_counts_default.txt -o $out_comparison/Normalized_counts_default.txt $mode_annot $gene_id -O $fun_organism
+    add_annotation.R -i $comparison_path/cpm_table.txt -o $out_comparison/cpm_table.txt $mode_annot -c rownames $gene_id -O $fun_organism
 
     cp -r $comparison_path/functional_enrichment $out_comparison
     cp -r $comparison_path/Results_WGCNA $out_comparison
