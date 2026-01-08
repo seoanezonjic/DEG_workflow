@@ -78,8 +78,22 @@ knitr::opts_chunk$set(fig.width = 10,
 		# Reselect table
 		mapping_metric_table <- mapping_metric_table[, c("sample", vars_STAR_mapping)]
 		melt_df <- filter_and_melt(mapping_metric_table)
-		return(melt_df)		
+		return(melt_df)
 	}
+
+
+	parse_data_for_stacked_var <- function(df) {
+	    df["multi_map", ] <- as.numeric(gsub("%", "", df["%_of_reads_mapped_to_multiple_loci", ])) + as.numeric(gsub("%", "",df["%_of_reads_mapped_to_too_many_loci", ]))
+		mapping_metric_table <- df[row.names(df) %in% c("sample",vars_STAR_mapping), ]
+		mapping_metric_table <- htmlreportR:::.row_to_header(mapping_metric_table)
+		row_names <- row.names(mapping_metric_table)
+		mapping_metric_table <- as.data.frame(lapply(mapping_metric_table, function(x) as.numeric(gsub("\\%", "", x))))
+		row.names(mapping_metric_table) <- row_names
+		return(mapping_metric_table)
+	}
+
+
+
 
 	make_stacked_barchart_from_df <- function(ggplot_obj) {
 		ggplot_obj + ggplot2::aes_string(x=ident, y="value", fill="variable") +
@@ -114,6 +128,13 @@ knitr::opts_chunk$set(fig.width = 10,
 		melt_df <- reshape2::melt(reduced_df, id.vars = ident)
 		return(melt_df)
 	}
+
+	filter_for_barplot <- function(df){
+		res <- df[c(ident, other_vars), ]
+		return(res)
+	}
+
+
 	# this is a little like a barplot, but the absolute values are shown, with a line connecting them.
 	make_vert_line_plot_from_df <- function(ggplot_obj){
 
@@ -347,71 +368,73 @@ end.rcode-->
 <h1> QC and Alignment Report </h1>
 
 
-<!--begin.rcode  length_before_trimming, eval=execute_length_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE
-cat(plotter$create_title("Length distribution before trimming", "l_dist_b", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
-cat(plotter$create_title("Comprarison of samples length distribution before trimming", "dist_b", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+# <!--begin.rcode  length_before_trimming, eval=execute_length_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE
+# cat(plotter$create_title("Length distribution before trimming", "l_dist_b", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+# cat(plotter$create_title("Comparison of samples length distribution before trimming", "dist_b", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 
-	column_name <- "initial_sequence_length_distribution"
-	title <- "Length distributions before trimming"
-	x_lab <- ""
-	y_lab <- "Length"
-	cat(plotter$static_ggplot_main("metrics", func = parse_ditributions_to_df, plotting_function = make_violin_plot, text = TRUE))
+# 	column_name <- "initial_sequence_length_distribution"
+# 	title <- "Length distributions before trimming"
+# 	x_lab <- ""
+# 	y_lab <- "Length"
+# 	cat(plotter$static_ggplot_main("metrics", func = parse_ditributions_to_df, plotting_function = make_violin_plot, text = TRUE))
+# 	# cat(plotter$prettify_div(plotter$boxplot(list(id = 'boxplot_factor.txt', title = "Violin boxplot", header = TRUE, row_names = TRUE, 
+# 	# 											  text = "dynamic", format = "wide", smp_attr = 5, group = "pathway", add_violin = TRUE)),
+#     #                                               preset = "magic"))
 	
-end.rcode-->
+# end.rcode-->
 
 
-<!--begin.rcode  qual_scores_initial, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_qual_scores_init
-cat(plotter$create_title("Quality scores for samples", "qual_b", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
-	cat("<br>
-	<b> Lowest scores (min/10th decile) and weighted average BEFORE trimming.</b><br>
-		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
-	legend_names <- metric_var_2_legend_name[match(vars_qual_scores_init, metric_var_2_legend_name$metric_var), "legend_name" ]
-	other_vars <- vars_qual_scores_init
-	ident <- "sample"
-	cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, plotting_function = make_vert_line_plot_from_df, text = TRUE))
+# <!--begin.rcode  qual_scores_initial, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_qual_scores_init
+# cat(plotter$create_title("Quality scores for samples", "qual_b", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+# 	cat("<br>
+# 	<b> Lowest scores (min/10th decile) and weighted average BEFORE trimming.</b><br>
+# 		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
+	
+# 	lineplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_qual_scores_init))
+# 	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
+#                                                config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
+#                                                fields = lineplot_fields)), preset = 'magic'))
 
-end.rcode-->
+# end.rcode-->
 
 
-<!--begin.rcode  length_after_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_length_trimming
-cat(plotter$create_title("Length distribution after trimming", "l_dist_a", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
-cat(plotter$create_title("Comprarison of samples length distribution after trimming", "dist_a", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+# <!--begin.rcode  length_after_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_length_trimming
+# cat(plotter$create_title("Length distribution after trimming", "l_dist_a", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+# cat(plotter$create_title("Comparison of samples length distribution after trimming", "dist_a", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 	
-	column_name <- "final_sequence_length_distribution"
- 	title <- "Length distributions after trimming"
- 	x_lab <- ""
- 	y_lab <- "Length"
+# 	column_name <- "final_sequence_length_distribution"
+#  	title <- "Length distributions after trimming"
+#  	x_lab <- ""
+#  	y_lab <- "Length"
 						 	
-	cat(plotter$static_ggplot_main("metrics", func = parse_ditributions_to_df, plotting_function = make_violin_plot, text = TRUE))	
+# 	cat(plotter$static_ggplot_main("metrics", func = parse_ditributions_to_df, plotting_function = make_violin_plot, text = TRUE))
  	
-end.rcode-->
+# end.rcode-->
 
-<!--begin.rcode  trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_trimming
-	cat(plotter$create_title("QC of reads before alignment", "QC", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
-cat(plotter$create_title("Total numbers of reads before and after trimming", "reads_cleaned", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+# <!--begin.rcode  trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_trimming
+# 	cat(plotter$create_title("QC of reads before alignment", "QC", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+# 	cat(plotter$create_title("Total numbers of reads before and after trimming", "reads_cleaned", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
-	# look up these vars in the legend table using match
-	legend_names <- metric_var_2_legend_name[match(vars_trimming, metric_var_2_legend_name$metric_var), "legend_name" ]
-	other_vars <- vars_trimming
-	ident <- "sample"
-
-	cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, plotting_function = make_stacked_barchart_from_df_dodge, text = TRUE))
+# 	barplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_trimming))
+# 	cat(plotter$prettify_div(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE,
+# 							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Values'), fields = barplot_fields)), preset = "magic"))
 	
-end.rcode-->
+# end.rcode-->
 
 
-<!--begin.rcode  qual_scores, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_qual_scores
-	cat(plotter$create_title("Quality scores for samples", "qual_sc", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+# <!--begin.rcode  qual_scores, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_qual_scores
+# 	cat(plotter$create_title("Quality scores for samples", "qual_sc", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
-	cat("<br>
-		<b> Lowest scores (min/10th decile) and weighted average.</b><br>
-		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
-	legend_names <- metric_var_2_legend_name[match(vars_qual_scores, metric_var_2_legend_name$metric_var), "legend_name" ]
-	other_vars <- vars_qual_scores
-	ident <- "sample"
-	cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, plotting_function = make_vert_line_plot_from_df, text = TRUE))
+# 	cat("<br>
+# 		<b> Lowest scores (min/10th decile) and weighted average.</b><br>
+# 		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
+	
+# 	lineplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_qual_scores))
+# 	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
+#                                                config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
+#                                                fields = lineplot_fields)), preset = 'magic'))
 
 end.rcode-->
 
@@ -421,34 +444,34 @@ end.rcode-->
 	##################################################
 	cat(plotter$create_title("Reads aligning to genes vs sequence quality scores", "align_vs_qual", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
-	cat("<br>
-		Here we plot the number of reads aligning to genomic features against the sequence quality scores.<br>\n")
-	vars_aligned_v_qual_legend_names <- metric_var_2_legend_name[match(vars_aligned_v_qual, metric_var_2_legend_name$metric_var), "legend_name"]
-
-	var1 <- vars_aligned_v_qual[1]
-	var2 <- vars_aligned_v_qual[2]
-	axis_lab_name1 <- vars_aligned_v_qual_legend_names[1]
-	axis_lab_name2 <- vars_aligned_v_qual_legend_names[2] 
-    cat(plotter$static_ggplot_main("metrics", plotting_function = make_scatterplot_from_df, text = TRUE))
+	cat("<br>Here we plot the number of reads aligning to genomic features against the sequence quality scores.<br>\n")
+	
+	plotter$hash_vars$scatter_data <- plotter$hash_vars$metrics[vars_aligned_v_qual]
+    cat(plotter$prettify_div(plotter$scatter2D(list(id = "scatter_data", title = "", row_names = FALSE, header = NULL,
+                               x_label = "Aligned to Genomic Feature", y_label = "Weighted Sequence Quality", alpha = 0.8, theme = "tableau",
+                               text = FALSE, config = list('setMinY' = 0))), preset = "magic"))
 end.rcode-->
 
 
 
 
-<!--begin.rcode  STAR_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_STAR_mapping
+<!--begin.rcode  STAR_mapping, results='asis', echo=TRUE, warning=TRUE, message=TRUE, eval=execute_STAR_mapping
 	cat(plotter$create_title("Main Alignment Details (STAR)", "align_det_star", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
 	cat(plotter$create_title("Trimmed reads mapping to the genome uniquely, non-uniquely, and not at all", "mapping_sum", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 	cat("<br>
 		STAR mapper used for this execution. All reads that maps more than once were rejected.<br>\n")
+
 	vars_STAR_mapping <- c(vars_STAR_mapping, "multi_map")
-    vars_STAR_mapping_legend_names <- metric_var_2_legend_name[match(vars_STAR_mapping, metric_var_2_legend_name$metric_var), "legend_name" ]
-	
     ident <- "sample" 
     other_vars <- vars_STAR_mapping
-    legend_names <- vars_STAR_mapping_legend_names	
-    cat(plotter$static_ggplot_main("metrics", func = parse_STAR_vars, plotting_function =make_stacked_barchart_from_df))
-    
+   
+
+    cat(plotter$prettify_div(plotter$barplot(list(id = "metrics", title = "", func = parse_data_for_stacked_var, row_names = NULL, header = NULL, transpose = TRUE,
+                                                 text = "dynamic", config = list('graphOrientation' = 'vertical', "graphType" = "Stacked", 'xAxisTitle' = 'Value', 
+                                                 	'stackBy' = "variable", 'setMaxX' = 100))), preset = "magic"))
+
+
 end.rcode-->
 
 <!--begin.rcode  alt_GFP_PMM2_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_alt_GFP_PMM2_mapping
@@ -463,9 +486,17 @@ end.rcode-->
 
     vars_alt_GFP_PMM2_mapping_legend_names <- metric_var_2_legend_name[match(vars_alt_GFP_PMM2_mapping, metric_var_2_legend_name$metric_var), "legend_name" ]
     ident <- "sample"
+<<<<<<< Updated upstream
     other_vars <- vars_alt_GFP_PMM2_mapping
 	legend_names <- vars_alt_GFP_PMM2_mapping_legend_names
     cat(plotter$static_ggplot_main("metrics", text = "dynamic", func = parse_alt_GFP_PMM2_metrics, plotting_function = make_stacked_barchart_from_df))
+=======
+    other_vars <- vars_bowtie2_mapping
+	legend_names <- vars_bowtie2_mapping_legend_names
+    
+    cat(plotter$static_ggplot_main("metrics", text = "dynamic", func = parse_bowtie2_metrics, plotting_function = make_stacked_barchart_from_df))
+
+>>>>>>> Stashed changes
 end.rcode-->
 
 
@@ -474,14 +505,12 @@ end.rcode-->
 
 	cat("<br>
 		STAR mapper used for this execution. Reads were aligned to whole genome so mapped reads can not map to genomic features.<br>\n")	
-	
 
-	vars_STAR_feature_overlap_legend_names <- metric_var_2_legend_name[match(vars_STAR_feature_overlap, metric_var_2_legend_name$metric_var), "legend_name" ]
+	barplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_STAR_feature_overlap))
+	cat(plotter$prettify_div(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE,
+							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Value', 'percentAspectRatioPlotArea' = 0.5), 
+							 fields = barplot_fields)), preset = "magic"))
 
-    ident <- "sample" 
-    other_vars <- vars_STAR_feature_overlap
-    legend_names <- vars_STAR_feature_overlap_legend_names
-    cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, plotting_function =make_stacked_barchart_from_df_dodge,text = TRUE))
 end.rcode-->
 
 <!--begin.rcode  bowtie2_feature_overlap, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_bowtie2_feature_overlap
@@ -489,14 +518,11 @@ end.rcode-->
 
 	cat("<br>
 		Bowtie 2 mapper used for this execution. Reads were aligned to transcriptome or custom fasta so mapped reads always overlap with genomic features.<br>\n")	
-	vars_bowtie2_feature_overlap_legend_names <- metric_var_2_legend_name[match(vars_bowtie2_feature_overlap, metric_var_2_legend_name$metric_var), "legend_name" ]
 
- 
-    other_vars <- vars_bowtie2_feature_overlap
-    legend_names <- vars_bowtie2_feature_overlap_legend_names
-    
-    ident <- "sample" 
-    cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, plotting_function =make_stacked_barchart_from_df_dodge,text = TRUE))
+    barplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_bowtie2_feature_overlap))
+	cat(plotter$prettify_div(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE,
+							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Value', 'percentAspectRatioPlotArea' = 0.5), 
+							 fields = barplot_fields)), preset = "magic"))
 
 end.rcode-->
 
@@ -514,6 +540,7 @@ end.rcode-->
     ident <- "sample" 
     other_vars <- vars_mirna_mapping
     legend_names <- vars_mirna_mapping_legend_names
+    
     cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, text = TRUE, plotting_function= make_stacked_barchart_from_df))
 
 end.rcode-->
@@ -532,7 +559,8 @@ end.rcode-->
 end.rcode-->
 
 <!--begin.rcode  top_n_expression, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_clustering
-	cat(plotter$create_title("Percentages of reads per sample mapping to the most highly expressed genes", "most_expressed", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+	cat(plotter$create_title("Percentages of reads per sample mapping to the most highly expressed genes", "most_expressed", 
+		hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 	n <- 5
 	cat(plotter$table(list(id = "all_counts", header = TRUE, row_names = TRUE, text = FALSE,table_rownames = TRUE,styled = "dt", func = make_top_n_expression_table)))
