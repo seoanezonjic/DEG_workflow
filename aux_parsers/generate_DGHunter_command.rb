@@ -140,6 +140,9 @@ def parse_string_command(cmd, mode)
 			option.on("--seed integer") do |item|
 				options["seed"] = ["--seed", item]
 			end
+			option.on("--count_var_quantile float") do |item|
+				options["count_var_quantile"] = ["--count_var_quantile", item]
+			end
 		end
 
 	elsif mode == 'functional_Hunter'
@@ -260,7 +263,8 @@ de_variables = {
 	"numeric_features" => ["-N"],
 	"target_path" => ["-t"],
 	"query_genes" => ["-q"],
-	"seed" => ["--seed"]
+	"seed" => ["--seed"],
+	"count_var_quantile" => ["--count_var_quantile"]
 }
 
 fun_variables = {

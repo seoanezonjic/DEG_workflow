@@ -1,0 +1,105 @@
+###################################  
+## GLOBAL VARS ##
+###################################   
+
+######	EXPERIMENT VARIABLES	#######
+export experiment_type="RNAseq_genome"	#-------#	Experiment type 'miRNAseq_detection', 'RNAseq_genome', 'Clusters_report' or 'RNAseq_transcriptome'. Chose RNAseq_genome for Human or Mouse and reference will be downloaded in "./daemon.sh 1a" 
+export organism='human'	#-------#	Model organism: Currently only 'human' and 'mouse' available for download. For other genome reference you must copy the genome (fasta) and gene annotations (gtf) inside $mapping_ref as genome.fa and annotation.gtf. If you use non-model transcriptome you have to set $transcriptome variable indicating transcriptome fasat file. You can rename transcripts IDs with ENSEMBL model species ortologs or indicate a translation file in $annotation_list
+export mapping_ref=$CODE_PATH'/references/'$organism	#-------#	Reference path: The references will be downloaded and indexed here.
+export only_read_ref=~pedro/references/hsGRc38        #-------#       References will be linked from this folder. Missing files will be downloaded and processed.
+export TRIM_TEMPLATE="transcriptomics.txt"	#-------#	Trimming template path. Available options are "$CODE_PATH"/templates/trimming/miRNA.txt (only for small RNAseq) or transcriptomics.txt
+export transcriptome=''	#-------#	Path to transcriptome must be specified when used as reference-
+
+######	EXECUTION VARIABLES	#######
+export RESOURCES="-c 2 -t 10:00:00 -m 10"	#-------#	AutoFlow resources setting 
+export project_folder=/mnt/home/users/bio_267_uma/aestebanm/dev_workflows/DEG_workflow/execution	#-------#	Global execution folder 
+export MAPPING_RESULTS_FOLDER=$project_folder'/clean_and_map'	#-------#	Secondary execution path
+export VARIANT_RESULTS_FOLDER=$project_folder'/variant_analysis'
+export TARGETS_FOLDER=$CODE_PATH'/TARGETS'	#-------#	Set the folder that stores all target files. DEFAULT: TARGETS_FOLDER=$CODE_PATH'/TARGETS'
+export link_path=''	#-------#	Folder with cleaned samples following the AutoFlow results folder structure. Folder must contain {sample_name}/seqtrimbb_0000/output_files. output_files folder will be linked
+export ADD_trimming_opt=""	#-------#	Additional triming options. Semicolon (:) equals to spaces ( ), and exclamation marks (!) to commas (,). Please consider this to replace
+export keep_bam=TRUE #-------#	Keep bam files after aligning. Set this variable to 'TRUE' to keep these files in the output folder.
+export launch_login=TRUE 	#-------#	Login execution mode. Set this variable to 'TRUE' to execute all modules in login.
+
+######	SAMPLES VARIABLES	#######
+export SAMPLES_FILE=$CODE_PATH"/samples_to_process.lst"	#-------#	A list with sample names. File name must be unique and must not include paired-end information or file extension. (e.g. For file "sample_ex_1.fastq.gz" and "sample_ex_2.fastq.gz", filename is "sample_ex")
+export read_path=$CODE_PATH'/raw_data'	#-------#	New path where samples were linked and renamed
+
+#####	REPORT VARIABLES	#######
+export REPORT_TEMPLATES_FOLDER=$CODE_PATH'/templates/reports'	#-------#	Report templates path
+export report_folder=$project_folder'/mapping_reports'	#-------#	Report output path
+
+if [[ $experiment_type == "miRNAseq_detection" ]]; then
+
+	##################################
+	## miRNA-seq variables
+	##################################
+	export TEMPLATE=$CODE_PATH"/templates/miRNA_detection.txt"	#-------#	AutoFlow mapping template. Modifying this variable is not advised.
+	export MIRBASE_ORGANISM='hsa'	#--------#	STRING for mirbase filtering (three words code) 'hsa', 'mmu'
+	export min_mirna_length=18	#-------# Minimum read length for miRNA detection.
+elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_transcriptome" ]]; then
+	##################################
+	## RNA-seq variables
+	##################################
+	####### Mapping	#######
+
+	export min_too_short=1	#-------#	Minimun percentage of Unmapped: too short reads to run the protocol to inspect them
+	export unmapped_ratio=0.8	#-------#	Ratio of unmapped nucleotids on a read to be reported as "too short" mapping
+	export HUNTER_RESULTS_FOLDER=$project_folder'/DEGenesHunter_results'	#-------#	Secondary execution path
+	export TEMPLATE=$CODE_PATH"/templates/mapping_template.txt"	#-------#	AutoFlow mapping template. Modifying this variable is not advised
+	export MIN_READ_LENGTH=135 	#-------#	Minimum read length theshold in trimming step. Set 10 for miRNA detection or miRNA DEA analysis
+	export min_qual=20	#-------#	Minimum quality threshold to be applied (Phred quality score). Integer
+	export read_layout='paired'	#-------#	Read layout must be defined as 'paired' in case of paired-end samples or 'single' in case of single-end samples
+	export stranded='yes'	#-------#	This parametrer must be changed in case of not-stranded sequencing only (rare case)
+	export miRNA_det_path=""	#-------#	Path to miRNA detection execution folder. This folder is only inspected to create the final results pack
+	export var_intervals="chr16:8797339-8849825" #-------# Genomic intervals to variant call (low confidence). If empty, variant calling will not be performed. If high-confidence variant calling is required, please use https://github.com/AEstebanMar/alignment_vc_pipeline. Specify more than one interval by separating them with ";".
+	export bam_coords="" #-------# Path to bed file with genome coordinates to keep in BAM files. Leave empty ("") to disable.
+	if [[ $var_intervals != "" ]]; then
+		export TEMPLATE=$TEMPLATE","$CODE_PATH"/templates/variant_calling.txt"
+	fi
+	export query_genes="ENSG00000100417;ENSG00000140650" #-------# Genes to explore in expression analysis. Use ENS symbol, and separate them with semicolons (";").
+	export alt_seq="" #-------# File with alternative sequence reference to do an alignment with the unmapped sequences from general mapping
+	export count_var_quantile=0
+
+	################## Differential expression analysis variables #####################
+	##### IMPORTANT: To delete a variable, you just have to define it as an empty string
+
+	######	DEgenesHunter comparisons	######
+
+	export seed="69" #-------#  Seed to define in degenes_Hunter.R script. Will affect PCA results. Leave empty ("") to use a random seed, else provide an integer.
+	export de_pvalue="0.05"	#-------#	Minimum P-value threshold 
+	export de_packages="DEL"	#-------#	Gene expresion analysis algorithms to use (D = DESeq2, E = edgeR, L = limma, N= NOISeq, W = WGCNA)
+	export de_min_pack="3"	#-------#	Number of minimum packages to consider a gene as a 'PREVALENT' DEG
+	export de_logfc="1"	#-------#	Log2FC threshold
+	export WGCNA_mergecutHeight="0.25"      #-------#       Value to merge two similar modules: Maximum dissimilarity (i.e., 1-correlation) 
+    export WGCNA_min_genes_cluster="30"     #-------#       Minimum number of genes to keep a cluster       
+    export WGCNA_detectcutHeight="0.995"    #-------#       Cut height to split modules
+   	export WGCNA_deepsplit="2"    #-------#		Split depth to define modules (values between 1 to 3)
+   	export WGCNA_corType=pearson    #-------#		Correlation function to build the coexpression network
+   	export min_reads=''	#------#	Used in filtering. Reads (counts per million mapped reads) per gene per sample threshold to count as expressed for --minlibraries value. Default=2
+	export min_libraries=''	#------#	Used in filtering. Minimum libraries needed to consider a gene as expressed. Default=2
+	export filter_type='' #------#	Used in filtering. Genes filtering mode. Set to 'global' to apply filter on all samples, or set to 'separate' to apply to each group independently. Default=separate
+	export string_features=''	#------#	Columns in the target file to be used as categorical factors in correlation analysis. Multiple columns should be separated by commas
+	export numeric_features=''
+	export generate_targets="
+		#generate_targets.rb -o $TARGETS_FOLDER -e experiment_design -t 'target_name>factorA:control_feature,treatment_feature_1/treatment_feature_2;factorB:control_Featrue,treatment_feature' -o $TARGETS_FOLDER
+		generate_targets.rb -o $TARGETS_FOLDER -e experiment_design -t 'pat_GFP_vs_PMM2>mRNA_added:GFP,PMM2' -f 'condition=patient' -o $TARGETS_FOLDER
+	"	#------#	Commands to generate target files. Whole string will be interpreted by BASH.
+	# If you need extra fields for multifactorial DEGENESHUNTER or additional features, or define auxiliar options for DEGENSHUNTER correlations, use the following:
+	# These auxiliar options have preference over config daemon variables and command line additional options
+	# -w whitelist -b blacklist --additional_features $numeric_features,$string_features --aux_options \"-N $numeric_features -S $string_features -v age -r 1.5\"  \n 
+	
+
+	######## Functional DEgenesHunter Analysis	#######
+	
+	export fun_pvalue=0.1 #-------#	Minimum P-value threshold
+	export fun_an_type="KgR"	#-------#	Functional annotation database and enrichment method(s) to use (topGO: G = GO | clusterProfiler: K = KEGG, g = GO, R = Reactome). D = Disease Ontology (DO), d = DGN.
+	export fun_an_performance="o"	#-------#	Functional analysis type ("o" for Over Representation Analysis and "g" for Gene Set Enrichment Analysis)
+	export GO_modules="MBC"	#-------#	Gene subontology analysis to perform (M = Molecular Function, B = Biological Process, C = Celular Components)
+	export fun_remote_mode=''	#-------#	Remote mode. deamon.sh 4 is executed at login when remote mode is activated (Use (b) to launch biomaRt translation; (k) to use Kegg remote data base)
+	export universe=''	#-------#	Set the universe for enrichments, default is 'all' genes in nomenclature. Set to 'expressed' to instead only consider expressed genes.
+	export custom_nomenclature=''	#-------#	File with custom nomenclature in GMT format
+	export fun_organism='Human'	#-------#	Organism to perform functional analysis on
+	export annotation_list=''	#-------#	Functional annotation of transcripts based on an model organism for functional analysis. First column must be ENSEMBL gene ID and second column transcript name
+	export clean_parentals=FALSE	#-------#	Activate parental cleaning in GO enrichments in clusters and topGO
+fi
