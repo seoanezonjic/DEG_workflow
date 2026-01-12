@@ -64,6 +64,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	fi
 	export query_genes="" #-------# Genes to explore in expression analysis. Use ENS symbol, and separate them with semicolons (";"). Example: "ENSG00000100417;ENSG00000140650"
 	export alt_seq="" #-------# File with alternative sequence reference to do an alignment with the unmapped sequences from general mapping
+	export count_var_quantile=0	#-------# Sort genes by variance in decreasing order, then remove tail according to this quantile
 
 	################## Differential expression analysis variables #####################
 	##### IMPORTANT: To delete a variable, you just have to define it as an empty string
