@@ -85,7 +85,7 @@ knitr::opts_chunk$set(fig.width = 10,
 	parse_data_for_stacked_var <- function(df) {
 	    df["multi_map", ] <- as.numeric(gsub("%", "", df["%_of_reads_mapped_to_multiple_loci", ])) + as.numeric(gsub("%", "",df["%_of_reads_mapped_to_too_many_loci", ]))
 		mapping_metric_table <- df[row.names(df) %in% c("sample",vars_STAR_mapping), ]
-		mapping_metric_table <- htmlreportR:::.row_to_header(mapping_metric_table)
+		mapping_metric_table <- row_to_header(mapping_metric_table)
 		row_names <- row.names(mapping_metric_table)
 		mapping_metric_table <- as.data.frame(lapply(mapping_metric_table, function(x) as.numeric(gsub("\\%", "", x))))
 		row.names(mapping_metric_table) <- row_names
