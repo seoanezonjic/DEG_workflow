@@ -368,73 +368,73 @@ end.rcode-->
 <h1> QC and Alignment Report </h1>
 
 
-# <!--begin.rcode  length_before_trimming, eval=execute_length_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE
-# cat(plotter$create_title("Length distribution before trimming", "l_dist_b", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
-# cat(plotter$create_title("Comparison of samples length distribution before trimming", "dist_b", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+<!--begin.rcode  length_before_trimming, eval=execute_length_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE
+cat(plotter$create_title("Length distribution before trimming", "l_dist_b", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+cat(plotter$create_title("Comparison of samples length distribution before trimming", "dist_b", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 
-# 	column_name <- "initial_sequence_length_distribution"
-# 	title <- "Length distributions before trimming"
-# 	x_lab <- ""
-# 	y_lab <- "Length"
-# 	cat(plotter$static_ggplot_main("metrics", func = parse_ditributions_to_df, plotting_function = make_violin_plot, text = TRUE))
-# 	# cat(plotter$prettify_div(plotter$boxplot(list(id = 'boxplot_factor.txt', title = "Violin boxplot", header = TRUE, row_names = TRUE, 
-# 	# 											  text = "dynamic", format = "wide", smp_attr = 5, group = "pathway", add_violin = TRUE)),
-#     #                                               preset = "magic"))
+	column_name <- "initial_sequence_length_distribution"
+	title <- "Length distributions before trimming"
+	x_lab <- ""
+	y_lab <- "Length"
+	cat(plotter$static_ggplot_main("metrics", func = parse_ditributions_to_df, plotting_function = make_violin_plot, text = TRUE))
+	# cat(plotter$prettify_div(plotter$boxplot(list(id = 'boxplot_factor.txt', title = "Violin boxplot", header = TRUE, row_names = TRUE, 
+	# 											  text = "dynamic", format = "wide", smp_attr = 5, group = "pathway", add_violin = TRUE)),
+    #                                               preset = "magic"))
 	
-# end.rcode-->
+end.rcode-->
 
 
-# <!--begin.rcode  qual_scores_initial, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_qual_scores_init
-# cat(plotter$create_title("Quality scores for samples", "qual_b", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
-# 	cat("<br>
-# 	<b> Lowest scores (min/10th decile) and weighted average BEFORE trimming.</b><br>
-# 		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
+<!--begin.rcode  qual_scores_initial, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_qual_scores_init
+cat(plotter$create_title("Quality scores for samples", "qual_b", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+	cat("<br>
+	<b> Lowest scores (min/10th decile) and weighted average BEFORE trimming.</b><br>
+		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
 	
-# 	lineplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_qual_scores_init))
-# 	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
-#                                                config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
-#                                                fields = lineplot_fields)), preset = 'magic'))
+	lineplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_qual_scores_init))
+	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
+                                               config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
+                                               fields = lineplot_fields)), preset = 'magic'))
 
-# end.rcode-->
+end.rcode-->
 
 
-# <!--begin.rcode  length_after_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_length_trimming
-# cat(plotter$create_title("Length distribution after trimming", "l_dist_a", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
-# cat(plotter$create_title("Comparison of samples length distribution after trimming", "dist_a", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+<!--begin.rcode  length_after_trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_length_trimming
+cat(plotter$create_title("Length distribution after trimming", "l_dist_a", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+cat(plotter$create_title("Comparison of samples length distribution after trimming", "dist_a", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 	
-# 	column_name <- "final_sequence_length_distribution"
-#  	title <- "Length distributions after trimming"
-#  	x_lab <- ""
-#  	y_lab <- "Length"
+	column_name <- "final_sequence_length_distribution"
+ 	title <- "Length distributions after trimming"
+ 	x_lab <- ""
+ 	y_lab <- "Length"
 						 	
-# 	cat(plotter$static_ggplot_main("metrics", func = parse_ditributions_to_df, plotting_function = make_violin_plot, text = TRUE))
+	cat(plotter$static_ggplot_main("metrics", func = parse_ditributions_to_df, plotting_function = make_violin_plot, text = TRUE))
  	
-# end.rcode-->
+end.rcode-->
 
-# <!--begin.rcode  trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_trimming
-# 	cat(plotter$create_title("QC of reads before alignment", "QC", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
-# 	cat(plotter$create_title("Total numbers of reads before and after trimming", "reads_cleaned", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+<!--begin.rcode  trimming, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_trimming
+	cat(plotter$create_title("QC of reads before alignment", "QC", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
+	cat(plotter$create_title("Total numbers of reads before and after trimming", "reads_cleaned", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
-# 	barplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_trimming))
-# 	cat(plotter$prettify_div(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE,
-# 							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Values'), fields = barplot_fields)), preset = "magic"))
+	barplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_trimming))
+	cat(plotter$prettify_div(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE,
+							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Values'), fields = barplot_fields)), preset = "magic"))
 	
-# end.rcode-->
+end.rcode-->
 
 
-# <!--begin.rcode  qual_scores, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_qual_scores
-# 	cat(plotter$create_title("Quality scores for samples", "qual_sc", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+<!--begin.rcode  qual_scores, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_qual_scores
+	cat(plotter$create_title("Quality scores for samples", "qual_sc", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
-# 	cat("<br>
-# 		<b> Lowest scores (min/10th decile) and weighted average.</b><br>
-# 		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
+	cat("<br>
+		<b> Lowest scores (min/10th decile) and weighted average.</b><br>
+		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
 	
-# 	lineplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_qual_scores))
-# 	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
-#                                                config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
-#                                                fields = lineplot_fields)), preset = 'magic'))
+	lineplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_qual_scores))
+	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
+                                               config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
+                                               fields = lineplot_fields)), preset = 'magic'))
 
 end.rcode-->
 
@@ -455,12 +455,11 @@ end.rcode-->
 
 
 
-<!--begin.rcode  STAR_mapping, results='asis', echo=TRUE, warning=TRUE, message=TRUE, eval=execute_STAR_mapping
+<!--begin.rcode  STAR_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_STAR_mapping
 	cat(plotter$create_title("Main Alignment Details (STAR)", "align_det_star", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
 	cat(plotter$create_title("Trimmed reads mapping to the genome uniquely, non-uniquely, and not at all", "mapping_sum", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
-	cat("<br>
-		STAR mapper used for this execution. All reads that maps more than once were rejected.<br>\n")
+	cat("<br>STAR mapper used for this execution. All reads that maps more than once were rejected.<br>\n")
 
 	vars_STAR_mapping <- c(vars_STAR_mapping, "multi_map")
     ident <- "sample" 
