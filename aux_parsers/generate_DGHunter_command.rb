@@ -224,11 +224,11 @@ def generate_command(variables)
 	variables.each do |variable, attributes|
 		flag, value = attributes
 		next if (value.nil? || value.empty? || value == "FALSE") && attributes.length > 1
-		
+		value = "" if value == 'NULL'
 		if "TRUE" == value
-			option = "#{flag} " 
+			option = "#{flag} "
 		else
-			option = "#{flag} #{value} "
+			option = "#{flag} \"#{value}\" "
 		end
 		command << option
 	end

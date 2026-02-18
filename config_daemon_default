@@ -73,7 +73,8 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 
 	export seed="" #-------#  Seed to define in degenes_Hunter.R script. Will affect PCA results. Leave empty ("") to use a random seed, else provide an integer.
 	export de_pvalue="0.05"	#-------#	Minimum P-value threshold 
-	export de_packages="WDELN"	#-------#	Gene expresion analysis algorithms to use (D = DESeq2, E = edgeR, L = limma, N= NOISeq, W = WGCNA)
+	export de_packages="WDELN"	#-------#	Gene expresion analysis algorithms to use (D = DESeq2, E = edgeR, L = limma, N= NOISeq, W = WGCNA). Specify "NULL"
+	to only execute the PCA
 	export de_min_pack="4"	#-------#	Number of minimum packages to consider a gene as a 'PREVALENT' DEG
 	export de_logfc="1"	#-------#	Log2FC threshold
 	export WGCNA_mergecutHeight="0.25"      #-------#       Value to merge two similar modules: Maximum dissimilarity (i.e., 1-correlation) 
