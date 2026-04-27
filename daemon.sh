@@ -12,6 +12,7 @@ export AUXSH_PATH=$CODE_PATH'/aux_sh'
 export MASK_YPAR_BEDS=$CODE_PATH'/bed_YPAR'
 export PATH=$AUXSH_PATH:$PATH
 export PATH=$CODE_PATH'/aux_parsers:'$PATH
+echo "Loading config from $CONFIG_DAEMON"
 source $CONFIG_DAEMON
 
 ## STAGE EXECUTION
