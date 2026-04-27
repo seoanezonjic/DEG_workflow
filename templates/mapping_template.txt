@@ -5,35 +5,39 @@
 clean_samples){
  	resources: -u 1 -n cal -c 16 -t '7-00:00:00' -m '80gb'
 	module unload java
-	source ~soft_bio_267/initializes/init_stbb	
+	source ~soft_bio_267/initializes/init_pytrimngs
+	source ~soft_bio_267/initializes/init_fastqc	
 	CPU=`echo "[cpu] - 2" | bc`
 	if [ "$ADD_trimming_opt" != "" ]; then
                 Add_trimming_opt=`echo ";$ADD_trimming_opt" | tr ':' ' ' | tr '!' ','`
         fi
 
 	if [ $link_path != "" ]; then
-		rm -rf output_files*
-		ln -s $link_path/$sample/seqtrimbb_0000/output_files ./	
+		ln -s $link_path/$sample/pytrimngs_0000/output_files ./	
 	else
 		if [ "$read_layout" == "paired" ]; then
-	? 
-			seqtrimbb -t $trim_template -Q $read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz' -P "quality_threshold=$MIN_QUAL;minlength=$min_read_length`echo $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
+			fastqs=$read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz'
 		elif [ "$read_layout" == "single" ] ; then
-			/usr/bin/time -o process_data -v seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -P "quality_threshold=$MIN_QUAL;minlength=$min_read_length`echo -e $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
-		fi	
+			fastqs=$read_folder'/'$sample'.fastq.gz'
+		fi
+	?
+		pytrimngs -t $trim_template -Q $fastqs -w $CPU -M 1000m -P "quality_threshold=$MIN_QUAL;minlength=$min_read_length `echo $Add_trimming_opt`" -O ./
+		### DISCLAIMER: java logs are appended in each execution, not overwritten
 	fi
 
 	if { [ ! -s output_files/paired_1.fastq.gz ] || [ ! -s output_files/paired_2.fastq.gz ]; } && [ ! -s output_files/sequences_.fastq.gz ]; then
 		>&2 echo "Trimming has failed"
 		exit 1
 	else 
-		module purge
-		. ~soft_bio_267/initializes/init_ruby
-		get_fastqc_data.rb -i 'output_files/initial_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tinitial_" $0 }' >> ../metrics
-		seqtrim_results_parser.rb -i "output_files/plugins_logs/*" | awk '{print "$sample" "\t" $0 }' >> ../metrics
+		mkdir -p output_files/initial_stats
+		mkdir -p output_files/final_stats
+		fastqc_files=`echo $fastqs | tr "," " "`
+		fastqc $fastqc_files -o output_files/initial_stats --threads 2
+		get_fastqc_data -i 'output_files/initial_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tinitial_" $0 }' >> ../metrics
+		pytrimngs_results_parser -i "output_files/plugins_logs/*" | awk '{print "$sample" "\t" $0 }' >> ../metrics
 		echo -e "$sample\tpair_layout\t`ls output_files/*fastq.gz | wc -l`" >> ../metrics
-		get_fastqc_data.rb -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
-		mv output_files/report_files/* ./
+		fastqc output_files/*fastq.gz -o output_files/final_stats --threads 2
+		get_fastqc_data -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
 	fi
 }
 
@@ -140,42 +144,4 @@ align_rna_seq){
 
 	fi
 }
-
-# get_variants){
-#         resources: -m '10gb' -c 16 -t '10:00:00'
-#         module load picard/2.20.2
-#         echo [cpu] &> /dev/null
-#         picard AddOrReplaceReadGroups \
-#                I=align_rna_seq)/sorted_mappings.bam \
-#                SO=coordinate \
-#                 O=formated.bam \
-#                RGID=4 \
-#                 RGLB=lib1 \
-#                RGPL=ILLUMINA \
-#                 RGPU=unit1 \
-#                RGSM=20
-#         picard MarkDuplicates I=formated.bam o=formated_dep.bam CREATE_INDEX=true VALIDATION_STRINGENCY=SILENT M=output.metrics
-#         rm -rf formated.bam
-#         module unload picard
-#         module load gatk/4.1.2.0
-#         module unload java
-#         module load java/jdk-8u121
-#         ?
-#         gatk --java-options "-Xmx10g" SplitNCigarReads -R $only_read_ref/genome.fa -I formated_dep.bam -O splitted.bam
-#         gatk --java-options "-Xmx10g" HaplotypeCaller  \
-#            -R $only_read_ref/genome.fa \
-#            -I splitted.bam \
-#            -O output.vcf #\
-#            #-stand_call_conf 20 \
-#            #-filterNoBases \
-#            #--filter_reads_with_N_cigar
-#         if [ ! -s output.vcf ]; then
-#                 >&2 echo "Variant calling step has failed"
-#                 exit 1
-#         else
-#                 #Removing temporal files
-#                 rm ./*.bam
-#                 rm align_rna_seq)/*.bam
-#         fi
-# }
 

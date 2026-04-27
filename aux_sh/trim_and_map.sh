@@ -1,4 +1,4 @@
-. ~soft_bio_267/initializes/init_autoflow
+. ~soft_bio_267/initializes/init_python
 
 while IFS= read sample; do
 
@@ -38,8 +38,7 @@ while IFS= read sample; do
 		\\$stranded=$stranded
 		" | tr -d [:space:]`
 	fi
-
-	AutoFlow -e -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" "$RESOURCES" $ADD_OPTIONS
+	AutoFlow -e -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" $RESOURCES $ADD_OPTIONS
 done < $SAMPLES_FILE
 
 
