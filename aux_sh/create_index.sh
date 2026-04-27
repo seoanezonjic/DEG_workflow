@@ -36,7 +36,12 @@ if [ $experiment_type == "RNAseq_genome" ]; then
 	if ! [[ -d $out || -L $out ]]; then
 		module load star/2.7.11b
 		mkdir -p $out
-		STAR --runThreadN 2 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/genome.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
+		STAR --runThreadN 8 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/genome.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
+		module purge
+		module load gatk # for variant calling on rnaseq
+		rm genome.dict
+		gatk CreateSequenceDictionary -R $mapping_ref'/genome.fa' -O $mapping_ref'/genome.dict'
+
 	else
 		echo "Reference seems to be indexed. If not, remove "$mapping_ref'/STAR_index'" folder"
 	fi
@@ -45,7 +50,7 @@ if [ $experiment_type == "RNAseq_genome" ]; then
 		if ! [[ -d $out || -L $out ]]; then
 			module load star/2.7.11b
 			mkdir -p $out
-			STAR --runThreadN 2 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/Y_PAR_MASKED/genome_Ymask.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
+			STAR --runThreadN 88888888 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/Y_PAR_MASKED/genome_Ymask.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
 		else
 			echo "Reference seems to be indexed. If not, remove "$mapping_ref'/Y_PAR_MASKED/STAR_index'" folder"
 		fi
