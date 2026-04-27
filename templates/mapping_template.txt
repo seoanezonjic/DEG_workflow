@@ -58,7 +58,7 @@ align_rna_seq){
 		sam2counts_all.py -o selected_counts -b sorted_mappings.bam
 		parse_bowtie_log.sh bowtie_log | awk '{print "$sample" "\t" $0}' >> ../metrics
 	elif [ "$experiment_type" == "RNAseq_genome" ]; then
-		module load star/2.5.3a
+		module load star/2.7.11b
 		if [[ $organism == 'human' ]]; then # only human has PAR regions well defined
 			REF_type=Y_PAR_MASKED/STAR_index
 		else

@@ -34,7 +34,7 @@ fi
 if [ $experiment_type == "RNAseq_genome" ]; then
 	out=$mapping_ref'/STAR_index'
 	if ! [[ -d $out || -L $out ]]; then
-		module load star/2.5.3a
+		module load star/2.7.11b
 		mkdir -p $out
 		STAR --runThreadN 2 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/genome.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
 	else
@@ -43,7 +43,7 @@ if [ $experiment_type == "RNAseq_genome" ]; then
 	if [[ $organism == 'human' ]]; then # only human has PAR regions well defined
 		out=$mapping_ref'/Y_PAR_MASKED/STAR_index'
 		if ! [[ -d $out || -L $out ]]; then
-			module load star/2.5.3a
+			module load star/2.7.11b
 			mkdir -p $out
 			STAR --runThreadN 2 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/Y_PAR_MASKED/genome_Ymask.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
 		else
