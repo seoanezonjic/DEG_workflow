@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-#SBATCH --mem='40gb'
+#SBATCH --mem='100gb'
 #SBATCH --time='7-00:00:00'
 #SBATCH --error=index.%J.err
 #SBATCH --output=index.%J.out
@@ -50,7 +50,7 @@ if [ $experiment_type == "RNAseq_genome" ]; then
 		if ! [[ -d $out || -L $out ]]; then
 			module load star/2.7.11b
 			mkdir -p $out
-			STAR --runThreadN 88888888 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/Y_PAR_MASKED/genome_Ymask.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
+			STAR --runThreadN 8 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/Y_PAR_MASKED/genome_Ymask.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
 		else
 			echo "Reference seems to be indexed. If not, remove "$mapping_ref'/Y_PAR_MASKED/STAR_index'" folder"
 		fi
