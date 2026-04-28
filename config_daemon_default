@@ -55,7 +55,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	export MIN_READ_LENGTH=65 	#-------#	Minimum read length theshold in trimming step. Set 10 for miRNA detection or miRNA DEA analysis
 	export min_qual=20	#-------#	Minimum quality threshold to be applied (Phred quality score). Integer
 	export read_layout='paired'	#-------#	Read layout must be defined as 'paired' in case of paired-end samples or 'single' in case of single-end samples
-	export stranded='yes'	#-------#	This parametrer must be changed in case of not-stranded sequencing only (rare case)
+	export stranded='no'	#-------#	Set this to 'yes' for stranded experiments (check kit used in sequencing)
 	export miRNA_det_path=""	#-------#	Path to miRNA detection execution folder. This folder is only inspected to create the final results pack
 	export bam_coords="" #-------# Path to bed file with genome coordinates to keep in BAM files. Leave empty ("") to disable.
 	export var_intervals="" #-------# Genomic intervals to variant call (low confidence). If empty, variant calling will not be performed. If high-confidence variant calling is required, please use https://github.com/AEstebanMar/alignment_vc_pipeline. Specify more than one interval by separating them with "&". Example: "chr1:1-100;chr2:2-200"

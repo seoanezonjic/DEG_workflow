@@ -82,7 +82,7 @@ align_rna_seq){
 		mv Log* mapping_logs/
 		mv Aligned.sortedByCoord.out.bam sorted_mappings.bam 
 		#creating count table
-		select_counts.rb -i ReadsPerGene.out.tab -s $stranded > selected_counts
+		select_counts.R -i ReadsPerGene.out.tab -s $stranded > selected_counts
 		#metric extraction
 		too_short_sample=`grep 'too_short' star_log | cut -f 3 | tr -d '%'`
 		if (( $(echo "$too_short_sample > $MIN_TOO_SHORT" | bc -l) )); then 
