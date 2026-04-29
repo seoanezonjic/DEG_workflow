@@ -75,7 +75,7 @@ align_rna_seq){
 			mv Unmapped.out.mate1 unmapped.fastq
 		fi
 		module purge
-		source ~soft_bio_267/initializes/init_R
+		source ~soft_bio_267/initializes/init_degenes_hunter
 		rm Aligned.toTranscriptome.out.bam
 		parse_STAR_log -d Log.final.out | awk '{print "$sample" "\t" $0}' > star_log 
 		mkdir mapping_logs 
@@ -92,16 +92,16 @@ align_rna_seq){
 		fi  
 	fi			
 	module purge
-	. ~soft_bio_267/initializes/init_qualimap	
+	#. ~soft_bio_267/initializes/init_qualimap
 	?
 	qualimap bamqc -nt [cpu] -bam sorted_mappings.bam -outdir results --java-mem-size=20G
-	if [ ! -s results/qualimapReport.html ] || [ ! -s selected_counts ]; then 
+	#if [ ! -s results/qualimapReport.html ] || [ ! -s selected_counts ]; then
 		>&2 echo "Mapping step has failed"
 		exit 1
 	else
 		cat star_log >> ../metrics
 		awk 'NR>4 {sum+=$2} END {print sum}' selected_counts |  awk '{print "$sample" "\t" "aligned_to_feature" "\t" $0 }' >> ../metrics
-		sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
+		#sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
 		# Keep specific genomic regions
 		if [ "$bam_coords" != "" ]; then
 				module purge
@@ -113,7 +113,7 @@ align_rna_seq){
 			
 			rm sorted_mappings.bam 
 		fi
-	fi
+	#fi
 	if [ -s $alt_seq ]; then
 		module load bowtie/2.5.1
 		module load samtools
