@@ -15,7 +15,8 @@ while IFS= read sample; do
 	\\$link_path=\"$link_path\",
 	\\$bam_coords=$bam_coords,
 	\\$var_intervals=$var_intervals,
-	\\$only_read_ref=$only_read_ref
+	\\$only_read_ref=$only_read_ref,
+	\\$alt_seq=$alt_seq
 	" | tr -d [:space:]`
 
 	if `echo $experiment_type | grep -q "^RNAseq"`; then
@@ -34,7 +35,7 @@ while IFS= read sample; do
 	if [[ $experiment_type == "RNAseq_genome" ]]; then
 		AF_VARS=$AF_VARS,`echo "
 		\\$MIN_TOO_SHORT=$min_too_short,
-		\\$UNPAMMED_RATIO=$unmapped_ratio,
+		\\$UNMAPPED_RATIO=$unmapped_ratio,
 		\\$stranded=$stranded
 		" | tr -d [:space:]`
 	fi

@@ -109,8 +109,7 @@ align_rna_seq){
 				bedtools intersect -a sorted_mappings.bam -b $bam_coords > filtered_region.bam
 		fi
 		#Removing temporal files
-		if [ "$keep_bam" == FALSE ]; then
-			
+		if [ "$keep_bam" == FALSE ]; then	
 			rm sorted_mappings.bam 
 		fi
 	#fi
