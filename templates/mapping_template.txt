@@ -86,7 +86,7 @@ align_rna_seq){
 		#metric extraction
 		too_short_sample=`grep 'too_short' star_log | cut -f 3 | tr -d '%'`
 		if (( $(echo "$too_short_sample > $MIN_TOO_SHORT" | bc -l) )); then 
-			map_too_short.sh unmapped.fastq $ref [cpu] $UNPAMMED_RATIO
+			map_too_short.sh unmapped.fastq $ref [cpu] $UNMAPPED_RATIO
 		else 
 			rm Unmapped.out*
 		fi  
@@ -114,7 +114,7 @@ align_rna_seq){
 			rm sorted_mappings.bam 
 		fi
 	#fi
-	if [ -s $alt_seq ]; then
+	if [ -s "$alt_seq" ]; then
 		module load bowtie/2.5.1
 		module load samtools
 		source ~soft_bio_267/initializes/init_R
