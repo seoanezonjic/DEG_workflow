@@ -8,7 +8,7 @@ module load samtools
 source ~soft_bio_267/initializes/init_R
 mkdir unmapped_mapping
 bowtie2-build $seq_reference unmapped_mapping'/alt_seq'
-bowtie2 -p 4 -x unmapped_mapping'/alt_seq' -q -1 'Unmapped.out.mate1' -2 'Unmapped.out.mate2' 2>bowtie_log | samtools sort -o unmapped_mapping'/sorted_mappings.bam'
+bowtie2 -p 4 -x unmapped_mapping'/alt_seq' -q -1 'Unmapped.out.mate1' -2 'Unmapped.out.mate2' 2>bowtie_alt_log | samtools sort -o unmapped_mapping'/sorted_mappings.bam'
 samtools flagstat unmapped_mapping'/sorted_mappings.bam' > unmapped_mapping'/alignment_stats.txt'
 samtools idxstats unmapped_mapping'/sorted_mappings.bam' > unmapped_mapping'/idxstats.txt'
 head -n-1 unmapped_mapping'/idxstats.txt' > unmapped_mapping'/relevant_stats'
