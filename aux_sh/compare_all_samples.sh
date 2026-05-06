@@ -4,13 +4,13 @@
 #SBATCH --time='02:00:00'
 hostname
 
-source ~soft_bio_267/initializes/init_degenes_hunter
+source ~aestebanm/software/inits/init_Hunter_dev
 source ~soft_bio_267/initializes/init_python
 
 mkdir $report_folder
 ## Collection information and mapping report generation
 cat $MAPPING_RESULTS_FOLDER/*/metrics | sed "s/'//g" | awk 'BEGIN {IFS="\t";OFS="\t"}{if($3 != "" )print $0}' > $report_folder'/all_metrics'
-create_metric_table $report_folder'/all_metrics' sample $report_folder'/metric_table' -c $report_folder'/corrupted_samples'
+cmdtabs -i $report_folder'/all_metrics' --sample_attributes sample -o $report_folder'/metric_table' --corrupted $report_folder'/corrupted_samples'
 
 full_path_tagets=`ls $TARGETS_FOLDER/*_target.txt | tr "\n" ","` 
 full_path_tagets=${full_path_tagets%?}
@@ -27,7 +27,7 @@ if [[ $experiment_type != "miRNAseq_detection" ]]; then
 	counts_tables=${counts_tables%?}
 	all_samples=${all_samples%?}
 	headers=$headers",t"
-	merge_count_tables.rb -i $counts_tables -t $all_samples > $report_folder/all_counts
+	merge_count_tables.R -i $counts_tables -t $all_samples > $report_folder/all_counts
 	sed -i '1s/^\t/gene_id\t/g' $report_folder/all_counts
 	all_report_files=$all_report_files,$report_folder/all_counts
 	if [ "$TARGETS" != "" ]; then
@@ -37,7 +37,9 @@ if [[ $experiment_type != "miRNAseq_detection" ]]; then
 		done
 	fi
 fi
-html_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.txt -o $report_folder/mapping_report.html -d $all_report_files --title "Mapping Report" 
+source ~/software/inits/init_htmlreportR
+html_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.txt -o $report_folder/mapping_report.html -d $all_report_files --title "Mapping Report"
+exit 0
 if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	. ~soft_bio_267/initializes/init_ruby
 	module load cdhit

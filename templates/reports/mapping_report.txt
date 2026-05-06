@@ -10,10 +10,8 @@
 	}
 </style>
 
-
-
-
 <!--begin.rcode functions, results='asis', echo=FALSE, warning=FALSE, message=FALSE
+
 knitr::opts_chunk$set(fig.width = 10, 
 					  fig.height= 6)
 	create_clustering <- function(target, all_metrics, metrics_to_process, count_data, metric_var_2_legend_name, method = "complete"){ #Use of 'complete' clustering method as default, as same as DEgenesHunter
@@ -41,13 +39,11 @@ knitr::opts_chunk$set(fig.width = 10,
 		index_control_cols <- as.character(subset(target, treat == "Ctrl", select = sample, drop = TRUE))
 		index_treatmn_cols <- as.character(subset(target, treat == "Treat", select = sample, drop = TRUE))
 		to_keep_control <- rowSums(edgeR::cpm(samples_count_data[index_control_cols]) > 2) >= 2
-	    	to_keep_treatment <- rowSums(edgeR::cpm(samples_count_data[index_treatmn_cols]) > 2) >= 2
+		to_keep_treatment <- rowSums(edgeR::cpm(samples_count_data[index_treatmn_cols]) > 2) >= 2
     		keep_cpm <- to_keep_control | to_keep_treatment
 		samples_count_data <- samples_count_data[keep_cpm, ]
 		samples_count_data <- samples_count_data[c(index_control_cols,index_treatmn_cols)]
-		dds <- DESeqDataSetFromMatrix(countData = samples_count_data,
-							colData = target,
-                            design = formula("~ treat"))
+		dds <- DESeqDataSetFromMatrix(countData = samples_count_data, colData = target, design = formula("~ treat"))
 		dds <- DESeq(dds)
 		normalized_counts <- as.data.frame(counts(dds, normalized=TRUE)) # Getting normalized values
 		normalized_counts <- data.frame(log10(data.matrix(normalized_counts) + 1)) # Data normalization
@@ -59,17 +55,14 @@ knitr::opts_chunk$set(fig.width = 10,
 	parse_bowtie2_metrics <- function(df) {
 		mapping_metric_table <-data.frame(df["sample"], df[, vars_bowtie2_mapping])
 		filter_and_melt(mapping_metric_table)
-
 	}
 
 	parse_alt_GFP_PMM2_metrics <- function(df) {
 		mapping_metric_table <-data.frame(df["sample"], df[, vars_alt_GFP_PMM2_mapping])
 		filter_and_melt(mapping_metric_table)
-
 	}
 
 	parse_STAR_vars <- function(df) {
-
 	    df[, "multi_map"] <- as.numeric(gsub("%", "", df[,"%_of_reads_mapped_to_multiple_loci"])) + as.numeric(gsub("%", "",df[,"%_of_reads_mapped_to_too_many_loci"]))
 		mapping_metric_table <- df[, colnames(df) %in% vars_STAR_mapping]
 		mapping_metric_table <- as.data.frame(lapply(mapping_metric_table, function(x) as.numeric(gsub("\\%", "", x))), check.names = FALSE)
@@ -81,7 +74,6 @@ knitr::opts_chunk$set(fig.width = 10,
 		return(melt_df)
 	}
 
-
 	parse_data_for_stacked_var <- function(df) {
 	    df["multi_map", ] <- as.numeric(gsub("%", "", df["%_of_reads_mapped_to_multiple_loci", ])) + as.numeric(gsub("%", "",df["%_of_reads_mapped_to_too_many_loci", ]))
 		mapping_metric_table <- df[row.names(df) %in% c("sample",vars_STAR_mapping), ]
@@ -91,9 +83,6 @@ knitr::opts_chunk$set(fig.width = 10,
 		row.names(mapping_metric_table) <- row_names
 		return(mapping_metric_table)
 	}
-
-
-
 
 	make_stacked_barchart_from_df <- function(ggplot_obj) {
 		ggplot_obj + ggplot2::aes_string(x=ident, y="value", fill="variable") +
@@ -122,7 +111,6 @@ knitr::opts_chunk$set(fig.width = 10,
 		ggplot2::xlab(axis_lab_name1) + ggplot2::ylab(axis_lab_name2) + ggplot2::ylim(0,NA)
 	}
 
-
 	filter_and_melt <- function(df){
 		reduced_df <- df[,c(ident, other_vars)]
 		melt_df <- reshape2::melt(reduced_df, id.vars = ident)
@@ -133,7 +121,6 @@ knitr::opts_chunk$set(fig.width = 10,
 		res <- df[c(ident, other_vars), ]
 		return(res)
 	}
-
 
 	# this is a little like a barplot, but the absolute values are shown, with a line connecting them.
 	make_vert_line_plot_from_df <- function(ggplot_obj){
@@ -183,8 +170,7 @@ knitr::opts_chunk$set(fig.width = 10,
 		as.data.frame(t(top_n_perc))
 	}
 
-	parse_ditributions_to_df <- function(all_metrics){
-
+	parse_distributions_to_df <- function(all_metrics){
 		samples <- seq(nrow(all_metrics))
 		all_distribution_parsed <- as.data.frame(do.call(rbind, lapply(samples, function(sample_index){
 			sample <- all_metrics$sample[sample_index]
@@ -245,7 +231,6 @@ knitr::opts_chunk$set(fig.width = 10,
 	}
 
 	plot_in_div <- function(g, fig_height=7, fig_width=12) {
-
 		cat('\n<div class="plot_real_size">\n')
 		g_deparsed <- paste0(deparse(function() {g}), collapse = '')
 		sub_chunk <- paste0("\n```{r sub_chunk_", floor(runif(1) * 10000), ", fig.height=", fig_height, ", fig.width=", fig_width, ", echo=FALSE, message= FALSE, warning= FALSE}", "\n(", g_deparsed, ")()\n```\n\n\n") 
@@ -253,9 +238,14 @@ knitr::opts_chunk$set(fig.width = 10,
 		cat('\n</div>\n')
 	}
 
-
 	chunks <- function(code, options = ""){paste(paste("```{r ",options,"}",sep = ""),code,"```",sep="\n")}
 	render <- function(text){paste(knit(text = paste(text,collapse = "\n")),collapse = "\n")}
+
+	match_metrics <- function(metrics, columns) {
+		fields <- match(c("sample", columns), colnames(metrics))
+		fields <- fields[!is.na(fields)]
+		return(fields)
+	}
 end.rcode-->
 
 <!--begin.rcode  prior_proc, results='asis', echo=FALSE, warning=FALSE, message=FALSE
@@ -306,13 +296,13 @@ end.rcode-->
 		"bowtie2_unmapped_per" = "Unmapped reads %",
 		"bowtie2_multimapping_per" = "Reads aligned more than once %",
 		"bowtie2_uniq_mapped_per" = "Reads aligned once %",
-		"aligned_to_gfp_per" = "Aligned to GFP %",
-		"unaligned_to_gfp_per" = "Not aligned to GFP %",
+		#"aligned_to_gfp_per" = "Aligned to GFP %",
+		#"unaligned_to_gfp_per" = "Not aligned to GFP %",
 		"aligned_to_inj_pmm2_per" = "Aligned to injected PMM2 %",
 		"unaligned_to_inj_pmm2_per" = "Not aligned to injected PMM2 %",
 		"initial_sequence_length_distribution" = "Read length distribution before trimming",
 		"final_sequence_length_distribution" = "Read length distribution after trimming",
-		"EGFP_unmapped_pct" = "Aligned to GFP (%)",
+		#"EGFP_unmapped_pct" = "Aligned to GFP (%)",
 		"injected_PMM2_unmapped_pct" = "Aligned to injected PMM2 (%)",
 		"unmapped_reads_unaligned_pct" = "Unaligned (%)"
 		)
@@ -323,7 +313,6 @@ end.rcode-->
 		metric_var = names(metric_dictionary),
 		legend_name = unlist(metric_dictionary)
 	)
-
 	
 	###############################
 	## CONTROL VARIABLES
@@ -359,8 +348,8 @@ end.rcode-->
 	execute_length_trimming <- all(vars_length_trimming %in% all_vars)
 	vars_clustering <- c("initial_total_sequences", "final_total_sequences", "Uniquely_mapped_reads_.", "multi_map", "%_of_reads_mapped_to_multiple_loci","%_of_reads_mapped_to_too_many_loci","%_of_reads_unmapped._too_short","%_of_reads_unmapped._other","Uniquely_mapped_reads_number","aligned_to_feature","initial_weigthed_qual_per_sequence","number_duplicatedreads.estimated.","final_mean_qual_per_base","final_min_qual_per_base_in_10th_decile","final_min_qual_per_base_in_lower_quartile","final_weigthed_qual_per_sequence","bowtie1_mapped_per","bowtie1_unmapped_per","bowtie1_multimapping_per","bowtie1_mapped","bowtie1_filtered_reads","bowtie2_unmapped_per","bowtie2_multimapping_per","bowtie2_uniq_mapped_per")
 	vars_clustering <- vars_clustering[vars_clustering %in% all_vars]	
-	vars_alt_GFP_PMM2_mapping <- c("EGFP_unmapped_pct", "injected_PMM2_unmapped_pct","unmapped_reads_unaligned_pct")
-	execute_alt_GFP_PMM2_mapping <- all(vars_alt_GFP_PMM2_mapping %in% all_vars)
+	#vars_alt_GFP_PMM2_mapping <- c("EGFP_unmapped_pct", "injected_PMM2_unmapped_pct","unmapped_reads_unaligned_pct")
+	#execute_alt_GFP_PMM2_mapping <- all(vars_alt_GFP_PMM2_mapping %in% all_vars)
 end.rcode-->
 
 
@@ -377,7 +366,7 @@ cat(plotter$create_title("Comparison of samples length distribution before trimm
 	title <- "Length distributions before trimming"
 	x_lab <- ""
 	y_lab <- "Length"
-	cat(plotter$static_ggplot_main("metrics", func = parse_ditributions_to_df, plotting_function = make_violin_plot, text = TRUE))
+	cat(plotter$static_ggplot_main("metrics", func = parse_distributions_to_df, plotting_function = make_violin_plot, text = TRUE))
 	# cat(plotter$prettify_div(plotter$boxplot(list(id = 'boxplot_factor.txt', title = "Violin boxplot", header = TRUE, row_names = TRUE, 
 	# 											  text = "dynamic", format = "wide", smp_attr = 5, group = "pathway", add_violin = TRUE)),
     #                                               preset = "magic"))
@@ -391,7 +380,7 @@ cat(plotter$create_title("Quality scores for samples", "qual_b", hlevel = 3, ind
 	<b> Lowest scores (min/10th decile) and weighted average BEFORE trimming.</b><br>
 		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
 	
-	lineplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_qual_scores_init))
+	lineplot_fields <- match_metrics(plotter$hash_vars$metrics, vars_qual_scores_init)
 	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
                                                config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
                                                fields = lineplot_fields)), preset = 'magic'))
@@ -409,7 +398,7 @@ cat(plotter$create_title("Comparison of samples length distribution after trimmi
  	x_lab <- ""
  	y_lab <- "Length"
 						 	
-	cat(plotter$static_ggplot_main("metrics", func = parse_ditributions_to_df, plotting_function = make_violin_plot, text = TRUE))
+	cat(plotter$static_ggplot_main("metrics", func = parse_distributions_to_df, plotting_function = make_violin_plot, text = TRUE))
  	
 end.rcode-->
 
@@ -417,7 +406,7 @@ end.rcode-->
 	cat(plotter$create_title("QC of reads before alignment", "QC", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
 	cat(plotter$create_title("Total numbers of reads before and after trimming", "reads_cleaned", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
-	barplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_trimming))
+	barplot_fields <- match_metrics(plotter$hash_vars$metrics, vars_trimming)
 	cat(plotter$prettify_div(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE,
 							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Values'), fields = barplot_fields)), preset = "magic"))
 	
@@ -431,7 +420,7 @@ end.rcode-->
 		<b> Lowest scores (min/10th decile) and weighted average.</b><br>
 		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
 	
-	lineplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_qual_scores))
+	lineplot_fields <- match_metrics(plotter$hash_vars$metrics, vars_qual_scores)
 	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
                                                config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
                                                fields = lineplot_fields)), preset = 'magic'))
@@ -473,7 +462,7 @@ end.rcode-->
 
 end.rcode-->
 
-<!--begin.rcode  alt_GFP_PMM2_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_alt_GFP_PMM2_mapping
+<!--begin.rcode  alt_GFP_PMM2_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=FALSE
 	##################################################
 	###	BOWTIE2 PLOTS
 	##################################################
@@ -485,30 +474,30 @@ end.rcode-->
 
     vars_alt_GFP_PMM2_mapping_legend_names <- metric_var_2_legend_name[match(vars_alt_GFP_PMM2_mapping, metric_var_2_legend_name$metric_var), "legend_name" ]
     ident <- "sample"
-<<<<<<< Updated upstream
+	### Updated upstream
     other_vars <- vars_alt_GFP_PMM2_mapping
 	legend_names <- vars_alt_GFP_PMM2_mapping_legend_names
     cat(plotter$static_ggplot_main("metrics", text = "dynamic", func = parse_alt_GFP_PMM2_metrics, plotting_function = make_stacked_barchart_from_df))
-=======
+	### =======
     other_vars <- vars_bowtie2_mapping
 	legend_names <- vars_bowtie2_mapping_legend_names
     
     cat(plotter$static_ggplot_main("metrics", text = "dynamic", func = parse_bowtie2_metrics, plotting_function = make_stacked_barchart_from_df))
 
->>>>>>> Stashed changes
+	###>>>>>>> Stashed changes
 end.rcode-->
 
 
 <!--begin.rcode  STAR_feature_overlap, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_STAR_feature_overlap
-	cat(plotter$create_title("Overlap of the mapped reads with genomic features", "overlap", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
+	cat(plotter$create_title("Overlap of mapped reads with genomic features", "overlap", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 	cat("<br>
 		STAR mapper used for this execution. Reads were aligned to whole genome so mapped reads can not map to genomic features.<br>\n")	
 
-	barplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_STAR_feature_overlap))
+	barplot_fields <- match_metrics(plotter$hash_vars$metrics, vars_STAR_feature_overlap)
 	cat(plotter$prettify_div(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE,
-							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Value', 'percentAspectRatioPlotArea' = 0.5), 
-							 fields = barplot_fields)), preset = "magic"))
+							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Value', 'percentAspectRatioPlotArea' = 0.5,
+							 legendPosition = "top"), fields = barplot_fields)), preset = "magic"))
 
 end.rcode-->
 
@@ -518,10 +507,10 @@ end.rcode-->
 	cat("<br>
 		Bowtie 2 mapper used for this execution. Reads were aligned to transcriptome or custom fasta so mapped reads always overlap with genomic features.<br>\n")	
 
-    barplot_fields <- which(colnames(plotter$hash_vars$metrics) %in% c("sample", vars_bowtie2_feature_overlap))
+    barplot_fields <- match_metrics(plotter$hash_vars$metrics, vars_bowtie2_feature_overlap)
 	cat(plotter$prettify_div(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE,
 							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Value', 'percentAspectRatioPlotArea' = 0.5), 
-							 fields = barplot_fields)), preset = "magic"))
+							 fields = barplot_fields, legendPosition = "top")), preset = "magic"))
 
 end.rcode-->
 

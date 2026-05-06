@@ -1,5 +1,4 @@
 . ~soft_bio_267/initializes/init_python
-
 while IFS= read sample; do
 
 	#############################################################
@@ -16,7 +15,9 @@ while IFS= read sample; do
 	\\$bam_coords=$bam_coords,
 	\\$var_intervals=$var_intervals,
 	\\$only_read_ref=$only_read_ref,
-	\\$alt_seq=$alt_seq
+	\\$alt_seq=$alt_seq,
+	\\$CODE_PATH=$CODE_PATH,
+	\\$keep_bam=$keep_bam
 	" | tr -d [:space:]`
 
 	if `echo $experiment_type | grep -q "^RNAseq"`; then
