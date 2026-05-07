@@ -39,7 +39,6 @@ if [[ $experiment_type != "miRNAseq_detection" ]]; then
 fi
 source ~/software/inits/init_htmlreportR
 html_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.txt -o $report_folder/mapping_report.html -d $all_report_files --title "Mapping Report"
-exit 0
 if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	. ~soft_bio_267/initializes/init_ruby
 	module load cdhit
@@ -63,8 +62,9 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 		mkdir $target_results_folder
 		
 		## Join all results of each sample in a general table
-		maps2DEGhunter.rb $target_path $MAPPING_RESULTS_FOLDER qualimap_0000/selected_counts $target_results_folder no
-		grep -v '^N_' $target_results_folder'/selected_counts' | sum_counts_by_isoform.rb - > $target_results_folder'/final_counts.txt'
+		head $target_path
+		target_samples=`cut -f 1 $target_path | tail -n +2 | tr "\n" ","`
+		cmdtabs -i $report_folder/all_counts -H --extract_cols ${target_samples%,} > $target_results_folder"/final_counts.txt"
 		degenes_hunter_options=`generate_DGHunter_command.rb -m "degenes_Hunter"`
 		## Launch DEGenesHunter
 		/usr/bin/time -o $target_results_folder/process_data_degenes_hunter -v degenes_Hunter.R $degenes_hunter_options -i $target_results_folder'/final_counts.txt' -o $target_results_folder &>$target_results_folder/'degenes_Hunter.log' &
