@@ -7,7 +7,7 @@ hostname
 
 functional_launch=$1
 source ~soft_bio_267/initializes/init_degenes_hunter
-functional_hunter_options=`generate_DGHunter_command.rb -m "functional_Hunter"`
+functional_hunter_options=`generate_DGHunter_command.R -m "functional_Hunter"`
 for TARGET_FILE in `echo $TARGETS | tr "," " "`
 do
 	TARGET_NAME=`echo $TARGET_FILE | sed 's/_target.txt//'`

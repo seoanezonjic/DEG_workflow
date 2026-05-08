@@ -58,8 +58,9 @@ if [ "$module" == "2c" ] ; then
 fi
 
 export TARGETS=1
-if [ $experiment_type != "miRNAseq_detection" ] ; then 
 
+if [ $experiment_type != "miRNAseq_detection" ] ; then
+	source ~soft_bio_267/initializes/init_degenes_hunter
 	rm -r $TARGETS_FOLDER
 	mkdir $TARGETS_FOLDER
 	eval "$generate_targets"

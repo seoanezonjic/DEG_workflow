@@ -44,6 +44,8 @@ clean_samples){
 align_rna_seq){ 
 	resources: -m '40gb' -c 4 -t '10:00:00' -n cal
 	#module load samtools/1.9 #not available on picasso now
+	source ~soft_bio_267/initializes/init_degenes_hunter
+	export PATH=$CODE_PATH'/aux_parsers:'$PATH
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
 	if [ "$experiment_type" == "RNAseq_transcriptome" ]; then
 		module load samtools/1.21

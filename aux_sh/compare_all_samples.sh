@@ -4,7 +4,7 @@
 #SBATCH --time='02:00:00'
 hostname
 
-source ~aestebanm/software/inits/init_Hunter_dev
+source ~soft_bio_267/initializes/init_degenes_hunter
 source ~soft_bio_267/initializes/init_python
 
 mkdir $report_folder
@@ -37,8 +37,7 @@ if [[ $experiment_type != "miRNAseq_detection" ]]; then
 		done
 	fi
 fi
-source ~/software/inits/init_htmlreportR
-html_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.txt -o $report_folder/mapping_report.html -d $all_report_files --title "Mapping Report"
+#html_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.txt -o $report_folder/mapping_report.html -d $all_report_files --title "Mapping Report"
 if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	. ~soft_bio_267/initializes/init_ruby
 	module load cdhit
@@ -53,19 +52,17 @@ if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	cd-hit-est -T 1 -M 0 -i $mapping_ref/all_miRNA.fasta -o $mapping_ref/miRNA_nr.fasta -c 1
 	cp $mapping_ref/miRNA_nr.fasta $report_folder/miRNA_nr.fasta
 	report_html -t $REPORT_TEMPLATES_FOLDER/all_miRNA_report.erb -d $report_folder/metric_table,$report_folder/known_per_sample -o $report_folder/all_miRNA_report
-elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_transcriptome" ]];then
+elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_transcriptome" ]]; then
 	mkdir $HUNTER_RESULTS_FOLDER
 	for TARGET_FILE in `echo $TARGETS | tr "," " "`
 	do
 		export target_path=$TARGETS_FOLDER/$TARGET_FILE
 		target_results_folder=$HUNTER_RESULTS_FOLDER'/'`echo $TARGET_FILE | sed 's/_target.txt//'`
 		mkdir $target_results_folder
-		
 		## Join all results of each sample in a general table
-		head $target_path
 		target_samples=`cut -f 1 $target_path | tail -n +2 | tr "\n" ","`
-		cmdtabs -i $report_folder/all_counts -H --extract_cols ${target_samples%,} > $target_results_folder"/final_counts.txt"
-		degenes_hunter_options=`generate_DGHunter_command.rb -m "degenes_Hunter"`
+		cmdtabs -i $report_folder/all_counts -H --extract_cols ID,${target_samples%,} > $target_results_folder"/final_counts.txt"
+		degenes_hunter_options=`generate_DGHunter_command.R -m "degenes_Hunter"`
 		## Launch DEGenesHunter
 		/usr/bin/time -o $target_results_folder/process_data_degenes_hunter -v degenes_Hunter.R $degenes_hunter_options -i $target_results_folder'/final_counts.txt' -o $target_results_folder &>$target_results_folder/'degenes_Hunter.log' &
 	done
