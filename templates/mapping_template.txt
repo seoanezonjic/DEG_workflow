@@ -34,7 +34,7 @@ clean_samples){
 		fastqc_files=`echo $fastqs | tr "," " "`
 		fastqc $fastqc_files -o output_files/initial_stats --threads 2
 		get_fastqc_data -i 'output_files/initial_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tinitial_" $0 }' >> ../metrics
-		pytrimngs_results_parser -i "output_files/plugins_logs/*" | awk '{print "$sample" "\t" $0 }' >> ../metrics
+		pytrimngs_results_parser -i "output_files/plugins_logs" | awk '{print "$sample" "\t" $0 }' >> ../metrics
 		echo -e "$sample\tpair_layout\t`ls output_files/*fastq.gz | wc -l`" >> ../metrics
 		fastqc output_files/*fastq.gz -o output_files/final_stats --threads 2
 		get_fastqc_data -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
