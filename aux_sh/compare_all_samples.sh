@@ -3,7 +3,6 @@
 #SBATCH --constraint=cal
 #SBATCH --time='02:00:00'
 hostname
-
 source ~soft_bio_267/initializes/init_degenes_hunter
 source ~soft_bio_267/initializes/init_python
 
@@ -41,9 +40,9 @@ html_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.txt -o $report_folder/m
 if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	. ~soft_bio_267/initializes/init_ruby
 	module load cdhit
-	## miRNA result unificaton and comparison in report # test
+	## miRNA result unificaton and comparison in report
 	
-	## THIS BLOCK TAKE MIRNA COORDS AND RETURN FASTA FILE
+	## THIS BLOCK TAKES MIRNA COORDS AND RETURNS FASTA FILE
 	merge_miRNA_coord.rb -d 20 -k "`echo $MAPPING_RESULTS_FOLDER`/*/miRDeep2.pl_0000/translated_known_miRNA.coord" -n "`echo $MAPPING_RESULTS_FOLDER`/*/miRDeep2.pl_0000/novel_miRNA.coord" -o $mapping_ref
 	cat $MAPPING_RESULTS_FOLDER/*/miRDeep2.pl_0000/known_per_sample > $report_folder/known_per_sample
 	cat $mapping_ref/*_miRNA.coord > $mapping_ref/final_miRNA.coord
