@@ -11,9 +11,8 @@ mkdir $report_folder
 cat $MAPPING_RESULTS_FOLDER/*/metrics | sed "s/'//g" | awk 'BEGIN {IFS="\t";OFS="\t"}{if($3 != "" )print $0}' > $report_folder'/all_metrics'
 cmdtabs -i $report_folder'/all_metrics' --sample_attributes sample -o $report_folder'/metric_table' --corrupted $report_folder'/corrupted_samples'
 
-full_path_tagets=`ls $TARGETS_FOLDER/*_target.txt | tr "\n" ","` 
-full_path_tagets=${full_path_tagets%?}
-headers="t"
+full_path_targets=`ls $TARGETS_FOLDER/*_target.txt | tr "\n" ","` 
+full_path_targets=${full_path_targets%?}
 all_report_files=$report_folder/metric_table
 
 if [[ $experiment_type != "miRNAseq_detection" ]]; then
@@ -25,15 +24,11 @@ if [[ $experiment_type != "miRNAseq_detection" ]]; then
 	done < $SAMPLES_FILE
 	counts_tables=${counts_tables%?}
 	all_samples=${all_samples%?}
-	headers=$headers",t"
 	merge_count_tables.R -i $counts_tables -t $all_samples > $report_folder/all_counts
 	sed -i '1s/^\t/gene_id\t/g' $report_folder/all_counts
 	all_report_files=$all_report_files,$report_folder/all_counts
 	if [ "$TARGETS" != "" ]; then
-		all_report_files=$all_report_files,$full_path_tagets
-		for target_path in `echo $full_path_tagets| tr "," " "`; do
-		        headers=$headers",t"
-		done
+		all_report_files=$all_report_files,$full_path_targets
 	fi
 fi
 html_report.R -t $REPORT_TEMPLATES_FOLDER/mapping_report.txt -o $report_folder/mapping_report.html -d $all_report_files --title "Mapping Report"
