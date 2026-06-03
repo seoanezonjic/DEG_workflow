@@ -4,7 +4,7 @@ reference=$2
 threads=$3
 unmapped_ratio=$4
 
-module load star/2.5.3a
+module load star/2.7.11b
 source ~soft_bio_267/initializes/init_python
 
 
