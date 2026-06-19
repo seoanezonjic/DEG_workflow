@@ -12,7 +12,7 @@ if [ $experiment_type == "RNAseq_genome" ]; then
 	if ! [[ -d $out || -L $out ]]; then
 		module load star/2.7.11b
 		mkdir -p $out
-		#STAR --runThreadN 8 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/genome.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
+		STAR --runThreadN 8 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/genome.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
 		module purge
 		module load gatk # for variant calling on rnaseq
 		rm genome.dict
