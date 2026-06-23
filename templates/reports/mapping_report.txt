@@ -318,7 +318,7 @@ end.rcode-->
 	## CONTROL VARIABLES
 	##############################
 	all_vars <- colnames(plotter$hash_vars$metrics)
-	vars_trimming <- c("initial_total_sequences", "adapter_filter_passed", "no_contaminants_reads", "final_total_sequences")
+	vars_trimming <- c("initial_total_sequences", "adapter_filter_passed", "no_contaminants_reads", "ribo_contaminants_reads", "final_total_sequences")
 	execute_trimming <- all(vars_trimming %in% all_vars)
 	vars_qual_scores_init<- c("initial_min_qual_per_base_in_10th_decile", "initial_min_qual_per_base_in_lower_quartile", "initial_mean_qual_per_base", "initial_weigthed_qual_per_sequence")
 	execute_qual_scores_init <- all(vars_qual_scores_init %in% all_vars)
