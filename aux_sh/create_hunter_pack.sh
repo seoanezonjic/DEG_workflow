@@ -37,11 +37,12 @@ do
     add_annotation.R -i $comparison_path/Common_results/hunter_results_table.txt -o $out_comparison/hunter_results_table.txt $mode_annot -c rownames $gene_id -K SYMBOL -O $fun_organism
     add_annotation.R -i $comparison_path/Results_default/Normalized_counts_default.txt -o $out_comparison/Normalized_counts_default.txt $mode_annot $gene_id -K SYMBOL -O $fun_organism
     add_annotation.R -i $comparison_path/cpm_table.txt -o $out_comparison/cpm_table.txt $mode_annot -c rownames $gene_id -K SYMBOL -O $fun_organism
-    add_ref_features.R -i $comparison_path/Common_results/hunter_results_table.txt -o $out_comparison/hunter_results_table.txt --gtf $CODE_PATH'/references/human/annotation.gtf'
-    add_ref_features.R -i $comparison_path/functional_enrichment/hunter_results_table_annotated.txt --column_name "input_IDs" -o $out_comparison/functional_enrichment/hunter_results_table_annotated.txt --gtf $CODE_PATH'/references/human/annotation.gtf'
 
     cp -r $comparison_path/functional_enrichment $out_comparison
     cp -r $comparison_path/Results_WGCNA $out_comparison
     cp -r $comparison_path/PCA_results $out_comparison
+    rm $out_comparison/PCA_results/pca_data.rds
     rm -rf $out_comparison/Results_WGCNA/*.RData
+    add_ref_features.R -i $comparison_path/Common_results/hunter_results_table.txt -o $out_comparison/hunter_results_table.txt --gtf $CODE_PATH'/references/human/annotation.gtf'
+    add_ref_features.R -i $comparison_path/functional_enrichment/hunter_results_table_annotated.txt --column_name "input_IDs" -o $out_comparison/functional_enrichment/hunter_results_table_annotated.txt --gtf $CODE_PATH'/references/human/annotation.gtf'
 done
