@@ -43,6 +43,6 @@ do
     cp -r $comparison_path/PCA_results $out_comparison
     rm $out_comparison/PCA_results/pca_data.rds
     rm -rf $out_comparison/Results_WGCNA/*.RData
-    add_ref_features.R -i $comparison_path/Common_results/hunter_results_table.txt -o $out_comparison/hunter_results_table.txt --gtf $CODE_PATH'/references/human/annotation.gtf'
-    add_ref_features.R -i $comparison_path/functional_enrichment/hunter_results_table_annotated.txt --column_name "input_IDs" -o $out_comparison/functional_enrichment/hunter_results_table_annotated.txt --gtf $CODE_PATH'/references/human/annotation.gtf'
+    add_ref_features.R -i $comparison_path/Common_results/hunter_results_table.txt -o $out_comparison/hunter_results_table.txt --gtf $CODE_PATH/references/$organism/annotation.gtf
+    add_ref_features.R -i $comparison_path/functional_enrichment/hunter_results_table_annotated.txt --column_name "input_IDs" -o $out_comparison/functional_enrichment/hunter_results_table_annotated.txt --gtf $CODE_PATH/references/$organism/annotation.gtf
 done
