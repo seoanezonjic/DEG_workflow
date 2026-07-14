@@ -29,6 +29,9 @@ export read_path=$CODE_PATH'/raw_data'	#-------#	New path where samples were lin
 export REPORT_TEMPLATES_FOLDER=$CODE_PATH'/templates/reports'	#-------#	Report templates path
 export report_folder=$project_folder'/mapping_reports'	#-------#	Report output path
 
+##### COMMON CLEANING VARIABLES
+export min_qual=20	#-------#	Minimum quality threshold to be applied (Phred quality score). Integer
+
 if [[ $experiment_type == "miRNAseq_detection" ]]; then
 
 	##################################
