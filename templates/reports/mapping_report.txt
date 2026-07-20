@@ -254,6 +254,8 @@ end.rcode-->
 	metric_table <- plotter$get_data(list(id = 'metric_table', transpose = FALSE, header = TRUE, row_names = FALSE, text = "dynamic"))$data_frame
 
 	metric_table$no_contaminants_reads <- metric_table$adapter_filter_passed - metric_table$contaminants_reads
+	colnames(metric_table)[grep("ribo_contaminants_reads", colnames(metric_table))] <-"no_ribo_contaminants_reads"
+	
 	plotter$hash_vars[["metrics"]] <- metric_table
 	targets <- grepl("_target.txt", names(plotter$hash_vars))
 	targets <- plotter$hash_vars[targets]
@@ -269,6 +271,7 @@ end.rcode-->
 		"initial_total_sequences" = "Total Reads Before Trimming", 
 		"adapter_filter_passed" = "Remaining reads after adapters filter",
 		"no_contaminants_reads"= "Remaining reads after contaminants filter",
+		"no_ribo_contaminants_reads" = "Remaining reads after ribo contaminants filter",
 		"final_total_sequences" = "Total Reads After Trimming",
 		"Uniquely_mapped_reads_%" = "Unique Map %",
 		"multi_map" = "Multi-mapping %",
@@ -318,7 +321,7 @@ end.rcode-->
 	## CONTROL VARIABLES
 	##############################
 	all_vars <- colnames(plotter$hash_vars$metrics)
-	vars_trimming <- c("initial_total_sequences", "adapter_filter_passed", "no_contaminants_reads", "ribo_contaminants_reads", "final_total_sequences")
+	vars_trimming <- c("initial_total_sequences", "adapter_filter_passed", "no_contaminants_reads", "no_ribo_contaminants_reads", "final_total_sequences")
 	execute_trimming <- all(vars_trimming %in% all_vars)
 	vars_qual_scores_init<- c("initial_min_qual_per_base_in_10th_decile", "initial_min_qual_per_base_in_lower_quartile", "initial_mean_qual_per_base", "initial_weigthed_qual_per_sequence")
 	execute_qual_scores_init <- all(vars_qual_scores_init %in% all_vars)
