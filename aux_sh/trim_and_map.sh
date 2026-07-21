@@ -17,7 +17,8 @@ while IFS= read sample; do
 	\\$only_read_ref=$only_read_ref,
 	\\$alt_seq=$alt_seq,
 	\\$CODE_PATH=$CODE_PATH,
-	\\$keep_bam=$keep_bam
+	\\$keep_bam=$keep_bam,
+	\\$MIN_QUAL=$min_qual
 	" | tr -d [:space:]`
 
 	if `echo $experiment_type | grep -q "^RNAseq"`; then
@@ -26,7 +27,6 @@ while IFS= read sample; do
 		\\$min_read_length=$MIN_READ_LENGTH,
 		\\$read_layout=$read_layout,
 		\\$experiment_type=$experiment_type,
-		\\$MIN_QUAL=$min_qual
 		" | tr -d [:space:]`
 	else 
 		AF_VARS=$AF_VARS,`echo "

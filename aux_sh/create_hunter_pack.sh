@@ -1,5 +1,6 @@
 #! /usr/bin/env bash
 
+
 source ~soft_bio_267/initializes/init_degenes_hunter
 output_folder=$CODE_PATH/DEG_workflow_results
 miRNA_det_path=$1
@@ -40,5 +41,8 @@ do
     cp -r $comparison_path/functional_enrichment $out_comparison
     cp -r $comparison_path/Results_WGCNA $out_comparison
     cp -r $comparison_path/PCA_results $out_comparison
+    rm $out_comparison/PCA_results/pca_data.rds
     rm -rf $out_comparison/Results_WGCNA/*.RData
+    add_ref_features.R -i $comparison_path/Common_results/hunter_results_table.txt -o $out_comparison/hunter_results_table.txt --gtf $CODE_PATH/references/$organism/annotation.gtf
+    add_ref_features.R -i $comparison_path/functional_enrichment/hunter_results_table_annotated.txt --column_name "input_IDs" -o $out_comparison/functional_enrichment/hunter_results_table_annotated.txt --gtf $CODE_PATH/references/$organism/annotation.gtf
 done

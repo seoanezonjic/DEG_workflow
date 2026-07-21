@@ -1,25 +1,32 @@
 clean_samples){
-	resources: -u 1 -n cal -c 16 -t '7-0:00:00' -m '40gb'
-	source ~soft_bio_267/initializes/init_stbb	
+	resources: -u 1 -n cpu -c 12 -t '7-0:00:00' -m '40gb'
+	echo [cpu]
+	source ~soft_bio_267/initializes/init_pytrimngs
+	source ~/dev_py/pytrimngs_env/bin/activate
+	source ~soft_bio_267/initializes/init_fastqc	
 	#rm -rf output_files*
-    Add_trimming_opt=`echo ";$ADD_trimming_opt" | tr ':' ' '`
+	fastqs=$read_folder'/'$sample'.fastq.gz'
+	if [ "$ADD_trimming_opt" != "" ]; then
+    	Add_trimming_opt=`echo ";$ADD_trimming_opt" | tr ':' ' '`
+	fi
 
 	if [ $link_path != "" ]; then
-                ln -s $link_path/$sample/seqtrimbb_0000/output_files ./
+                ln -s $link_path/$sample/pytrimngs_0000/output_files ./
         else    
 	?
-		seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -w [cpu] -P "minlength=$MIN_MIRNA_LENGTH`echo -e $Add_trimming_opt`" -O output_files --full_throttle
-	fi
-	if [ ! -s output_files/sequences_.fastq.gz ]; then
+		pytrimngs -t $trim_template -Q $fastqs -w 36 -M 1000m -P "quality_threshold=$MIN_QUAL;minlength=$MIN_MIRNA_LENGTH`echo -e $Add_trimming_opt`" -O ./
+ 	fi
+	if [ ! -s output_files/single_.fastq.gz ]; then
 		>&2 echo "Triming has failed"
 		exit 1
 	else
-		module purge
-		. ~soft_bio_267/initializes/init_ruby
-		get_fastqc_data.rb -i 'output_files/initial_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tinitial_" $0 }' >> ../metrics
-		seqtrim_results_parser.rb -i "output_files/plugins_logs/*" | awk '{print "$sample" "\t" $0 }' >> ../metrics
-	    get_fastqc_data.rb -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
-		mv output_files/report_files/* ./
+		mkdir -p output_files/initial_stats
+		mkdir -p output_files/final_stats
+		fastqc $fastqs -o output_files/initial_stats --threads 2
+		get_fastqc_data -i 'output_files/initial_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tinitial_" $0 }' >> ../metrics
+		pytrimngs_results_parser -i "output_files/plugins_logs" | awk '{print "$sample" "\t" $0 }' >> ../metrics
+		fastqc output_files/*fastq.gz -o output_files/final_stats --threads 2
+	    get_fastqc_data -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
 	fi
 }
 
