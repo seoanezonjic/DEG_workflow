@@ -28,7 +28,7 @@ if [ $experiment_type == "miRNAseq_detection" ] ; then
 	cut -f 1 -d " " $ref_miRNA/mature.fa > $ref_miRNA/miRNA_mature.fasta
 
 	cat $ref_miRNA/mature.fa $ref_miRNA/hairpin.fa  | grep "^>" | tr -d ">"| cut -f 1,2 -d " "| tr " " "\t" > $ref_miRNA/prev_aliases.txt
-	aggregate_column_data -i $ref_miRNA/prev_aliases.txt -x 2 -s ";" -a 1 > $ref_miRNA/aliases.txt
+	cmdtabs --aggregate -i $ref_miRNA/prev_aliases.txt --agg_ref_col_index 2 --agg_col 1 --agg_sep ";" > $ref_miRNA/aliases.txt
 	rm $ref_miRNA/*hairpin.fa $ref_miRNA/*mature.fa $ref_miRNA/prev_aliases.txt
 fi
 
@@ -42,8 +42,10 @@ if [[ $experiment_type == "RNAseq_genome" || $experiment_type == "miRNAseq_detec
 			wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/gencode.v49.annotation.gtf.gz' -O $mapping_ref/annotation.gtf.gz
 			wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_49/GRCh38.p14.genome.fa.gz' -O $mapping_ref/genome.fa.gz
 		elif [ $organism == "mouse" ]; then
-			wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M23/gencode.vM23.annotation.gtf.gz' -O $mapping_ref/annotation.gtf.gz
-			wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M23/GRCm38.p6.genome.fa.gz' -O $mapping_ref/genome.fa.gz 
+			#wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M23/gencode.vM23.annotation.gtf.gz' -O $mapping_ref/annotation.gtf.gz
+			#wget 'ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M23/GRCm38.p6.genome.fa.gz' -O $mapping_ref/genome.fa.gz 
+			wget 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M39/gencode.vM39.annotation.gtf.gz' -O $mapping_ref/annotation.gtf.gz
+			wget 'https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M39/GRCm39.genome.fa.gz' -O $mapping_ref/genome.fa.gz
 		fi
 		gunzip -f $mapping_ref/*
 
