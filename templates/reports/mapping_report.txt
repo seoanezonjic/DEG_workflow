@@ -385,7 +385,7 @@ cat(plotter$create_title("Quality scores for samples", "qual_b", hlevel = 3, ind
 	
 	lineplot_fields <- match_metrics(plotter$hash_vars$metrics, vars_qual_scores_init)
 	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
-                                               config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
+                                               config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 45),
                                                fields = lineplot_fields)), preset = 'magic'))
 
 end.rcode-->
@@ -420,12 +420,12 @@ end.rcode-->
 	cat(plotter$create_title("Quality scores for samples", "qual_sc", hlevel = 3, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
 	cat("<br>
-		<b> Lowest scores (min/10th decile) and weighted average.</b><br>
+		<b> Lowest scores (min/10th decile) and weighted average AFTER trimming.</b><br>
 		The weighted average is the weighted average  quality score per sequence. Other scores represent the minimum (10th percentile) score and average score per base.<br>\n")
 	
 	lineplot_fields <- match_metrics(plotter$hash_vars$metrics, vars_qual_scores)
 	cat(plotter$prettify_div(plotter$line(list(id = "metrics", title = "", header = NULL, text = FALSE,
-                                               config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 40),
+                                               config = list('graphOrientation' = 'vertical','xAxisTitle' = 'Values', 'setMinX' = 0, 'setMaxX' = 45),
                                                fields = lineplot_fields)), preset = 'magic'))
 
 end.rcode-->
