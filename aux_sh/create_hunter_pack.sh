@@ -6,6 +6,8 @@ miRNA_det_path=$1
 
 rm -rf $output_folder
 mkdir -p $output_folder
+bam_folder=$output_folder/bam_files
+mkdir -p $bam_folder
 
 cp $report_folder/mapping_report.html $output_folder
 if [ ! -z "$miRNA_det_path" ]; then
@@ -13,6 +15,15 @@ if [ ! -z "$miRNA_det_path" ]; then
     cp $miRNA_det_path/mapping_reports/mapping_report.html $output_folder/mapping_report_detection.html # use this to add files from other execution (miRNA DEA plus miRNA detection)
     cp $miRNA_det_path/mapping_reports/all_miRNA_report.html $output_folder/all_miRNA_report.html
     cp $miRNA_det_path/mapping_reports/miRNA_nr.fasta $output_folder/miRNA_detected.fasta
+fi
+
+if [[ "$keep_bam" == TRUE || "$bam_coords" != "" ]]; then
+    for sample_folder in $MAPPING_RESULTS_FOLDER/*
+    do
+        sample_name=`basename $sample_folder`    
+        file=`basename $sample_folder/qualimap_0000/*.bam .bam`
+        ln -s $sample_folder/qualimap_0000/*.bam $bam_folder/$sample_name'_'$file.bam
+    done 
 fi
 
 for comparison_path in $HUNTER_RESULTS_FOLDER/*
