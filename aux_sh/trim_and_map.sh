@@ -1,5 +1,4 @@
-. ~soft_bio_267/initializes/init_autoflow
-
+. ~soft_bio_267/initializes/init_python
 while IFS= read sample; do
 
 	#############################################################
@@ -15,7 +14,11 @@ while IFS= read sample; do
 	\\$link_path=\"$link_path\",
 	\\$bam_coords=$bam_coords,
 	\\$var_intervals=$var_intervals,
-	\\$only_read_ref=$only_read_ref
+	\\$only_read_ref=$only_read_ref,
+	\\$alt_seq=$alt_seq,
+	\\$CODE_PATH=$CODE_PATH,
+	\\$keep_bam=$keep_bam,
+	\\$MIN_QUAL=$min_qual
 	" | tr -d [:space:]`
 
 	if `echo $experiment_type | grep -q "^RNAseq"`; then
@@ -23,8 +26,7 @@ while IFS= read sample; do
 		AF_VARS=$AF_VARS,`echo "
 		\\$min_read_length=$MIN_READ_LENGTH,
 		\\$read_layout=$read_layout,
-		\\$experiment_type=$experiment_type,
-		\\$MIN_QUAL=$min_qual
+		\\$experiment_type=$experiment_type
 		" | tr -d [:space:]`
 	else 
 		AF_VARS=$AF_VARS,`echo "
@@ -34,12 +36,11 @@ while IFS= read sample; do
 	if [[ $experiment_type == "RNAseq_genome" ]]; then
 		AF_VARS=$AF_VARS,`echo "
 		\\$MIN_TOO_SHORT=$min_too_short,
-		\\$UNPAMMED_RATIO=$unmapped_ratio,
+		\\$UNMAPPED_RATIO=$unmapped_ratio,
 		\\$stranded=$stranded
 		" | tr -d [:space:]`
 	fi
-
-	AutoFlow -e -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" "$RESOURCES" $ADD_OPTIONS
+	AutoFlow -e -w $TEMPLATE -V "$AF_VARS" -o "$MAPPING_RESULTS_FOLDER"/"$sample" $RESOURCES $ADD_OPTIONS
 done < $SAMPLES_FILE
 
 

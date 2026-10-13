@@ -3,58 +3,66 @@
 ### Trimming and mapping template. Parametres can be customized at config_deamon "Trimming and Mapping" section.
 
 clean_samples){
- 	resources: -u 1 -n cal -c 16 -t '7-00:00:00' -m '80gb'
+ 	resources: -u 1 -n cpu -c 16 -t '1-12:00:00' -m '80gb'
+ 	echo [cpu]
 	module unload java
-	source ~soft_bio_267/initializes/init_stbb	
-	CPU=`echo "[cpu] - 2" | bc`
+	source ~soft_bio_267/initializes/init_pytrimngs
+	source ~soft_bio_267/initializes/init_fastqc	
 	if [ "$ADD_trimming_opt" != "" ]; then
                 Add_trimming_opt=`echo ";$ADD_trimming_opt" | tr ':' ' ' | tr '!' ','`
         fi
 
 	if [ $link_path != "" ]; then
-		rm -rf output_files*
-		ln -s $link_path/$sample/seqtrimbb_0000/output_files ./	
+		ln -s $link_path/$sample/pytrimngs_0000/output_files ./	
 	else
 		if [ "$read_layout" == "paired" ]; then
-	? 
-			seqtrimbb -t $trim_template -Q $read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz' -P "quality_threshold=$MIN_QUAL;minlength=$min_read_length`echo $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
+			fastqs=$read_folder'/'$sample'_1.fastq.gz,'$read_folder'/'$sample'_2.fastq.gz'
 		elif [ "$read_layout" == "single" ] ; then
-			/usr/bin/time -o process_data -v seqtrimbb -t $trim_template -Q $read_folder'/'$sample'.fastq.gz' -P "quality_threshold=$MIN_QUAL;minlength=$min_read_length`echo -e $Add_trimming_opt`" -w $CPU --full_throttle -O output_files #--full_throttle
-		fi	
+			fastqs=$read_folder'/'$sample'.fastq.gz'
+		fi
+		?
+		pytrimngs -t $trim_template -Q $fastqs -w 48 -M 1000m -P "quality_threshold=$MIN_QUAL;minlength=$min_read_length `echo $Add_trimming_opt`" -O ./
+		### DISCLAIMER: java logs are appended in each execution, not overwritten
 	fi
 
-	if { [ ! -s output_files/paired_1.fastq.gz ] || [ ! -s output_files/paired_2.fastq.gz ]; } && [ ! -s output_files/sequences_.fastq.gz ]; then
+	if { [ ! -s output_files/paired_1.fastq.gz ] || [ ! -s output_files/paired_2.fastq.gz ]; } && [ ! -s output_files/single_.fastq.gz ]; then
 		>&2 echo "Trimming has failed"
 		exit 1
 	else 
-		module purge
-		. ~soft_bio_267/initializes/init_ruby
-		get_fastqc_data.rb -i 'output_files/initial_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tinitial_" $0 }' >> ../metrics
-		seqtrim_results_parser.rb -i "output_files/plugins_logs/*" | awk '{print "$sample" "\t" $0 }' >> ../metrics
+		mkdir -p output_files/initial_stats
+		mkdir -p output_files/final_stats
+		fastqc_files=`echo $fastqs | tr "," " "`
+		fastqc $fastqc_files -o output_files/initial_stats --threads 2
+		get_fastqc_data -i 'output_files/initial_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tinitial_" $0 }' >> ../metrics
+		pytrimngs_results_parser -i "output_files/plugins_logs" | awk '{print "$sample" "\t" $0 }' >> ../metrics
 		echo -e "$sample\tpair_layout\t`ls output_files/*fastq.gz | wc -l`" >> ../metrics
-		get_fastqc_data.rb -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
-		mv output_files/report_files/* ./
+		fastqc output_files/*fastq.gz -o output_files/final_stats --threads 2
+		get_fastqc_data -i 'output_files/final_stats/*fastqc.zip' -T -H | awk '{print "$sample" "\tfinal_" $0 }' >> ../metrics
 	fi
 }
 
 align_rna_seq){ 
-	resources: -m '40gb' -c 16 -t '10:00:00' -n cal
+	resources: -m '40gb' -c 4 -t '10:00:00' -n cpu
 	#module load samtools/1.9 #not available on picasso now
+	source ~soft_bio_267/initializes/init_degenes_hunter
+	export PATH=$CODE_PATH'/aux_sh:'$PATH
+	export PATH=$CODE_PATH'/aux_parsers:'$PATH
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
 	if [ "$experiment_type" == "RNAseq_transcriptome" ]; then
 		module load samtools/1.21
 		module load bowtie/2.2.9
 #		module load sam2counts/20131126
-		module load python/2.7.18
+		source ~soft_bio_267/initializes/init_python27
 		if [ "$read_layout" == "paired" ] ; then
 			bowtie2 -q -x $ref'/bowtie_index_tr/reference' -1 clean_samples)/output_files/paired_1.fastq.gz -2 clean_samples)/output_files/paired_2.fastq.gz --no-discordant --no-mixed -p [cpu] 2>bowtie_log | samtools sort -o sorted_mappings.bam
 		elif [ "$read_layout" == "single" ]; then
-			bowtie2 -q -x $ref'/bowtie_index_tr/reference' -U clean_samples)/output_files/sequences_.fastq.gz -p [cpu] 2>bowtie_log | samtools sort -o sorted_mappings.bam
+			bowtie2 -q -x $ref'/bowtie_index_tr/reference' -U clean_samples)/output_files/single_.fastq.gz -p [cpu] 2>bowtie_log | samtools sort -o sorted_mappings.bam
 		fi
 		sam2counts_all.py -o selected_counts -b sorted_mappings.bam
 		parse_bowtie_log.sh bowtie_log | awk '{print "$sample" "\t" $0}' >> ../metrics
 	elif [ "$experiment_type" == "RNAseq_genome" ]; then
-		module load star/2.5.3a
+		source ~soft_bio_267/initializes/init_pytrimngs
+		module load star/2.7.11b
 		if [[ $organism == 'human' ]]; then # only human has PAR regions well defined
 			REF_type=Y_PAR_MASKED/STAR_index
 		else
@@ -66,37 +74,37 @@ align_rna_seq){
 			sed -r 's,\t([01][01]),_2\t\1,g' Unmapped.out.mate2 >> unmapped.fastq
 			rm Unmapped.out*
 		elif [ "$read_layout" == "single" ]; then
-			STAR --runThreadN [cpu] --genomeDir $ref/$REF_type --readFilesIn clean_samples)/output_files/sequences_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate --outReadsUnmapped Fastx
+			STAR --runThreadN [cpu] --genomeDir $ref/$REF_type --readFilesIn clean_samples)/output_files/single_.fastq.gz --readFilesCommand 'zcat' --quantMode TranscriptomeSAM GeneCounts --outSAMtype BAM SortedByCoordinate --outReadsUnmapped Fastx
 			mv Unmapped.out.mate1 unmapped.fastq
 		fi
 		module purge
-		source ~soft_bio_267/initializes/init_R
+		source ~soft_bio_267/initializes/init_degenes_hunter
 		rm Aligned.toTranscriptome.out.bam
-		parse_STAR_log.R -d Log.final.out | awk '{print "$sample" "\t" $0}' > star_log 
+		parse_STAR_log -d Log.final.out | awk '{print "$sample" "\t" $0}' > star_log 
 		mkdir mapping_logs 
 		mv Log* mapping_logs/
 		mv Aligned.sortedByCoord.out.bam sorted_mappings.bam 
 		#creating count table
-		select_counts.rb -i ReadsPerGene.out.tab -s $stranded > selected_counts
+		select_counts.R -i ReadsPerGene.out.tab -s $stranded > selected_counts
 		#metric extraction
 		too_short_sample=`grep 'too_short' star_log | cut -f 3 | tr -d '%'`
-		if (( $(echo "$too_short_sample > $MIN_TOO_SHORT" | bc -l) )); then 
-			map_too_short.sh unmapped.fastq $ref [cpu] $UNPAMMED_RATIO
+		if [[ $(echo "$too_short_sample > $MIN_TOO_SHORT" | bc -l) ]]; then 
+			map_too_short.sh unmapped.fastq $ref [cpu] $UNMAPPED_RATIO
 		else 
 			rm Unmapped.out*
 		fi  
 	fi			
 	module purge
-	. ~soft_bio_267/initializes/init_qualimap	
+	#. ~soft_bio_267/initializes/init_qualimap
 	?
 	qualimap bamqc -nt [cpu] -bam sorted_mappings.bam -outdir results --java-mem-size=20G
-	if [ ! -s results/qualimapReport.html ] || [ ! -s selected_counts ]; then 
-		>&2 echo "Mapping step has failed"
-		exit 1
-	else
+	#if [ ! -s results/qualimapReport.html ] || [ ! -s selected_counts ]; then
+	#	>&2 echo "Mapping step has failed"
+	#	exit 1
+	#else
 		cat star_log >> ../metrics
 		awk 'NR>4 {sum+=$2} END {print sum}' selected_counts |  awk '{print "$sample" "\t" "aligned_to_feature" "\t" $0 }' >> ../metrics
-		sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
+		#sed 's/^ *//g' results/genome_results.txt | grep number | sed 's/ of /_/g' | sed 's/([0-9\.%]*)//g' | sed 's/ bp//g' | tr -d ' ' | tr -d ',' | tr '=' "\t" |  awk '{print "$sample" "\t" $0 }' >> ../metrics
 		# Keep specific genomic regions
 		if [ "$bam_coords" != "" ]; then
 				module purge
@@ -104,48 +112,15 @@ align_rna_seq){
 				bedtools intersect -a sorted_mappings.bam -b $bam_coords > filtered_region.bam
 		fi
 		#Removing temporal files
-		if [ "$keep_bam" == FALSE ]; then
-			
+		if [ "$keep_bam" == FALSE ]; then	
 			rm sorted_mappings.bam 
 		fi
+	#fi
+	if [ -s "$alt_seq" ]; then
+		module load bowtie/2.5.1
+		module load samtools
+		source ~soft_bio_267/initializes/init_R
+		alt_mapping.sh $seq_reference # No fastq?
 	fi
 }
-
-# get_variants){
-#         resources: -m '10gb' -c 16 -t '10:00:00'
-#         module load picard/2.20.2
-#         echo [cpu] &> /dev/null
-#         picard AddOrReplaceReadGroups \
-#                I=align_rna_seq)/sorted_mappings.bam \
-#                SO=coordinate \
-#                 O=formated.bam \
-#                RGID=4 \
-#                 RGLB=lib1 \
-#                RGPL=ILLUMINA \
-#                 RGPU=unit1 \
-#                RGSM=20
-#         picard MarkDuplicates I=formated.bam o=formated_dep.bam CREATE_INDEX=true VALIDATION_STRINGENCY=SILENT M=output.metrics
-#         rm -rf formated.bam
-#         module unload picard
-#         module load gatk/4.1.2.0
-#         module unload java
-#         module load java/jdk-8u121
-#         ?
-#         gatk --java-options "-Xmx10g" SplitNCigarReads -R $only_read_ref/genome.fa -I formated_dep.bam -O splitted.bam
-#         gatk --java-options "-Xmx10g" HaplotypeCaller  \
-#            -R $only_read_ref/genome.fa \
-#            -I splitted.bam \
-#            -O output.vcf #\
-#            #-stand_call_conf 20 \
-#            #-filterNoBases \
-#            #--filter_reads_with_N_cigar
-#         if [ ! -s output.vcf ]; then
-#                 >&2 echo "Variant calling step has failed"
-#                 exit 1
-#         else
-#                 #Removing temporal files
-#                 rm ./*.bam
-#                 rm align_rna_seq)/*.bam
-#         fi
-# }
 

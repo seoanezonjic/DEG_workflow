@@ -6,7 +6,8 @@
 # Help: <br/><b>Plugin list and aplication order:</b><br/>
 
 # Help: <ul>
-# Help: <li>PluginAdapters: trimming sequencing adapters.</li>
+# Help: <li>PluginAdapters3: trimming sequencing adapters from 3'.</li>
+# Help: <li>PluginAdapters5: trimming sequencing adapters from 5'.</li>
 # Help: <li>PluginFindPolyAt: trimming PolyA and PolyT. </li>
 # Help: <li>PluginContaminants: filtering out reads with contaminant fragments found in the contaminant database. </li>
 # Help: <li>PluginQuality: trimming low quality regions from sequences. </li>
@@ -14,7 +15,7 @@
 # Help: </ul>
 
 #plugin_list = PluginAdapters,PluginPolyAt,PluginContaminants,PluginQuality
-plugin_list = PluginAdapters,PluginQuality
+plugin_list = PluginAdapters3,PluginAdapters5,PluginQuality
 
 #contaminants_db = cont_ribosome
 

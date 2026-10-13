@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-. ~soft_bio_267/initializes/init_autoflow
+. ~soft_bio_267/initializes/init_python
 echo $ADD_OPTIONS
 while read sample; do
 	echo $sample

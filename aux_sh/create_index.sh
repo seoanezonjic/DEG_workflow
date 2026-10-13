@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-#SBATCH --mem='40gb'
+#SBATCH --mem='100gb'
 #SBATCH --time='7-00:00:00'
 #SBATCH --error=index.%J.err
 #SBATCH --output=index.%J.out
@@ -7,45 +7,26 @@
 #SBATCH --constraint=cal
 
 
-if [ $experiment_type == "RNAseq_genome" ] || [ $experiment_type == "miRNAseq_detection" ]; then
-	if [ -L $mapping_ref/genome.fa ];then
-		echo "Genome has not been processed because has been linked from other proyect."
-	else
-		mv $mapping_ref/genome.fa $mapping_ref/raw_genome.fa
-		cut -f 1 -d " " $mapping_ref/raw_genome.fa > $mapping_ref/genome.fa 
-		#fasta_editor.rb -i $mapping_ref/raw_genome.fa -r "CLEAN" -c a -o $mapping_ref/genome.fa
-		if [ `grep -c -e '^>' $mapping_ref/raw_genome.fa` ==  `grep -c -e '^>' $mapping_ref/genome.fa` ]; then
-			rm $mapping_ref/raw_genome.fa
-			
-			# This process removes all genome sequences without annotation
-			. ~soft_bio_267/initializes/init_python
-			mv $mapping_ref/genome.fa $mapping_ref/genome_orig.fa
-			grep -v '#' $mapping_ref/annotation.gtf | cut -f 1 | sort -u > $mapping_ref/annotated_seq_ids
-			lista2fasta.py $mapping_ref/annotated_seq_ids $mapping_ref/genome_orig.fa > $mapping_ref/genome.fa
-			if [ `wc -l $mapping_ref/annotated_seq_ids |cut -f 1 -d " "` == `grep -c -e '^>' $mapping_ref/genome.fa` ]; then
-				rm $mapping_ref/genome_orig.fa
-			fi
-		else
-			echo "IDs cleaning has failed"
-		fi
-	fi
-fi 
-
 if [ $experiment_type == "RNAseq_genome" ]; then
 	out=$mapping_ref'/STAR_index'
 	if ! [[ -d $out || -L $out ]]; then
-		module load star/2.5.3a
+		module load star/2.7.11b
 		mkdir -p $out
-		STAR --runThreadN 2 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/genome.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
+		STAR --runThreadN 8 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/genome.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
+		module purge
+		module load gatk # for variant calling on rnaseq
+		rm genome.dict
+		gatk CreateSequenceDictionary -R $mapping_ref'/genome.fa' -O $mapping_ref'/genome.dict'
+
 	else
 		echo "Reference seems to be indexed. If not, remove "$mapping_ref'/STAR_index'" folder"
 	fi
 	if [[ $organism == 'human' ]]; then # only human has PAR regions well defined
 		out=$mapping_ref'/Y_PAR_MASKED/STAR_index'
 		if ! [[ -d $out || -L $out ]]; then
-			module load star/2.5.3a
+			module load star/2.7.11b
 			mkdir -p $out
-			STAR --runThreadN 2 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/Y_PAR_MASKED/genome_Ymask.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
+			STAR --runThreadN 8 --runMode genomeGenerate --genomeDir $out --genomeFastaFiles $mapping_ref'/Y_PAR_MASKED/genome_Ymask.fa' --sjdbGTFfile $mapping_ref'/annotation.gtf' --sjdbOverhang 100
 		else
 			echo "Reference seems to be indexed. If not, remove "$mapping_ref'/Y_PAR_MASKED/STAR_index'" folder"
 		fi

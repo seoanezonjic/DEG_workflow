@@ -12,6 +12,7 @@ export AUXSH_PATH=$CODE_PATH'/aux_sh'
 export MASK_YPAR_BEDS=$CODE_PATH'/bed_YPAR'
 export PATH=$AUXSH_PATH:$PATH
 export PATH=$CODE_PATH'/aux_parsers:'$PATH
+echo "Loading config from $CONFIG_DAEMON"
 source $CONFIG_DAEMON
 
 ## STAGE EXECUTION
@@ -57,8 +58,9 @@ if [ "$module" == "2c" ] ; then
 fi
 
 export TARGETS=1
-if [ $experiment_type != "miRNAseq_detection" ] ; then 
 
+if [ $experiment_type != "miRNAseq_detection" ] ; then
+	source ~soft_bio_267/initializes/init_degenes_hunter
 	rm -r $TARGETS_FOLDER
 	mkdir $TARGETS_FOLDER
 	eval "$generate_targets"
