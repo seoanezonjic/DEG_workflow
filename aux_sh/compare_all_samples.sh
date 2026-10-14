@@ -58,7 +58,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 		cmdtabs -i $report_folder/all_counts -H --extract_cols ID,${target_samples%,} > $target_results_folder"/final_counts.txt"
 		degenes_hunter_options=`generate_DGHunter_command.R -m "degenes_Hunter"`
 		## Launch DEGenesHunter
-		/usr/bin/time -o $target_results_folder/process_data_degenes_hunter -v degenes_Hunter.R $degenes_hunter_options -i $target_results_folder'/final_counts.txt' -o $target_results_folder &>$target_results_folder/'degenes_Hunter.log' &
+		/usr/bin/time -o $target_results_folder/process_data_degenes_hunter -v degenes_Hunter.R $degenes_hunter_options -i $target_results_folder'/final_counts.txt' -o $target_results_folder $additional_flags &>$target_results_folder/'degenes_Hunter.log' &
 	done
 	wait
 fi

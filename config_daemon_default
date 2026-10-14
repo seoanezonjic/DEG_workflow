@@ -94,7 +94,7 @@ elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_trans
 	# If you need extra fields for multifactorial DEGENESHUNTER or additional features, or define auxiliar options for DEGENSHUNTER correlations, use the following:
 	# These auxiliar options have preference over config daemon variables and command line additional options
 	# -w whitelist -b blacklist --additional_features $numeric_features,$string_features --aux_options \"-N $numeric_features -S $string_features -v age -r 1.5\"  \n 
-	
+	export additional_flags=''	#-------# Additional flags to pass to degenes_Hunter.R. For example: --force_ndims 4
 
 	######## Functional DEgenesHunter Analysis	#######
 	
