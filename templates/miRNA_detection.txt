@@ -32,6 +32,7 @@ clean_samples){
 
 mapping_sample){
 	resources: -u 1 -c 16 -m '20gb' -n cpu
+	module unload openmpi_gcc/5.0.9_gcc15
 	module unload gcc
 	module load samtools/1.3
 	. ~soft_bio_267/initializes/init_mirdeep2
