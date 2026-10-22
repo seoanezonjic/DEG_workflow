@@ -16,7 +16,7 @@ def load_file(input_file):
     with open(input_file, "r") as f:
         for line in f:
             line = line.rstrip("\n")
-            if line != '': raw_file.append(line.rstrip("\t"))
+            if line != '': raw_file.append(line.split("\t"))
     return raw_file
 
 
