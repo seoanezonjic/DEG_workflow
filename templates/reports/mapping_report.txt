@@ -531,7 +531,7 @@ end.rcode-->
     cat(plotter$static_ggplot_main("metrics", text = "dynamic", func = filter_and_melt, plotting_function = make_stacked_barchart_from_df_dodge))
 end.rcode-->
 
-<!--begin.rcode  top_n_expression, results='asis', echo=FALSE, warning=FALSE, message=FALSE
+<!--begin.rcode  top_n_expression, results='asis', echo=FALSE, warning=FALSE, message=FALSE,eval=!execute_mirna_mapping
 	cat(plotter$create_title("Percentages of reads per sample mapping to the most highly expressed genes", "most_expressed", 
 		hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
