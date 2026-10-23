@@ -248,12 +248,6 @@ end.rcode-->
 	targets <- grepl("_target.txt", names(plotter$hash_vars))
 	targets <- plotter$hash_vars[targets]
 
-	execute_clustering <- TRUE
-	out_clustering <- NULL
-	if(length(targets) == 0){
-		execute_clustering <- FALSE	
-	}
-
 	
 	metric_dictionary <- list(
 		"initial_total_sequences" = "Total Reads Before Trimming", 
@@ -537,7 +531,7 @@ end.rcode-->
     cat(plotter$static_ggplot_main("metrics", text = "dynamic", func = filter_and_melt, plotting_function = make_stacked_barchart_from_df_dodge))
 end.rcode-->
 
-<!--begin.rcode  top_n_expression, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_clustering
+<!--begin.rcode  top_n_expression, results='asis', echo=FALSE, warning=FALSE, message=FALSE
 	cat(plotter$create_title("Percentages of reads per sample mapping to the most highly expressed genes", "most_expressed", 
 		hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
@@ -546,37 +540,4 @@ end.rcode-->
 
 end.rcode-->
 
-
-
-<!--begin.rcode  samples_clustering, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval = FALSE
- #eval = execute_clustering}
-invisible(lapply(names(targets),function(target_name){
-	# Take results
-	# Check and generate info
-	#######################3
-	### REMOVE
-	#######################w
-
-	body <- "
-	target_readable <- str_remove('{{target_name}}', '_target.txt')
-	cat(paste(c('\n\n### **Sample clustering for ', target_readable, ' comparison **\n\n'),collapse = ''))
-	target_obj <- targets[['{{target_name}}']]
-	sample_counts <- length(target_obj)
-	
-
-#######################
-#############
-
-	create_clustering(target_obj, metric_table, vars_clustering, count_data, metric_var_2_legend_name) #Nor recommended to set dinamic sizes
-	
-	"
-
-	out_clustering <<- c(out_clustering,paste(knit_expand(text = paste(
-															chunks(body, options = "echo = FALSE, results='asis', message= FALSE, warning= FALSE"),
-										 					"\n",sep = "\n")),
-															sep = "\n"))
-}))
-end.rcode-->
-
-<!--  `r paste(knit(text = paste(out_clustering,collapse = "\n")),collapse = "\n")` -->
  
