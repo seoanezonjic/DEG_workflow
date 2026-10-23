@@ -1,3 +1,4 @@
+
 clean_samples){
 	resources: -u 1 -n cpu -c 12 -t '7-0:00:00' -m '40gb'
 	echo [cpu]
@@ -72,11 +73,11 @@ miRNA_detection){
 	?
 	miRDeep2.pl dir_temp/miRDeep2_input_reads.fasta $ref/genome.fa mapping_sample)/mapping.arf $ref/ref_miRNA/miRNA_mature.fasta none $ref/ref_miRNA/miRNA_precursors.fasta -d -g -1 -a 1 &>miRDeep2.log	
 	if grep -q "ended" miRDeep2.log; then
-		parse_miRDeep2.rb result*csv
+		parse_miRDeep2.py result*csv
 		
 		# # ## FORMAT KNOWN MIRNA DATA
 		tail -n +2 known_miRDeep_miRNAs | cut -f 1,17 | tr ":" "\t"| sed -r 's/\.\./\t/' | awk 'BEGIN{IFS="\t";OFS="\t"}{print $2,$3,$4,$1,$2":"$3":"$4,$5}' > known_miRNA.coord
-		mature2miRBase.rb known_miRNA.coord $ref/ref_miRNA/aliases.txt translated_known_miRNA.coord
+		mature2miRBase.py known_miRNA.coord $ref/ref_miRNA/aliases.txt translated_known_miRNA.coord
 		echo -e "$sample\tmiRDeep2_confirmed_known_miRNAs\t`awk '{if ($2 >= 0) print $0}' < known_miRDeep_miRNAs | wc -l`" >> ../metrics
 		echo -e "$sample\tputative_known_miRNAs\t`awk '{if ($2 < 0) print $0}'  known_miRDeep_miRNAs | wc -l`" >> ../metrics
 		cut -f 4 known_miRNA.coord | sort -u | awk '{print $0"\t$sample"}' > known_per_sample
