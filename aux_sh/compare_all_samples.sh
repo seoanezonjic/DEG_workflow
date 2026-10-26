@@ -38,10 +38,10 @@ if [[ $experiment_type == "miRNAseq_detection" ]]; then
 	## miRNA result unificaton and comparison in report
 	
 	## THIS BLOCK TAKES MIRNA COORDS AND RETURNS FASTA FILE
-	merge_miRNA_coord.rb -d 20 -k "`echo $MAPPING_RESULTS_FOLDER`/*/miRDeep2.pl_0000/translated_known_miRNA.coord" -n "`echo $MAPPING_RESULTS_FOLDER`/*/miRDeep2.pl_0000/novel_miRNA.coord" -o $mapping_ref
+	merge_miRNA_coord.py -d 20 -k "`echo $MAPPING_RESULTS_FOLDER`/*/miRDeep2.pl_0000/translated_known_miRNA.coord" -n "`echo $MAPPING_RESULTS_FOLDER`/*/miRDeep2.pl_0000/novel_miRNA.coord" -o $mapping_ref
 	cat $MAPPING_RESULTS_FOLDER/*/miRDeep2.pl_0000/known_per_sample > $report_folder/known_per_sample
 	cat $mapping_ref/*_miRNA.coord > $mapping_ref/final_miRNA.coord
-	fasta_editor.rb -i $mapping_ref/genome.fa -f $mapping_ref/final_miRNA.coord -c a -o $mapping_ref/all_miRNA.fasta
+	fasta_editor.py -i $mapping_ref/genome.fa -f $mapping_ref/final_miRNA.coord -c a -o $mapping_ref/all_miRNA.fasta
 
 	cd-hit-est -T 1 -M 0 -i $mapping_ref/all_miRNA.fasta -o $mapping_ref/miRNA_nr.fasta -c 1
 	cp $mapping_ref/miRNA_nr.fasta $report_folder/miRNA_nr.fasta
