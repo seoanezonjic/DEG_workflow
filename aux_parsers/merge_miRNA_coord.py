@@ -82,8 +82,6 @@ parser.add_argument("-d", "--max_distance", dest="distance", type=int, default=0
 	help="Maximum distance in chain to consider the sequences are the same. Default = 0")
 parser.add_argument("-o", "--output", dest="output_path", default="./",
 	help="Define path to write output files. Default = ./")
-parser.add_argument("-h", "--help", action="help",
-	help="Displays help")
 
 args = parser.parse_args()
 
