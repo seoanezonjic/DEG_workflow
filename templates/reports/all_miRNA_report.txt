@@ -1,0 +1,132 @@
+<%
+	import copy
+	from collections import defaultdict
+
+	#################################################
+	######## => INITIALIZE
+	#################################################
+
+	F_NAME = 0 
+	F_POS_IN_TABLE = 1
+
+
+	features = {
+		'sample': ["Sample"],
+		'final_total_sequences': ["Pre-processed reads"],
+		'bowtie1_mapped': ["Mapped reads"],
+		'putative_known_miRNAs': ["Known miRNAs (all posible)"],
+		'miRDeep2_confirmed_known_miRNAs': ["Known miRNAs confirmed by miRDeep2"],
+		'novel_miRNAs': ["Novel miRNAs"],
+		'total_miRNAs': ["Total miRNAs in sample"]
+	}
+	
+	#################################################
+	######## => METHODS
+	#################################################
+
+	def copy_table(table_name):
+		table_copy = []		
+		for row in plotter.hash_vars[table_name]: table_copy.append(copy.copy(row))
+		header = table_copy[0]
+		return table_copy, header
+
+	def get_features_index(features, header):
+		indexed_features = {}
+		for feature, attributes in features.items():
+			position = header.index(feature)
+			attributes[F_POS_IN_TABLE] = position
+			indexed_features[feature] = attributes
+		return indexed_features
+
+	def count_miRNAs(known_per_sample, top = 50):
+		miRNA_count = defaultdict(int)
+		for miRNA, sample in known_per_sample: miRNA_count[miRNA] += 1
+		mirna_table = [[k, v] for k, v in d.items()]
+		mirna_table = mirna_table.sorted(key = lambda x: x[1], reverse = True)
+		mirna_table = miRNA_count[1:top+1]
+		mirna_table = ["known_miRNA", "sample_count"] + mirna_table
+		return mirna_table
+
+
+	#################################################
+	######## => MAIN
+	#################################################
+	all_metrics, header = copy_table('metric_table')
+	plotter.hash_vars["all_metrics"] = all_metrics
+	plotter.hash_vars['known_miRNA_per_samples'] = count_miRNAs(plotter.hash_vars['known_per_sample'])
+	features = get_features_index(features, header)
+
+%>
+
+<h1 style="text-align:center; background-color:#d6eaf8 ">miRNA analysis workflow report</h1>
+<div style="overflow: hidden">
+	
+	<h2 style="text-align:center; background-color:#d6eaf8 ">Sample features compared with total miRNAs</h2>
+	<div style="overflow: hidden">
+		<%
+		pairs = [
+			['final_total_sequences', 'total_miRNAs'],
+			['bowtie1_mapped', 'total_miRNAs']
+		]
+		for x,y in pairs:
+			cols = [0, header.index(x), header.index(y)]
+			x_name = features[x][F_NAME]
+			y_name = features[y][F_NAME]
+			%>
+			${
+				plotter.sccater2D(id ="all_metrics", fields = cols, header = True, row_names = True, 
+					responsive = False,
+					text = True,
+					height = '600px', width = '600px',
+					title =  f"{x_name} VS {y_name}",
+					x_label = x_name, y_label = y_name,
+					regressionLine = True,
+					config = {
+						'graphOrientation': 'vertical',
+						'lineDecoration': False}
+				)
+			}
+
+		</div>
+
+	<h2 style="text-align:center; background-color:#d6eaf8 ">Summary: Known and novel miRNA detected in samples</h2>
+		<div style="overflow: hidden">
+		<%
+			fields = ['putative_known_miRNAs', 'miRDeep2_confirmed_known_miRNAs', 'novel_miRNAs']
+			cols = [ features[feature][F_POS_IN_TABLE] for feature in fields ]
+		%>	
+	    ${
+			plotter.barplot(id = 'all_metrics', 
+				fields = [0].extend(cols), 
+				header = True, 
+				row_names = True,
+				responsive = False, 
+				title = '', 
+				x_label = 'Sample', y_label= 'Count',
+				height = '600px', width= '1300px',
+				config = { 'graphOrientation': 'vertical'}
+			)
+		}
+		</div>
+
+	<h2 style="text-align:center; background-color:#d6eaf8 ">Frequency of the top 50 known miRNAs across samples</h2>
+		<div style="overflow: hidden">
+
+	    ${ 	
+			plotter.barplot(id = 'known_miRNA_per_samples', 
+				header = True, 
+				row_names = True,
+				responsive = False, 
+				title = '', 
+				x_label = 'Frequency across samples', y_label= 'Count',
+				height = '600px', width = '1300px',
+				config = {
+					'smpLabelScaleFontFactor': 0.5,
+					'graphOrientation':  'vertical',
+					'smpLabelRotate': 45
+				}
+			)
+		}
+
+		</div>
+</div>
