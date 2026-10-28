@@ -45,7 +45,7 @@ if [[ $experiment_type == "miRNAseq_detection" ]]; then
 
 	cd-hit-est -T 1 -M 0 -i $mapping_ref/all_miRNA.fasta -o $mapping_ref/miRNA_nr.fasta -c 1
 	cp $mapping_ref/miRNA_nr.fasta $report_folder/miRNA_nr.fasta
-	report_html -t $REPORT_TEMPLATES_FOLDER/all_miRNA_report.erb -d $report_folder/metric_table,$report_folder/known_per_sample -o $report_folder/all_miRNA_report
+	report_html -t $REPORT_TEMPLATES_FOLDER/all_miRNA_report.txt -d $report_folder/metric_table,$report_folder/known_per_sample -o $report_folder/all_miRNA_report
 elif [[ $experiment_type == "RNAseq_genome" || $experiment_type == "RNAseq_transcriptome" ]]; then
 	mkdir $HUNTER_RESULTS_FOLDER
 	for TARGET_FILE in `echo $TARGETS | tr "," " "`
