@@ -85,7 +85,7 @@ miRNA_detection){
 		tail -n +2 novel_miRDeep_miRNAs | cut -f 1,17 | tr ":" "\t"| sed -r 's/\.\./\t/' |awk 'BEGIN{IFS="\t";OFS="\t"}{print $1,$2,$3,$1":"$2":"$3,$4}' > novel_miRNA.coord
 		echo -e "$sample\tnovel_miRNAs\t`cat novel_miRNA.coord | wc -l`" >> ../metrics
 		echo -e "$sample\ttotal_miRNAs\t`cat *_miRNA.coord | wc -l`" >> ../metrics
-		report_html -t $REPORT_TEMPLATES_FOLDER/miRNA_sample.erb -d novel_miRDeep_miRNAs,known_miRDeep_miRNAs -o miRNA_report
+		report_html -t $REPORT_TEMPLATES_FOLDER/miRNA_sample.txt -d novel_miRDeep_miRNAs,known_miRDeep_miRNAs -o miRNA_report
 	else
 		>&2 echo "Analysis has failed" 
 		exit 1
