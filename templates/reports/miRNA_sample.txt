@@ -1,0 +1,151 @@
+<%
+	import sys
+	scatter_columns = [1,4]
+
+	def transpose(tab):
+		return [list(row) for row in zip(*tab)]
+
+	def copy_table(table_name, tag = "none"):
+		table_copy = []
+		for i,row in enumerate(plotter.hash_vars[table_name]):
+			if i == 0:
+				table_copy.append([row[0], row[1], row[4], row[2], 'Type'])
+			else:
+				table_copy.append([row[0], row[1], row[4], row[2].split("_")[0], tag])
+		return table_copy
+
+	def combine_tables(all_tables):
+		header = None
+		combined_data = []
+		for table in all_tables:
+			for i, row in enumerate(table):
+				if i == 0:
+					if header == None:
+						header = row
+					else:
+						continue
+				else:
+					combined_data.append(row)
+		combined_data = [header] + combined_data
+		return combined_data
+
+	novel_mirnas = copy_table('novel_miRDeep_miRNAs', tag = "Novel")
+	known_mirnas = copy_table('known_miRDeep_miRNAs', tag = "Known")
+	
+	plotter.hash_vars["novel_mirnas"] = novel_mirnas
+	plotter.hash_vars["known_mirnas"] = known_mirnas
+	# plotter.hash_vars["combined_data"] = combine_tables([novel_mirnas, known_mirnas])
+	plotter.hash_vars["summary"] = [
+		["Type of miRNA discovered", "Count"],
+		["Known", len(known_mirnas)],
+		["Novel", len(novel_mirnas)]
+	]
+
+%>
+
+<h1 style="text-align:center; background-color:#d6eaf8 ">miRNA analysis workflow report</h1>
+<div style="overflow: hidden">
+	<h2 style="text-align:center; background-color:#d6eaf8 ">miRDeep2 analysis summary table</h2>
+	<div style="overflow: hidden">
+		${
+			plotter.table(
+				id = "summary",
+				text = True,
+				header = True,
+				cell_align = ['left', 'right'])
+		}
+	<h2 style="text-align:center; background-color:#d6eaf8 ">miRDeep2 score vs supporting reads</h2>
+	<div style="overflow: hidden">
+		${
+			plotter.scatter2D(
+				id = "novel_mirnas", 
+				text = True,
+				header = True, 
+				row_names = True,
+				title = "Novel miRNAs discovered",
+				height = '600px', width = '600px', 
+				responsive = False, 
+				x_label = "miRDeep2 score", 
+				y_label = "Supporting reads",
+				fields = [0,1,2],
+				config = {
+					"xAxis": ["miRDeep2_score"],
+					"yAxis": ["total_read_count"]
+				})
+		}
+		${
+			plotter.scatter2D(
+				id = "known_mirnas", 
+				text = True,
+				header = True, 
+				row_names = True,
+				title = "Known miRNAs discovered",
+				height = '600px', 
+				width = '600px', 
+				responsive = False, 
+				x_label = "miRDeep2 score", 
+				y_label = "Supporting reads",
+				fields = [0,1,2],
+				config = {
+					"xAxis": ["miRDeep2_score"],
+					"yAxis": ["total_read_count"]
+			})
+		}
+		<%
+		# plotter.scatterbubble2D(
+		# 		id = "combined_data", 
+		# 		header = True, 
+		# 		row_names = True,
+		# 		title = "Novel miRNAs discovered",
+		# 		height = '600px', width = '600px', 
+		# 		responsive = False, 
+		# 		x_label = "miRDeep2 score", 
+		# 		y_label = "Supporting reads",
+		# 		config = {
+		# 			"xAxis": transpose(plotter.hash_vars["combined_data"])[1],
+		# 			"yAxis": transpose(plotter.hash_vars["combined_data"])[2],
+		# 			"colorBy": transpose(plotter.hash_vars["combined_data"])[4]
+		# 	})
+		%>
+	</div>
+	<h2 style="text-align:center; background-color:#d6eaf8 ">Estimated probability that the miRNA candidate is a True positive vs suppeorting reads</h2>
+	<div style="overflow: hidden">
+		${
+			plotter.scatter2D(
+				id = "novel_mirnas", 
+				text = True,
+				header = True, 
+				row_names = True,
+				title = "Novel miRNAs discovered",
+				height = '600px', width = '600px', 
+				responsive = False, 
+				x_label = "True positive probability (%)", 
+				y_label = "Supporting reads",
+				fields = [0,2,3],
+				config = {
+					"xAxis": ['estimated_probability_that_the_miRNA_is_a_true_positive'],
+					"yAxis": ['total_read_count']
+				})
+		}
+		${
+			plotter.scatter2D(
+				id = "known_mirnas", 
+				text = True,
+				header = True, 
+				row_names = True,
+				title = "Known miRNAs discovered",
+				height = '600px', 
+				width = '600px', 
+				responsive = False, 
+				x_label = "True positive probability (%)", 
+				y_label = "Supporting reads",
+				fields = [0,2,3],
+				config = {
+					"xAxis": ['estimated_probability_that_the_miRNA_is_a_true_positive'],
+					"yAxis": ['total_read_count']
+				})
+		}
+	</div>
+
+</div>
+
