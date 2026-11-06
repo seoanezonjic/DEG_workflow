@@ -42,23 +42,24 @@ clean_samples){
 }
 
 align_rna_seq){ 
-	resources: -m '40gb' -c 4 -t '10:00:00' -n cpu
+	resources: -m '80gb' -c 4 -t '10:00:00' -n cpu
 	#module load samtools/1.9 #not available on picasso now
-	source ~soft_bio_267/initializes/init_degenes_hunter
 	export PATH=$CODE_PATH'/aux_sh:'$PATH
 	export PATH=$CODE_PATH'/aux_parsers:'$PATH
 	unset DISPLAY # This line disable $DISPLAY definition to avoid errors in Qualimap html report rendering.
 	if [ "$experiment_type" == "RNAseq_transcriptome" ]; then
-		module load samtools/1.21
+		module purge
+		module load samtools/1.25
 		module load bowtie/2.2.9
-#		module load sam2counts/20131126
-		source ~soft_bio_267/initializes/init_python27
+#		module load sam2counts/201311261
 		if [ "$read_layout" == "paired" ] ; then
 			bowtie2 -q -x $ref'/bowtie_index_tr/reference' -1 clean_samples)/output_files/paired_1.fastq.gz -2 clean_samples)/output_files/paired_2.fastq.gz --no-discordant --no-mixed -p [cpu] 2>bowtie_log | samtools sort -o sorted_mappings.bam
 		elif [ "$read_layout" == "single" ]; then
 			bowtie2 -q -x $ref'/bowtie_index_tr/reference' -U clean_samples)/output_files/single_.fastq.gz -p [cpu] 2>bowtie_log | samtools sort -o sorted_mappings.bam
 		fi
-		sam2counts_all.py -o selected_counts -b sorted_mappings.bam
+		samtools index sorted_mappings.bam
+		source ~soft_bio_267/initializes/init_degenes_hunter
+		map2counts.R  -o selected_counts -i sorted_mappings.bam
 		parse_bowtie_log.sh bowtie_log | awk '{print "$sample" "\t" $0}' >> ../metrics
 	elif [ "$experiment_type" == "RNAseq_genome" ]; then
 		source ~soft_bio_267/initializes/init_pytrimngs
