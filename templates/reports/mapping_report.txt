@@ -62,13 +62,28 @@ knitr::opts_chunk$set(fig.width = 10,
 		return(melt_df)
 	}
 
-	parse_data_for_stacked_var <- function(df) {
-	    df["multi_map", ] <- as.numeric(gsub("%", "", df["%_of_reads_mapped_to_multiple_loci", ])) + as.numeric(gsub("%", "",df["%_of_reads_mapped_to_too_many_loci", ]))
-		mapping_metric_table <- df[row.names(df) %in% c("sample",vars_STAR_mapping), ]
-		mapping_metric_table <- row_to_header(mapping_metric_table)
-		row_names <- row.names(mapping_metric_table)
-		mapping_metric_table <- as.data.frame(lapply(mapping_metric_table, function(x) as.numeric(gsub("\\%", "", x))))
-		row.names(mapping_metric_table) <- row_names
+	parse_data_for_stacked_var <- function(df, aligner) {
+		if (aligner == "STAR") {
+			df["multi_map", ] <- as.numeric(gsub("%", "", df["%_of_reads_mapped_to_multiple_loci", ])) + as.numeric(gsub("%", "",df["%_of_reads_mapped_to_too_many_loci", ]))
+			mapping_metric_table <- df[row.names(df) %in% c("sample",vars_STAR_mapping), ]
+			mapping_metric_table <- row_to_header(mapping_metric_table)
+			row_names <- row.names(mapping_metric_table)
+			mapping_metric_table <- as.data.frame(lapply(mapping_metric_table, function(x) as.numeric(gsub("\\%", "", x))))
+			row.names(mapping_metric_table) <- row_names
+		} else if (grepl("bowtie", aligner)) {
+			if (aligner == "bowtie1") {
+				mapping_vars <- vars_mirna_mapping
+			} else {
+				mapping_vars <- vars_bowtie2_mapping
+			}
+			mapping_metric_table <- df[, c("sample", mapping_vars)]
+			row.names(mapping_metric_table) <- mapping_metric_table$sample
+			mapping_metric_table$sample <- NULL
+			mapping_metric_table <- as.data.frame(t(mapping_metric_table))
+			vars_mapping_legend_names <- metric_var_2_legend_name[match(mapping_vars, metric_var_2_legend_name$metric_var), "legend_name" ]
+			rownames(mapping_metric_table) <- vars_mapping_legend_names
+		}
+
 		return(mapping_metric_table)
 	}
 
@@ -438,11 +453,11 @@ end.rcode-->
 	vars_STAR_mapping <- c(vars_STAR_mapping, "multi_map")
     ident <- "sample" 
     other_vars <- vars_STAR_mapping
-   
+    aligner <- "STAR"
 
-    cat(plotter$prettify_div(plotter$barplot(list(id = "metrics", title = "", func = parse_data_for_stacked_var, row_names = NULL, header = NULL, transpose = TRUE,
-                                                 text = "dynamic", config = list('graphOrientation' = 'vertical', "graphType" = "Stacked", 'xAxisTitle' = 'Value', 
-                                                 	'stackBy' = "variable", 'setMaxX' = 100))), preset = "magic"))
+    cat(plotter$prettify_div(plotter$barplot(list(id = "metrics", title = "", func = function(df) {parse_data_for_stacked_var(df, aligner = aligner)}, row_names = NULL, 
+    											 header = NULL, transpose = TRUE, text = "dynamic", config = list('graphOrientation' = 'vertical', "graphType" = "Stacked", 
+    											 'xAxisTitle' = 'Value', 'stackBy' = "variable", 'setMaxX' = 100))), preset = "magic"))
 
 
 end.rcode-->
@@ -499,22 +514,28 @@ end.rcode-->
 
 end.rcode-->
 
-<!--begin.rcode  mirna_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_mirna_mapping
+<!--begin.rcode  mirna_mapping, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=execute_mirna_mapping || execute_bowtie2_mapping
 	##################################################
 	###	miRNASEQ PLOTS
 	##################################################
 	cat(plotter$create_title("Alignment Details", "align_det", hlevel = 2, indexable = TRUE, clickable = FALSE, t_id = NULL))
 
-	cat("<br>
-	 <b> Trimmed reads mapping to the genome almost once, reads mapping suppresed by multimapping threshold, and not mapped at all </b><br>
-	 Bowtie 1 mapper was used. Reads that mapped more than 7 times onto genome were rejected.<br>\n")
+	if (execute_mirna_mapping) {
+		cat("<br>
+	 		<b> Trimmed reads mapping to the genome almost once, reads mapping suppresed by multimapping threshold, and not mapped at all </b><br>
+	 		Bowtie 1 mapper was used. Reads that mapped more than 7 times onto genome were rejected.<br>\n")
+		vars_mirna_mapping_legend_names <- metric_var_2_legend_name[match(vars_mirna_mapping, metric_var_2_legend_name$metric_var), "legend_name" ]
+		aligner <- "bowtie1"
+	} else {
+		cat("<br>
+	 		<b> Trimmed reads mapping to the genome once, reads mapping suppresed by multimapping threshold, and not mapped at all </b><br>
+	 		Bowtie 2 mapper was used. Reads that mapped more than 7 times onto genome were rejected.<br>\n")
+		aligner <- "bowtie2"
+	} 
 
-    vars_mirna_mapping_legend_names <- metric_var_2_legend_name[match(vars_mirna_mapping, metric_var_2_legend_name$metric_var), "legend_name" ]
-    ident <- "sample" 
-    other_vars <- vars_mirna_mapping
-    legend_names <- vars_mirna_mapping_legend_names
-    
-    cat(plotter$static_ggplot_main("metrics", func = filter_and_melt, text = TRUE, plotting_function= make_stacked_barchart_from_df))
+    cat(plotter$prettify_div(plotter$barplot(list(id = "metrics", title = "", func = function(df) {parse_data_for_stacked_var(df, aligner = aligner)}, row_names = NULL, 
+    											 header = NULL, transpose = FALSE, text = "dynamic", config = list('graphOrientation' = 'vertical', "graphType" = "Stacked", 
+    											 'xAxisTitle' = 'Value', 'stackBy' = "variable", 'setMaxX' = 100))), preset = "magic"))
 
 end.rcode-->
 
