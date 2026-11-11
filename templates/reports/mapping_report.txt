@@ -524,7 +524,6 @@ end.rcode-->
 		cat("<br>
 	 		<b> Trimmed reads mapping to the genome almost once, reads mapping suppresed by multimapping threshold, and not mapped at all </b><br>
 	 		Bowtie 1 mapper was used. Reads that mapped more than 7 times onto genome were rejected.<br>\n")
-		vars_mirna_mapping_legend_names <- metric_var_2_legend_name[match(vars_mirna_mapping, metric_var_2_legend_name$metric_var), "legend_name" ]
 		aligner <- "bowtie1"
 	} else {
 		cat("<br>
@@ -544,12 +543,13 @@ end.rcode-->
 
 	cat("<br>
 		Summary: smallRNAseq reads mapped onto genome using Bowtie1. A filtering step was performed before mapping, and reads smaller than 18 bp.\n")
-	vars_mirna_mapping_abs_legend_names <- metric_var_2_legend_name[match(vars_mirna_mapping_abs, metric_var_2_legend_name$metric_var), "legend_name" ]
 
-    ident <- "sample" 
-    other_vars <- vars_mirna_mapping_abs
-    legend_names <- vars_mirna_mapping_abs_legend_names
-    cat(plotter$static_ggplot_main("metrics", text = "dynamic", func = filter_and_melt, plotting_function = make_stacked_barchart_from_df_dodge))
+	barplot_fields <- match_metrics(plotter$hash_vars$metrics, vars_mirna_mapping_abs)
+
+	cat(plotter$prettify_div(plotter$barplot(list(id = "metrics", title = "", row_names = TRUE, header = NULL, transpose = TRUE,
+							 text = FALSE, config = list('graphOrientation' = 'vertical', 'xAxisTitle' = 'Value', 'percentAspectRatioPlotArea' = 0.5), 
+							 fields = barplot_fields, legendPosition = "top")), preset = "magic"))
+
 end.rcode-->
 
 <!--begin.rcode  top_n_expression, results='asis', echo=FALSE, warning=FALSE, message=FALSE,eval=!execute_mirna_mapping
