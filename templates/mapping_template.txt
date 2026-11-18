@@ -59,7 +59,7 @@ align_rna_seq){
 		fi
 		samtools index sorted_mappings.bam
 		source ~soft_bio_267/initializes/init_degenes_hunter
-		map2counts.R  -o selected_counts -i sorted_mappings.bam
+		map2counts.R -o selected_counts -i sorted_mappings.bam
 		parse_bowtie_log.sh bowtie_log | awk '{print "$sample" "\t" $0}' >> ../metrics
 	elif [ "$experiment_type" == "RNAseq_genome" ]; then
 		source ~soft_bio_267/initializes/init_pytrimngs

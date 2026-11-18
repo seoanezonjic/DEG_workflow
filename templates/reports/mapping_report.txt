@@ -163,16 +163,6 @@ knitr::opts_chunk$set(fig.width = 10,
        	plot
 	}
 
-	make_top_n_expression_table <- function(count_data) {
-		top_n_index <- order(rowSums(count_data), decreasing=TRUE)[1:n]
-		sample_totals <- colSums(count_data)
-		top_n_count <- count_data[top_n_index, ]
-		top_n_perc <- apply(top_n_count, 1, function(x) { 
-			round(x / sample_totals * 100, 3)
-		})
-		as.data.frame(t(top_n_perc))
-	}
-
 	parse_distributions_to_df <- function(all_metrics){
 		samples <- seq(nrow(all_metrics))
 		all_distribution_parsed <- as.data.frame(do.call(rbind, lapply(samples, function(sample_index){
