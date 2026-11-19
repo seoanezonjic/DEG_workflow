@@ -9,15 +9,18 @@ miRNA_det_path=$1
 rm -rf $output_folder
 mkdir -p $output_folder
 bam_folder=$CODE_PATH/bam_files
-mkdir -p $bam_folder
+
 
 for sample_folder in $MAPPING_RESULTS_FOLDER/*;do
     sample_name=`basename $sample_folder`
     if [[ "$keep_bam" == TRUE && "$bam_coords" == "" ]]; then
+        mkdir -p $bam_folder
         ln -s $sample_folder/qualimap_0000/sorted_mappings.bam $bam_folder/$sample_name'_'sorted_mappings.bam
     elif [[ "$keep_bam" == FALSE && "$bam_coords" != "" ]]; then
+        mkdir -p $bam_folder
         ln -s $sample_folder/qualimap_0000/filtered_region.bam $bam_folder/$sample_name'_'filtered_region.bam
     elif [[ "$keep_bam" == TRUE || "$bam_coords" != ""  ]]; then
+        mkdir -p $bam_folder
         ln -s $sample_folder/qualimap_0000/sorted_mappings.bam $bam_folder/$sample_name'_'sorted_mappings.bam
         ln -s $sample_folder/qualimap_0000/filtered_region.bam $bam_folder/$sample_name'_'filtered_region.bam
     fi
