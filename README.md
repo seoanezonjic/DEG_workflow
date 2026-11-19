@@ -30,13 +30,13 @@ The final common step will be creating the experiment design file, a table with 
 ### mRNA-seq differential expression analysis 
 
 1º. To perform mRNA-seq analysis, the config_daemon file must be customized. You can find a detailed description for each parameter in said file.
-When creating all target (comparison) files in the 'DEgenesHunter comparisons' section, the generate_targets.R will be used. This script takes the experiment design table as input (***-e***) and it generates each target by parsing a config string. The config string is given by the ***-t*** flag and must be designed manually. The structure is as follows: 'name of the comparison **>** feature_name:control_feature1,treatment_feature_1'. For example: adult_vs_child>age_group:adult,child. You can also compare one group of samples against two others by adding a '/' in the corresponding feature. For example, if we had samples from healthy controls and two groups of patients (soft, severe), we could compare the controls to the patients by creating the string 'control_vs_patient>clinical_status:healthy,soft/severe'. 
+When creating all target (comparison) files in the 'DEgenesHunter comparisons' section, the generate_targets.R will be used. This script takes the experiment design table as input (***-e***) and it generates each target by parsing a config string. The config string is given by the ***-t*** flag and must be designed manually. The structure is as follows: 'name of the comparison>feature_name:control_feature1,treatment_feature_1'. For example: adult_vs_child>age_group:adult,child. You can also compare one group of samples against two others by adding a '/' in the corresponding feature. For example, if we had samples from healthy controls and two groups of patients (soft, severe), we could compare the controls to the patients by creating the string 'control_vs_patient>clinical_status:healthy,soft/severe'.  
 We can also create more than one target by separating them with **;** or duplicate the lines and execute the generate_target.R script as many times as needed. An example for the first option would be for **healthy vs disease** and **child vs others** comparisons: **'**hl_vs_dis**>**clinical_status**:**healthy**,**diseased**;**ch_vs_other**>**age_group**:**child**,**adult**/**senior**'**. 
 Filtering criteria can also be used. You can select only samples that fulfill a specific feature using the ***-f*** flag with an argument like "FEATURE_NAME=feature". To select only USA samples, for example, we would add ***-f*** "location=usa". This script also admits a blacklist file (one column table) with samples that will not be included in the experiment using the ***-b*** flag. This feature is very useful to discard certain samples in the analysis without needing to change the samples_to_process.lst. On the contrary, there is also a ***-w*** flag to include a whitelist file with the samples you want to select for the analysis. 
 In the event of wanting to add quantitative or qualitative features for the Principal Components Analysis, you may define the corresponding column headers of the experiment design file in the 'string_features' and 'numeric_features' parameters and follow the specified structure in the config_daemon file.
 
 2º. Launch all daemon modules step by step. The daemon.sh script must be launched from its original location by default. The module must be indicated in the first argument.
-  Modules:
+  Modules:  
   1a -> Download all reference genome files. If saved from previous analyses, you can specify the path to 'only_read_ref'.  
   1b -> Index the reference (omit if saved reference is already indexed).  
   2a -> Trimming and mapping steps (a second argument '-v' can be used to launch AutoFlow verbose mode).  
@@ -50,8 +50,8 @@ In the event of wanting to add quantitative or qualitative features for the Prin
 To perform miRNA-seq analysis, there is a first 'miRNA detection' step and the following 'Differential Expression Analysis' step. Each step will have its own config_daemon file.
 
 #### Step 1: miRNA detection
-The experiment type specified in the config_daemon file must be 'miRNAseq_detection' and the trimming template path (TRIM_TEMPLATE parameter) must be "$CODE_PATH"/templates/trimming/miRNA.txt.
-Launch the following daemon.sh modules:
+The experiment type specified in the config_daemon file must be 'miRNAseq_detection' and the trimming template path (TRIM_TEMPLATE parameter) must be "$CODE_PATH"/templates/trimming/miRNA.txt.  
+Launch the following daemon.sh modules:  
 1a  -> Download all reference genome files. If saved from previous analyses, you can specify the path to 'only_read_ref'.  
 1b  -> Index the reference (omit if saved reference is already indexed).  
 2a  -> Trimming, mapping and miRNA detection steps (a second argument '-v' can be used to launch AutoFlow verbose mode).  
@@ -61,8 +61,8 @@ Launch the following daemon.sh modules:
 Once those two reports are created, the miRNA detection step will be finished and a copy of the config_daemon file will be created with the name config_daemon_DET. 
 
 #### Step 2: Differential Expression Analysis
-The first step will be changing the experiment type to 'RNAseq_transcriptome', changing the project_folder parameter path to the previous one '**_**DEA' and add the path to the clean_and_map results folder from the miRNA detection step to the 'link_path' parameter.
-Launch the following daemon.sh modules: 
+The first step will be changing the experiment type to 'RNAseq_transcriptome', changing the project_folder parameter path to the previous one '_DEA' and add the path to the clean_and_map results folder from the miRNA detection step to the 'link_path' parameter.  
+Launch the following daemon.sh modules:  
 1b  -> Index the FASTA file that contains miRNA reads for he mapping step.  
 2a  -> Create soft link to clean reads from miRNA detection step and maps reads to transcriptome.  
 2b  -> Check mapping workflow.  
